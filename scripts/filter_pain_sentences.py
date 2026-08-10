@@ -1,12 +1,32 @@
-"""문제 표현 후보를 코드로 축소하고 근거 ID를 유지한다.
+"""후보 문제 문장을 코드 기반 패턴으로 선별한다."""
 
-구현 시 CLAUDE.md와 관련 docs 정책을 준수한다. 현재 파일은 의도적 스텁이다.
-"""
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+
+from saas_words_two import db, ids, text_filter
 
 
-def main() -> int:
-    print("NOT IMPLEMENTED: filter_pain_sentences.py — 문제 표현 후보를 코드로 축소하고 근거 ID를 유지한다.")
-    return 2
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--project-root", type=Path, default=Path.cwd())
+    args = parser.parse_args(argv)
+
+    project_root = args.project_root
+    conn = db.connect(project_root)
+    try:
+        summary = text_filter.run_filter_pass(conn, created_at=ids.now_kst().isoformat())
+    finally:
+        conn.close()
+
+    print(
+        f"CANDIDATE SENTENCES: source_items={summary.source_items} "
+        f"before_dedupe={summary.candidates_before_dedupe} "
+        f"after_dedupe={summary.candidates_after_dedupe} "
+        f"reduction_from_source_units={summary.reduction_from_source_units_pct:.1f}%"
+    )
+    return 0
 
 
 if __name__ == "__main__":
