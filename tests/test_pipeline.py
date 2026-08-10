@@ -151,6 +151,41 @@ def seed_candidates_for_clustering(conn):
     conn.commit()
 
 
+def test_brief_context_empty_when_file_missing(tmp_path):
+    assert pipeline._brief_context(tmp_path) == ""
+
+
+def test_brief_context_empty_when_file_blank(tmp_path):
+    (tmp_path / "input").mkdir()
+    (tmp_path / "input" / "brief.md").write_text("   \n\n", encoding="utf-8")
+    assert pipeline._brief_context(tmp_path) == ""
+
+
+def test_brief_context_includes_file_content(tmp_path):
+    (tmp_path / "input").mkdir()
+    (tmp_path / "input" / "brief.md").write_text("제외 시장: 성인 콘텐츠", encoding="utf-8")
+    context = pipeline._brief_context(tmp_path)
+    assert "제외 시장: 성인 콘텐츠" in context
+    assert "brief.md" in context
+
+
+def test_stage_extract_and_cluster_problems_includes_brief_in_instructions(tmp_path):
+    with_real_scripts(tmp_path)
+    (tmp_path / "input").mkdir()
+    (tmp_path / "input" / "brief.md").write_text("제외 시장: 도박", encoding="utf-8")
+    options = make_options(tmp_path, run_id="QA-20260810-190000-KST")
+    state = pipeline._load_or_create_state(options)
+    conn = db.connect(tmp_path)
+    seed_candidates_for_clustering(conn)
+
+    with pytest.raises(judgment.JudgmentRequired) as excinfo:
+        pipeline._stage_extract_and_cluster_problems(conn, tmp_path, options, state)
+    conn.close()
+
+    request_doc = json.loads(excinfo.value.request_path.read_text(encoding="utf-8"))
+    assert "제외 시장: 도박" in request_doc["instructions"]
+
+
 def test_stage_extract_and_cluster_problems_writes_request_when_no_response(tmp_path):
     with_real_scripts(tmp_path)
     options = make_options(tmp_path, run_id="QA-20260810-190000-KST")
@@ -304,6 +339,22 @@ def seed_opportunity(conn, problem_id="P-0001", decision="RESEARCH_MORE"):
         (problem_id, decision),
     )
     conn.commit()
+
+
+def test_stage_review_opportunities_includes_brief_in_instructions(tmp_path):
+    (tmp_path / "input").mkdir()
+    (tmp_path / "input" / "brief.md").write_text("제외 시장: 도박", encoding="utf-8")
+    options = make_options(tmp_path, run_id="QA-20260810-190000-KST")
+    state = pipeline._load_or_create_state(options)
+    conn = db.connect(tmp_path)
+    seed_opportunity(conn)
+
+    with pytest.raises(judgment.JudgmentRequired) as excinfo:
+        pipeline._stage_review_opportunities(conn, tmp_path, options, state)
+    conn.close()
+
+    request_doc = json.loads(excinfo.value.request_path.read_text(encoding="utf-8"))
+    assert "제외 시장: 도박" in request_doc["instructions"]
 
 
 def test_stage_review_opportunities_writes_request(tmp_path):

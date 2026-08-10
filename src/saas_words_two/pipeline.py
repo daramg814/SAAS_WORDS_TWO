@@ -109,6 +109,22 @@ def _read_lines(path: Path) -> list[str]:
     return path.read_text(encoding="utf-8").splitlines() if path.exists() else []
 
 
+def _brief_context(project_root: Path) -> str:
+    """Design 2.1: /input/brief.md is an optional file for target/excluded
+    market, language, and similar scope settings ("입력이 없으면 광범위한
+    B2B·B2C SaaS 문제를 대상으로 한다" - its absence just means no
+    restriction, which is also a valid, common state). Prepended to judgment
+    instructions wherever market/user scope actually matters, so an edited
+    brief.md is honored instead of being silently ignored."""
+    path = project_root / "input" / "brief.md"
+    if not path.exists():
+        return ""
+    content = path.read_text(encoding="utf-8").strip()
+    if not content:
+        return ""
+    return f"실행 브리프(범위 설정, /input/brief.md):\n{content}\n\n"
+
+
 def _write_shortfall_intermediate(project_root: Path, state: run_state.RunState, titles: list[str]) -> Path:
     """Design 2.3/9.3: a run that ends short of its target count must save
     what it has to /output/intermediate/, never to the published outputs.
@@ -205,14 +221,16 @@ def _stage_extract_and_cluster_problems(
         for cluster in clusters
     ]
     instructions = (
-        "각 군집이 실제 SaaS로 해결 가능한 반복 업무 문제인지 판단하라. ambiguous=true인 "
+        _brief_context(project_root)
+        + "각 군집이 실제 SaaS로 해결 가능한 반복 업무 문제인지 판단하라. ambiguous=true인 "
         "군집은 구성원이 정말 같은 문제인지 먼저 확인하고, 아니라면 problems를 여러 개로 "
         "나누거나 관련 없는 구성원은 제외하라. 채택하는 각 problem마다 target_user, task, "
         "workaround, pain, impact, desired_outcome, "
         "frequency(daily/weekly/monthly/occasional/unknown), "
         "risk_severity(none/moderate/severe), purchase_intent(none/weak/strong), "
         "has_manual_or_complaint_evidence(bool), member_candidate_ids(정수 배열)를 채워라. "
-        "SaaS로 해결하기 어렵거나 일회성 개인 문제면 problems를 빈 배열로 두어라."
+        "SaaS로 해결하기 어렵거나 일회성 개인 문제면 problems를 빈 배열로 두어라. "
+        "브리프에 제외 시장/대상이 명시되어 있으면 해당 문제는 problems를 빈 배열로 두어라."
     )
     request_path = judgment.write_request(
         run_dir, stage_name, state.run_id, instructions, items, generated_at=ids.now_kst().isoformat()
@@ -435,12 +453,14 @@ def _stage_review_opportunities(
         for opp in top
     ]
     instructions = (
-        "각 기회를 독립 검토해 GENERATE_TITLES, RESEARCH_MORE, REJECT, SCARCITY_PRIORITY 중 "
+        _brief_context(project_root)
+        + "각 기회를 독립 검토해 GENERATE_TITLES, RESEARCH_MORE, REJECT, SCARCITY_PRIORITY 중 "
         "하나로 최종 판정하라. 공급 조사가 충분치 않으면 RESEARCH_MORE, 실제 수요가 없거나 "
         "강력한 경쟁 제품이 다수면 REJECT, 수요는 낮지만 공급이 극도로 부족하고 반복 손실이 "
         "확인되면 SCARCITY_PRIORITY를 사용하라. provisional_decision은 참고용 코드 판정이다. "
         "scarcity_grade가 C인 항목은 GENERATE_TITLES나 SCARCITY_PRIORITY로 판정하지 마라 "
-        "(C 등급은 제목 생성 대상이 아니다 — RESEARCH_MORE 또는 REJECT만 가능)."
+        "(C 등급은 제목 생성 대상이 아니다 — RESEARCH_MORE 또는 REJECT만 가능). "
+        "브리프에 제외 시장으로 명시된 대상이면 REJECT하라."
     )
     request_path = judgment.write_request(
         run_dir, stage_name, state.run_id, instructions, items, generated_at=ids.now_kst().isoformat()
