@@ -20,7 +20,7 @@ sources:
     recent_days_max: 90
     incremental_cursor: data/cache/gh_archive_last_hour.txt
   common_crawl:
-    enabled: false
+    enabled: true
     required: false
     activation_gate: access_test_pass
     scope: known_candidate_domains_only

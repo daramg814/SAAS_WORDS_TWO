@@ -43,6 +43,19 @@
    검색해 공급 후보로 추가하는 방식으로 이루어진다(HN Show/mention, GH Archive
    mention과 동일하게 넓게 모으고 관련성 판정은 기존 활성 신호 검증 판정 단계에
    맡긴다 — "이게 개발자 문제인가"를 코드가 미리 분류하지 않는다).
+8. **Common Crawl은 접근성 검사(PASS, 실제 CDX 조회·WARC range 요청·HTML 추출)를
+   거쳐 `enabled: true`로 전환됨(2026-08-11).** 공식 CDX 인덱스(`index.commoncrawl.org`)와
+   WARC 데이터(`data.commoncrawl.org`)만 사용하며, 키·로그인 불필요. **CLAUDE.md 4항·
+   3.1절 원문 그대로 "이미 확보한 후보 도메인의 기능·가격·활성 상태 보강에만" 사용하고
+   Common Crawl 전체를 검색하지 않는다** — `collect_supply_candidates.py`의
+   `enrich_with_common_crawl()`이 이미 `supply_candidates`에 있는 도메인만 대상으로
+   최신 크롤(`collinfo.json`으로 매번 자동 확인, 특정 CC-MAIN을 하드코딩하지 않음)에서
+   캡처를 조회하고, HTTP Range 요청으로 WARC 레코드 일부만 가져와(전체 WARC 파일을
+   내려받지 않음) HTML 본문을 텍스트로 추출한다(최대 3,000자, `text_filter.strip_html`
+   재사용). 캡처가 없거나 실패해도 빈 문자열로 기록해 재시도하지 않으며(`NULL`=미시도,
+   `""`=시도했지만 못 찾음), 추출된 발췌문은 `collect_and_verify_supply` 판정 단계의
+   `kind=product` 항목에 `common_crawl_excerpt`로 포함되어 HN 텍스트를 보강하는
+   추가 증거로만 쓰인다.
 
 ## 원본 설계 세부 규칙
 

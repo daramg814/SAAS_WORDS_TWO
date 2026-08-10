@@ -336,7 +336,8 @@ def _stage_collect_and_verify_supply(
     _run_or_raise(project_root, "collect_supply_candidates.py")
 
     candidate_rows = conn.execute(
-        "SELECT sc.product_id, sc.problem_id, sc.name, sc.domain, sc.source, sc.evidence_url "
+        "SELECT sc.product_id, sc.problem_id, sc.name, sc.domain, sc.source, sc.evidence_url, "
+        "sc.common_crawl_excerpt "
         "FROM supply_candidates sc "
         "WHERE sc.product_id NOT IN (SELECT product_id FROM supply_verification) "
         "AND sc.merged_into_product_id IS NULL"
@@ -373,8 +374,10 @@ def _stage_collect_and_verify_supply(
     instructions = (
         "kind=product 항목마다 8개 활성 신호(official_name, target_user, core_feature, "
         "signup_or_demo, pricing, recent_activity, product_docs, customer_references) 중 "
-        "HN 게시글/댓글 텍스트만으로 확인 가능한 것을 signals 객체(불리언)로 판정하고, "
-        "supply_type을 direct/partial/generic/noncompeting 중 하나로 분류하라. "
+        "HN 게시글/댓글 텍스트와 common_crawl_excerpt(있는 경우 — 해당 도메인의 실제 "
+        "웹페이지 발췌, 기능·가격·활성 상태 확인용 보강 증거)로 확인 가능한 것을 "
+        "signals 객체(불리언)로 판정하고, supply_type을 direct/partial/generic/"
+        "noncompeting 중 하나로 분류하라. "
         "kind=problem_gap 항목마다 supply_gap_user_specific(특정 사용자 전용 제품 부족), "
         "supply_gap_no_strong_incumbent(강력한 기존 제품 부재), "
         "supply_gap_no_recent_entrants(최근 24개월 신규 공급 부족), "

@@ -85,7 +85,8 @@ CREATE TABLE IF NOT EXISTS supply_candidates (
     dedupe_key TEXT NOT NULL,
     source TEXT NOT NULL,
     evidence_url TEXT,
-    merged_into_product_id TEXT REFERENCES supply_candidates(product_id)
+    merged_into_product_id TEXT REFERENCES supply_candidates(product_id),
+    common_crawl_excerpt TEXT
 );
 
 CREATE TABLE IF NOT EXISTS supply_verification (
@@ -161,6 +162,7 @@ COLUMN_MIGRATIONS: tuple[tuple[str, str, str], ...] = (
     ("titles", "title_collision_adjustment", "REAL NOT NULL DEFAULT 0.0"),
     ("opportunities", "direct_competitor_count", "INTEGER NOT NULL DEFAULT 0"),
     ("supply_candidates", "merged_into_product_id", "TEXT"),
+    ("supply_candidates", "common_crawl_excerpt", "TEXT"),
 )
 
 

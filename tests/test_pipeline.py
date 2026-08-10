@@ -323,6 +323,31 @@ def test_stage_collect_and_verify_supply_no_merge_candidates_item_with_single_ca
     assert not [item for item in request_doc["items"] if item["kind"] == "merge_candidates"]
 
 
+def test_stage_collect_and_verify_supply_includes_common_crawl_excerpt_in_product_item(tmp_path, monkeypatch):
+    """design 3.2: Common Crawl only enriches an already-collected candidate;
+    the excerpt (collect_supply_candidates.py's enrich_with_common_crawl)
+    must actually reach the product judgment item as extra evidence."""
+    monkeypatch.setattr(pipeline, "_run_or_raise", lambda *a, **k: None)
+    options = make_options(tmp_path, run_id="QA-20260810-190000-KST")
+    state = pipeline._load_or_create_state(options)
+    conn = db.connect(tmp_path)
+    seed_demand_passed_problem_with_candidate(conn)
+    conn.execute(
+        "UPDATE supply_candidates SET common_crawl_excerpt = ? WHERE product_id = 'S-0001'",
+        ("pricing signup demo page text",),
+    )
+    conn.commit()
+
+    with pytest.raises(judgment.JudgmentRequired) as excinfo:
+        pipeline._stage_collect_and_verify_supply(conn, tmp_path, options, state)
+    conn.close()
+
+    request_doc = json.loads(excinfo.value.request_path.read_text(encoding="utf-8"))
+    product_items = [item for item in request_doc["items"] if item["kind"] == "product"]
+    assert product_items[0]["common_crawl_excerpt"] == "pricing signup demo page text"
+    assert "common_crawl_excerpt" in request_doc["instructions"]
+
+
 def test_stage_collect_and_verify_supply_applies_merge_group_decision(tmp_path):
     """design 7.2: two candidates the reviewer judges to be the same
     underlying product (here: a rebrand/regional-site pair) merge into one -

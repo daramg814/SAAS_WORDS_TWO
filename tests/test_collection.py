@@ -591,3 +591,60 @@ def test_run_access_test_exercises_npm_registry_and_reports_pass(tmp_path):
     )
     assert report.results["npm_registry"]["status"] == "PASS"
     assert "sample_name=vendor-guard" in report.results["npm_registry"]["detail"]
+
+
+# ---------------------------------------------------------------------------
+# common_crawl access test
+# ---------------------------------------------------------------------------
+
+CC_SOURCES_CONFIG = {"sources": {"common_crawl": {"enabled": True, "required": False}}}
+
+
+def test_run_access_test_exercises_common_crawl_and_reports_pass(tmp_path):
+    from saas_words_two import common_crawl_client as ccc
+
+    sources_config = {**SOURCES_CONFIG, "sources": {**SOURCES_CONFIG["sources"], **CC_SOURCES_CONFIG["sources"]}}
+    hn_session = FakeSession(
+        {"maxitem.json": 100, "item/100.json": {"id": 100, "type": "story"}, "search": {"hits": []}}
+    )
+
+    class FakeCcJsonResponse:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return [{"id": "CC-MAIN-2026-30"}]
+
+    class FakeCcTextResponse:
+        text = '{"status": "200", "mime": "text/html", "offset": "0", "length": "10", "filename": "a"}\n'
+
+        def raise_for_status(self):
+            return None
+
+    warc_bytes = gzip.compress(b"WARC/1.0\r\n\r\nHTTP/1.1 200 OK\r\n\r\n<p>pricing</p>")
+
+    class FakeCcBinaryResponse:
+        content = warc_bytes
+
+        def raise_for_status(self):
+            return None
+
+    class CombinedHnCcSession:
+        def __init__(self, hn_session):
+            self.hn_session = hn_session
+            self._cdx_calls = 0
+
+        def get(self, url, timeout, headers=None):
+            if url.startswith(ccc.CDX_BASE + "/collinfo.json"):
+                return FakeCcJsonResponse()
+            if url.startswith(ccc.CDX_BASE):
+                return FakeCcTextResponse()
+            if url.startswith(ccc.DATA_BASE):
+                return FakeCcBinaryResponse()
+            return self.hn_session.get(url, timeout)
+
+    report = collection.run_access_test(
+        tmp_path, sources_config, CombinedHnCcSession(hn_session), generated_at="t0"
+    )
+    assert report.results["common_crawl"]["status"] == "PASS"
+    assert "index=CC-MAIN-2026-30" in report.results["common_crawl"]["detail"]

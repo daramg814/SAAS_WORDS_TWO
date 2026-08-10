@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from . import gh_archive_client, hn_client, npm_client, stack_exchange_client
+from . import common_crawl_client, gh_archive_client, hn_client, npm_client, stack_exchange_client
 from .contracts import atomic_write_text
 
 # Below this much free disk space, collection should not proceed - not a
@@ -125,6 +125,19 @@ def run_access_test(
             }
         else:
             results["npm_registry"] = {"status": "FAIL", "detail": npm_result.error or "unknown error"}
+
+    if "common_crawl" in sources_config["sources"]:
+        cc_result = common_crawl_client.access_test(session)
+        if cc_result.ok:
+            results["common_crawl"] = {
+                "status": "PASS",
+                "detail": (
+                    f"index={cc_result.data['index_id']} domain={cc_result.data['domain']} "
+                    f"excerpt_chars={cc_result.data['excerpt_chars']}"
+                ),
+            }
+        else:
+            results["common_crawl"] = {"status": "FAIL", "detail": cc_result.error or "unknown error"}
 
     for name in sources_config["sources"]:
         if name in results:

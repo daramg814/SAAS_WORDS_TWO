@@ -8,7 +8,7 @@ from pathlib import Path
 
 import requests
 
-from saas_words_two import config, db, hn_client, ids, npm_client, supply
+from saas_words_two import common_crawl_client, config, db, hn_client, ids, npm_client, supply
 
 _DOMAIN_RE = re.compile(r"https?://(?:www\.)?([^/]+)")
 _GITHUB_REPO_RE = re.compile(r"github\.com/([^/]+)/([^/]+)")
@@ -145,6 +145,37 @@ def collect_npm_mentions_for_problem(conn, problem_row, session, *, hits_per_pro
     return inserted
 
 
+def enrich_with_common_crawl(conn, session) -> int:
+    """design 3.2/CLAUDE.md rule 4: Common Crawl only enriches domains this
+    pipeline has *already* collected as supply candidates - never a broad
+    product search. One index lookup is shared across all candidates in this
+    run; each candidate with a domain and no excerpt yet gets a best-effort
+    fetch. A missing capture or fetch failure is expected/common (not every
+    domain is in Common Crawl) and is recorded as "" (attempted, nothing
+    found) so it is not retried every run - only NULL means "not yet tried"."""
+    index_result = common_crawl_client.fetch_latest_index(session)
+    if not index_result.ok:
+        return 0
+    index_id = index_result.data
+
+    rows = conn.execute(
+        "SELECT product_id, domain FROM supply_candidates "
+        "WHERE domain IS NOT NULL AND common_crawl_excerpt IS NULL AND merged_into_product_id IS NULL"
+    ).fetchall()
+
+    enriched = 0
+    for row in rows:
+        result = common_crawl_client.fetch_domain_excerpt(session, row["domain"], index_id)
+        excerpt = result.data if result.ok else ""
+        conn.execute(
+            "UPDATE supply_candidates SET common_crawl_excerpt = ? WHERE product_id = ?",
+            (excerpt, row["product_id"]),
+        )
+        if excerpt:
+            enriched += 1
+    return enriched
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--project-root", type=Path, default=Path.cwd())
@@ -155,6 +186,7 @@ def main(argv: list[str] | None = None) -> int:
     sources_config = config.load_sources_config(project_root)
     hits_per_problem = project_config["collection"]["hacker_news"].get("supply_hits_per_problem", 20)
     npm_enabled = sources_config["sources"].get("npm_registry", {}).get("enabled", False)
+    common_crawl_enabled = sources_config["sources"].get("common_crawl", {}).get("enabled", False)
 
     conn = db.connect(project_root)
     try:
@@ -173,10 +205,18 @@ def main(argv: list[str] | None = None) -> int:
                     conn, problem_row, session, hits_per_problem=hits_per_problem
                 )
         conn.commit()
+
+        enriched = 0
+        if common_crawl_enabled:
+            enriched = enrich_with_common_crawl(conn, session)
+            conn.commit()
     finally:
         conn.close()
 
-    print(f"SUPPLY CANDIDATES: problems={len(problems)} candidates_inserted={total_inserted}")
+    print(
+        f"SUPPLY CANDIDATES: problems={len(problems)} candidates_inserted={total_inserted} "
+        f"common_crawl_enriched={enriched}"
+    )
     return 0
 
 
