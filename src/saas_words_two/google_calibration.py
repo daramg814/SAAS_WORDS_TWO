@@ -104,6 +104,71 @@ def group_market_observations_by_problem(observations: list[dict]) -> dict[str, 
     return grouped
 
 
+# 4.8: qualitative title-conflict rules, grounded directly in the existing
+# TITLE_QUERY observation fields - distinct from classify_title_query_error()
+# above, which grades AI *prediction accuracy* (4.6), not the title's actual
+# collision risk (4.8). Exact numeric values are this implementation's choice
+# (the design gives only "novelty bonus" / "neutral" / "strong penalty or
+# elimination" / "immediate re-review", not numbers); BRAND_CONFLICT is large
+# enough to always lose a tie-break, effectively excluding it in practice.
+TITLE_COLLISION_ADJUSTMENTS = {
+    "BRAND_CONFLICT": -100.0,
+    "COLLISION": -10.0,
+    "GENERIC": 0.0,
+    "NOVEL": 1.0,
+}
+
+
+def title_brand_conflict_flagged(user_notes: str | None) -> bool:
+    """4.8: '사용자가 메모로 직접 충돌을 표시하면 TITLE_BRAND_CONFLICT로 즉시 재검토' -
+    the documented convention is the literal marker string in user_notes."""
+    return bool(user_notes) and "TITLE_BRAND_CONFLICT" in user_notes.upper()
+
+
+def classify_title_collision(
+    user_result_count: int, top_results_relevant: int | None, user_notes: str | None
+) -> str:
+    if title_brand_conflict_flagged(user_notes):
+        return "BRAND_CONFLICT"
+    if top_results_relevant is not None and top_results_relevant >= 1:
+        return "COLLISION"
+    if result_band(user_result_count) in ("VERY_LOW", "LOW"):
+        return "NOVEL"
+    return "GENERIC"
+
+
+def group_title_observations_by_title(observations: list[dict]) -> dict[str, list[dict]]:
+    grouped: dict[str, list[dict]] = {}
+    for observation in observations:
+        if observation.get("query_type") != "TITLE_QUERY" or not observation.get("title"):
+            continue
+        grouped.setdefault(observation["title"], []).append(observation)
+    return grouped
+
+
+def compute_title_calibration(observations_for_title: list[dict]) -> dict:
+    """Ledger order is append-order (chronological); the most recent check
+    is taken as the title's current status."""
+    count = len(observations_for_title)
+    if count == 0:
+        return {
+            "validation_count": 0,
+            "google_title_footprint": None,
+            "google_title_collision_class": None,
+            "title_collision_adjustment": 0.0,
+        }
+    latest = observations_for_title[-1]
+    collision_class = classify_title_collision(
+        latest["user_result_count"], latest.get("top_results_relevant"), latest.get("user_notes")
+    )
+    return {
+        "validation_count": count,
+        "google_title_footprint": round(google_footprint(latest["user_result_count"]), 4),
+        "google_title_collision_class": collision_class,
+        "title_collision_adjustment": TITLE_COLLISION_ADJUSTMENTS[collision_class],
+    }
+
+
 def compute_supply_adjustment(observations_for_problem: list[dict], base_score: float) -> dict:
     """4.7: adjusted_supply_scarcity = base x (1-w) + human_google_scarcity x w.
     Shared by apply_human_calibration.py (recalibrates existing opportunities

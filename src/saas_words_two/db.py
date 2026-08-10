@@ -121,6 +121,10 @@ CREATE TABLE IF NOT EXISTS titles (
     status TEXT NOT NULL,
     reason TEXT,
     created_at TEXT NOT NULL,
+    google_title_footprint REAL,
+    google_title_collision_class TEXT,
+    human_title_validation_count INTEGER NOT NULL DEFAULT 0,
+    title_collision_adjustment REAL NOT NULL DEFAULT 0.0,
     PRIMARY KEY (normalized, run_id)
 );
 """
@@ -149,6 +153,10 @@ COLUMN_MIGRATIONS: tuple[tuple[str, str, str], ...] = (
     # gh_archive_client.normalize_event). "source" distinguishes the two for
     # evidence traceability; it does not gate any query.
     ("hn_items", "source", "TEXT NOT NULL DEFAULT 'hacker_news'"),
+    ("titles", "google_title_footprint", "REAL"),
+    ("titles", "google_title_collision_class", "TEXT"),
+    ("titles", "human_title_validation_count", "INTEGER NOT NULL DEFAULT 0"),
+    ("titles", "title_collision_adjustment", "REAL NOT NULL DEFAULT 0.0"),
 )
 
 

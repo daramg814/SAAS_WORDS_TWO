@@ -80,12 +80,23 @@ def allocate_title_slots(opportunities: list[dict], target_count: int) -> dict[s
     return allocation
 
 
+def _selection_sort_key(item: dict) -> tuple:
+    # priority_score (market/opportunity score, design 8.1) ranks first;
+    # title_collision_adjustment (design 4.8's separate title-quality score)
+    # only breaks ties within that - CLAUDE.md rule 8 requires MARKET_QUERY
+    # and TITLE_QUERY calibration to feed different scores, never blended
+    # into one number. Missing the key (most callers/tests) defaults to 0.0,
+    # i.e. no effect on ordering.
+    return (item["priority_score"], item.get("title_collision_adjustment", 0.0))
+
+
 def select_final_titles(approved: list[dict], target_count: int) -> list[dict]:
     """Pick up to target_count from an approved pool, ranked by opportunity
-    priority_score, capped at 30% per opportunity (docs/pipeline/
-    10-title-generation.md 9.4). Clarity/diversity/distance/pronounceability
-    were already judged when each title was approved, so priority ordering
-    plus the cap is what's left for code to enforce.
+    priority_score (ties broken by title_collision_adjustment, design 4.8),
+    capped at 30% per opportunity (docs/pipeline/10-title-generation.md 9.4).
+    Clarity/diversity/distance/pronounceability were already judged when each
+    title was approved, so priority ordering plus the cap is what's left for
+    code to enforce.
 
     Deliberately never exceeds the cap to force target_count: if the capped
     pool can't fill target_count, this returns fewer, same as
@@ -97,7 +108,7 @@ def select_final_titles(approved: list[dict], target_count: int) -> list[dict]:
         cap = max_titles_per_opportunity(target_count)
         per_opportunity_count: dict[str, int] = {}
         within_cap = []
-        for item in sorted(approved, key=lambda entry: entry["priority_score"], reverse=True):
+        for item in sorted(approved, key=_selection_sort_key, reverse=True):
             pid = item["problem_id"]
             if per_opportunity_count.get(pid, 0) >= cap:
                 continue
@@ -106,7 +117,7 @@ def select_final_titles(approved: list[dict], target_count: int) -> list[dict]:
         return within_cap
 
     cap = max_titles_per_opportunity(target_count)
-    ordered = sorted(approved, key=lambda item: item["priority_score"], reverse=True)
+    ordered = sorted(approved, key=_selection_sort_key, reverse=True)
 
     selected: list[dict] = []
     per_opportunity_count = {}

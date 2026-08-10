@@ -134,3 +134,75 @@ def test_is_duplicate_observation_same_query_different_date_is_not_duplicate():
         {"validation_id": "GVQ-1", "user_result_count": "150", "user_checked_at": "2026-08-05T00:00:00+09:00"},
         existing,
     )
+
+
+# ---------------------------------------------------------------------------
+# 4.8 title-conflict calibration
+# ---------------------------------------------------------------------------
+
+
+def test_title_brand_conflict_flagged_detects_marker_case_insensitively():
+    assert gc.title_brand_conflict_flagged("looks like a title_brand_conflict with Notion")
+    assert gc.title_brand_conflict_flagged("TITLE_BRAND_CONFLICT")
+    assert not gc.title_brand_conflict_flagged("looks fine")
+    assert not gc.title_brand_conflict_flagged(None)
+
+
+def test_classify_title_collision_brand_conflict_wins_over_everything():
+    assert gc.classify_title_collision(0, None, "TITLE_BRAND_CONFLICT: same as existing app") == "BRAND_CONFLICT"
+
+
+def test_classify_title_collision_relevant_top_results_is_collision():
+    assert gc.classify_title_collision(500, 3, None) == "COLLISION"
+
+
+def test_classify_title_collision_low_count_no_relevant_hits_is_novel():
+    assert gc.classify_title_collision(5, 0, None) == "NOVEL"
+    assert gc.classify_title_collision(5, None, None) == "NOVEL"
+
+
+def test_classify_title_collision_high_count_no_relevant_hits_is_generic():
+    assert gc.classify_title_collision(50_000, 0, None) == "GENERIC"
+    assert gc.classify_title_collision(50_000, None, None) == "GENERIC"
+
+
+def test_group_title_observations_by_title_ignores_market_query_and_missing_title():
+    observations = [
+        {"query_type": "TITLE_QUERY", "title": "Vendor Guard", "user_result_count": 1},
+        {"query_type": "MARKET_QUERY", "title": "Vendor Guard", "user_result_count": 1},
+        {"query_type": "TITLE_QUERY", "title": "", "user_result_count": 1},
+        {"query_type": "TITLE_QUERY", "title": "Vendor Guard", "user_result_count": 2},
+    ]
+    grouped = gc.group_title_observations_by_title(observations)
+    assert list(grouped.keys()) == ["Vendor Guard"]
+    assert len(grouped["Vendor Guard"]) == 2
+
+
+def test_compute_title_calibration_no_observations_is_neutral_zero():
+    result = gc.compute_title_calibration([])
+    assert result == {
+        "validation_count": 0,
+        "google_title_footprint": None,
+        "google_title_collision_class": None,
+        "title_collision_adjustment": 0.0,
+    }
+
+
+def test_compute_title_calibration_uses_most_recent_observation():
+    observations = [
+        {"user_result_count": 500, "top_results_relevant": 3, "user_notes": None},  # older: COLLISION
+        {"user_result_count": 2, "top_results_relevant": 0, "user_notes": None},  # latest: NOVEL
+    ]
+    result = gc.compute_title_calibration(observations)
+    assert result["validation_count"] == 2
+    assert result["google_title_collision_class"] == "NOVEL"
+    assert result["title_collision_adjustment"] == gc.TITLE_COLLISION_ADJUSTMENTS["NOVEL"]
+    assert result["google_title_footprint"] == round(gc.google_footprint(2), 4)
+
+
+def test_compute_title_calibration_brand_conflict_gets_large_negative_adjustment():
+    result = gc.compute_title_calibration(
+        [{"user_result_count": 10, "top_results_relevant": None, "user_notes": "TITLE_BRAND_CONFLICT"}]
+    )
+    assert result["google_title_collision_class"] == "BRAND_CONFLICT"
+    assert result["title_collision_adjustment"] < -50

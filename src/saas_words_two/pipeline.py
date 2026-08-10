@@ -6,7 +6,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from . import db, ids, judgment, opportunity_scoring, run_state, title_generation
+from . import db, google_calibration, ids, judgment, opportunity_scoring, run_state, title_generation
 from .contracts import (
     atomic_write_text,
     normalize_title,
@@ -673,6 +673,48 @@ def _stage_generate_and_review_titles(
 # ---------------------------------------------------------------------------
 
 
+def _load_title_observations(project_root: Path) -> dict[str, list[dict]]:
+    ledger_path = project_root / "memory" / "human_feedback" / "google_supply_observations.jsonl"
+    if not ledger_path.exists():
+        return {}
+    observations = [
+        json.loads(line) for line in ledger_path.read_text(encoding="utf-8").splitlines() if line.strip()
+    ]
+    return google_calibration.group_title_observations_by_title(observations)
+
+
+def _apply_title_calibration(
+    conn, project_root: Path, run_id: str, approved_rows: list
+) -> dict[str, dict]:
+    """design 4.8: TITLE_QUERY human observations calibrate title quality
+    separately from the opportunity's (MARKET_QUERY-driven) priority_score.
+    Computed and persisted for every approved title on every validate_outputs
+    pass, same rationale as the inline supply calibration in
+    score_opportunities.py (never stale, not dependent on a separate script
+    happening to run first)."""
+    observations_by_title = _load_title_observations(project_root)
+    calibration_by_title: dict[str, dict] = {}
+    for row in approved_rows:
+        title = row["title"]
+        calibration = google_calibration.compute_title_calibration(observations_by_title.get(title, []))
+        calibration_by_title[title] = calibration
+        conn.execute(
+            "UPDATE titles SET google_title_footprint = ?, google_title_collision_class = ?, "
+            "human_title_validation_count = ?, title_collision_adjustment = ? "
+            "WHERE run_id = ? AND title = ?",
+            (
+                calibration["google_title_footprint"],
+                calibration["google_title_collision_class"],
+                calibration["validation_count"],
+                calibration["title_collision_adjustment"],
+                run_id,
+                title,
+            ),
+        )
+    conn.commit()
+    return calibration_by_title
+
+
 def _stage_validate_outputs(conn, project_root: Path, options: RunOptions, state: run_state.RunState) -> None:
     approved = conn.execute(
         "SELECT title, problem_id FROM titles WHERE run_id = ? AND status = 'approved'", (state.run_id,)
@@ -680,13 +722,20 @@ def _stage_validate_outputs(conn, project_root: Path, options: RunOptions, state
     opportunities_by_id = {
         row["problem_id"]: dict(row) for row in conn.execute("SELECT * FROM opportunities").fetchall()
     }
+    calibration_by_title = _apply_title_calibration(conn, project_root, state.run_id, approved)
     scored = [
         {
             "title": row["title"],
             "problem_id": row["problem_id"],
             "priority_score": opportunities_by_id.get(row["problem_id"], {}).get("priority_score", 0.0),
+            "title_collision_adjustment": calibration_by_title[row["title"]]["title_collision_adjustment"],
         }
         for row in approved
+        # design 4.8: an explicit user-flagged brand conflict is excluded
+        # outright, not merely down-ranked - the same treatment as any other
+        # hard validation failure (contracts.validate_title_set already
+        # excludes exact/case/reversed history duplicates the same way).
+        if calibration_by_title[row["title"]]["google_title_collision_class"] != "BRAND_CONFLICT"
     ]
     selected = title_generation.select_final_titles(scored, options.target_count)
     if len(selected) != options.target_count:

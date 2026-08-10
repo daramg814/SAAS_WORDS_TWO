@@ -654,6 +654,55 @@ def seed_approved_titles(conn, run_id, count, opportunity_count=8):
     return titles
 
 
+def test_stage_validate_outputs_excludes_brand_conflict_title_and_persists_calibration(tmp_path):
+    """design 4.8: an explicit user-flagged brand conflict must be excluded
+    from final selection outright, and the calibration fields must be
+    persisted on the titles rows for every approved title, not just the
+    excluded one."""
+    options = make_options(tmp_path, target_count=20, run_id="QA-20260810-190000-KST")
+    state = pipeline._load_or_create_state(options)
+    with_qa_history_snapshot(tmp_path, state)
+    conn = db.connect(tmp_path)
+    titles = seed_approved_titles(conn, state.run_id, 21)  # one extra so excluding 1 still hits 20
+
+    ledger_path = tmp_path / "memory" / "human_feedback" / "google_supply_observations.jsonl"
+    ledger_path.parent.mkdir(parents=True, exist_ok=True)
+    conflicted_title = titles[0]  # "Vendor Guard" - problem P-0000, highest priority (100)
+    observation = {
+        "query_type": "TITLE_QUERY",
+        "title": conflicted_title,
+        "user_result_count": 5,
+        "top_results_relevant": None,
+        "user_notes": "TITLE_BRAND_CONFLICT: same name as an existing SaaS product",
+    }
+    ledger_path.write_text(json.dumps(observation) + "\n", encoding="utf-8")
+
+    pipeline._stage_validate_outputs(conn, tmp_path, options, state)
+
+    selected_titles = {
+        row["title"]
+        for row in conn.execute(
+            "SELECT title FROM titles WHERE run_id = ? AND status = 'selected'", (state.run_id,)
+        ).fetchall()
+    }
+    assert len(selected_titles) == 20
+    assert conflicted_title not in selected_titles
+
+    conflicted_row = conn.execute(
+        "SELECT * FROM titles WHERE run_id = ? AND title = ?", (state.run_id, conflicted_title)
+    ).fetchone()
+    assert conflicted_row["google_title_collision_class"] == "BRAND_CONFLICT"
+    assert conflicted_row["human_title_validation_count"] == 1
+    assert conflicted_row["status"] == "approved"  # excluded from selection, not force-rejected
+
+    other_row = conn.execute(
+        "SELECT * FROM titles WHERE run_id = ? AND title = ?", (state.run_id, titles[1])
+    ).fetchone()
+    assert other_row["human_title_validation_count"] == 0
+    assert other_row["google_title_collision_class"] is None
+    conn.close()
+
+
 def test_stage_validate_outputs_selects_exact_target_and_marks_selected(tmp_path):
     options = make_options(tmp_path, target_count=20, run_id="QA-20260810-190000-KST")
     state = pipeline._load_or_create_state(options)
