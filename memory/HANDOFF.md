@@ -1,25 +1,27 @@
 # HANDOFF
 
 - 상태: `PAUSED`
-- 요약 한 줄: **"설계서 대비 전체 구현 감사" 배치(사용자 지시: "모든 것을 전부
-  고쳐줘") 완료 — #8~#26 전부 끝났다.** 전체 회귀 QA(pytest 403 passed,
-  `verify_design_coverage.py` PASS, 실제 `run.py --mode qa` 파이프라인 재실행)와
-  `final-qa-runner` 독립 검증까지 마쳤다. 남은 것은 이 배치 범위 밖의 별개
-  이슈인 **`DEMAND-001`(수요 관문 통과 군집 0건, 4회 실측 확인, 미해결)뿐** —
-  상세는 `ACTIVE_ISSUES.md` `DEMAND-001`.
+- 요약 한 줄: **"설계서 대비 전체 구현 감사" 배치(#8~#26) 완료에 이어, 사용자가
+  추가로 지시한 "DEMAND-001을 다른 종류의 데이터원으로 풀어보라"는 탐색까지
+  마쳤다.** App Store 리뷰(Apple 공식 API)를 새 수요 데이터원으로 실제
+  구현·활성화했지만, 실측 결과 `DEMAND-001`(수요 관문 통과 군집 0건)은 여전히
+  미해결이다 — 상세는 `ACTIVE_ISSUES.md` `DEMAND-001` "다섯 번째 확인". 이
+  세션은 사용자가 "자리를 비운다"며 확인 없이 계속 진행하라고 명시적으로
+  승인한 상태에서 자율적으로 여기까지 진행했다.
 
 ## 1. 지금 이 세션을 새로 열면 가장 먼저 할 일
 
-이번 감사 배치는 끝났다. 새로 열면 사용자에게 다음 작업을 물어볼 것 — 단,
-`DEMAND-001`을 다시 다룰 경우 아래 §4를 먼저 읽고 "같은 방법을 더 크게" 실험을
-반복하지 말 것.
+감사 배치와 이번 데이터원 탐색 라운드 둘 다 끝났다. 새로 열면 사용자에게
+다음 작업을 물어볼 것 — 단, `DEMAND-001`을 다시 다룰 경우 아래 §4를 먼저 읽고
+이미 다섯 번 확인된 실패 패턴("같은 방법을 더 크게" 반복, 또는 자격증명이
+필요한 API를 시도)을 반복하지 말 것.
 
 1. `CLAUDE.md` → `memory/KNOWLEDGE_MANIFEST.yaml` → 이 파일 → `memory/PROJECT_PLAYBOOK.md`
    → `memory/ACTIVE_ISSUES.md`(`DEMAND-001` 전체) 순서로 읽는다.
 2. 환경 확인:
    ```bash
    cd "C:\Share\Claude_project\SAAS_WORDS_TWO_claude_code_project_v2.4"
-   ./.venv/Scripts/python -m pytest -q          # 403 passed 나와야 정상
+   ./.venv/Scripts/python -m pytest -q          # 419 passed 나와야 정상
    ./.venv/Scripts/python tools/verify_design_coverage.py   # PASS 나와야 정상
    ```
 3. `git log --oneline`으로 로컬 커밋 확인. **push는 PC에서 사용자가 요청할 때만**
@@ -94,6 +96,43 @@
        격차가 실제로 고쳐지고 테스트·문서·실행으로 검증됨"이며 이는 충족됐다.
        남은 유일한 이슈는 `DEMAND-001`(별도, 사전에 추적되던, 이 배치 범위 밖).
 
+## 2b. 데이터원 탐색 라운드(감사 배치 이후, 2026-08-11) — "다른 종류의 데이터원 찾기"
+
+사용자 지시: 볼륨/필터를 더 다듬지 말고, 지금까지의 모든 소스(HN/GH Archive/
+Stack Exchange/npm/Common Crawl/RSS)가 공유하는 "개발자·소프트웨어 커뮤니티
+텍스트" 범주를 완전히 벗어난 새 데이터원을 찾아 반복 시도하고, 찾으면 계획·
+문서를 역수정하라.
+
+키 없이(로그인·API 키·CAPTCHA 우회 없이) 접근 가능한 후보 6개를 실측(curl/
+urllib로 직접 요청 먼저, 클라이언트 코드는 나중):
+- Reddit 공개 JSON, CFPB Consumer Complaint Database, Product Hunt GraphQL,
+  Canny 피드백 보드 API — **전부 자격증명 필요 또는 봇 차단으로 기각**(상세
+  근거는 `ACTIVE_ISSUES.md` `DEMAND-001` "다섯 번째 확인" 및
+  `docs/policies/04-data-source-policy.md` 10번).
+- GitHub Issue 전문 검색 API — 접근은 PASS했지만 실제 검색 결과 표본이
+  GH Archive와 같은 구조적 문제(서로 무관한 저장소의 기능 요청)를 보여 구현
+  자체를 안 함.
+- **Apple App Store 고객 리뷰 — 유일하게 구현·활성화함.** 신규
+  `src/saas_words_two/app_store_client.py`, `collection.py::run_app_store_reviews_collection`,
+  `config/sources.yaml`의 `app_store_reviews`(검색어 12개, 카테고리별 앱 동적
+  발견), `collect_sources.py` 연결. 테스트 22개 신규(pytest 403→419). 실제
+  접근성 PASS 후 활성화, 실제 수집 3회(2,377건, 56개 앱).
+
+**실측 결과**: 실제 파이프라인 재실행(`QA-20260811-031153-KST`)에서
+`independent_user_count>=5` 군집 34개 전부를 직접 읽고 REJECT — 이 중
+`app_store_reviews`가 기여한 군집은 **정확히 0개**(SQL로 직접 확인). 앱
+리뷰는 "미해결 시장 문제"보다 "기존 앱의 버그/가격 불만"에 본질적으로
+치우쳐 있어 구조적으로 다른 종류의 콘텐츠였다. `CAPABILITY_STAGNATION`,
+체크섬 불변 확인. 커밋 `f554e6f`.
+
+**결정**: `app_store_reviews`는 되돌리지 않고 유지(B안 TF-IDF와 달리 다른
+소스에 해가 되지 않고, 향후 공급 후보 `supply_gap_unresolved_complaints`
+판정 보조 증거로 쓰일 잠재력이 남아있음). `DEMAND-001`은 여전히 미해결.
+**다음에 다시 만나면**: 사용자가 직접 자격증명(Reddit OAuth 앱, GitHub PAT,
+Canny API 키 등)을 발급해 제공하면 그 경로들을 재시도할 수 있다 — 그렇지
+않다면 이 세션이 자체적으로 시도할 수 있는 "다른 종류의 데이터원" 후보는
+사실상 소진되었다.
+
 ## 3. Git/원격 설정 — SSH(원격) 세션에서는 push가 원래 안 됨, 정상 동작
 
 - `origin` = `https://github.com/daramg814/SAAS_WORDS_TWO.git`.
@@ -112,8 +151,8 @@
 
 ## 4. DEMAND-001 (별도 미해결 이슈 — 이번 감사 배치의 범위 밖)
 
-수요 관문(`독립 사용자 5명 이상`)을 통과하는 군집이 아직 0건이다. 네 가지 실측
-실험 전부 근본 원인을 못 풀었다:
+수요 관문(`독립 사용자 5명 이상`)을 통과하는 군집이 아직 0건이다. 다섯 가지
+실측 실험 전부 근본 원인을 못 풀었다:
 1. **볼륨 증가**(HN `search_hits_per_pattern` 40→1000): 실패.
 2. **A안(소스 다양화, GH Archive 추가)**: 후보 5,200개로 증가했지만 실패
    (오히려 새로운 보일러플레이트 오염원 추가).
@@ -121,15 +160,21 @@
 4. **#26 최종 QA(5개 소스 전부 활성화 + 일반 인사말 필터 + SE 버그 수정 후
    재실행)**: 여전히 동일 패턴(GitHub 이슈 템플릿, HN 질문 템플릿, 고립
    불만/인사말 문구) — `ACTIVE_ISSUES.md` `DEMAND-001` "네 번째 확인" 참고.
+5. **"다른 종류의 데이터원 찾기" 라운드(App Store 리뷰 실장)**: 접근 가능한
+   6개 후보 중 5개는 자격증명/봇 차단으로 기각, 유일하게 구현한 App Store
+   리뷰는 실제 34개 고득점 군집 중 기여 0건 — `ACTIVE_ISSUES.md` `DEMAND-001`
+   "다섯 번째 확인" 참고 (§2b에 요약).
 
 **결론(`PROJECT_PLAYBOOK.md` "확인된 한계" 누적 기록)**: 짧은 보일러플레이트
 문장은 내용어가 거의 없어 어떤 1차 유사도 지표로도 서로 구분이 안 된다 — 이건
 `extract_and_cluster_problems`의 애매 군집 AI 판정이 원래 하도록 설계된 일이며,
-19개 군집을 전부 정직하게 REJECT한 것 자체가 설계대로 정상 동작한 결과다. 남은
-방법은 (a) 판정 기준 완화(금지, CLAUDE.md 12항) 외에 (b) 더 오래 데이터를
-쌓거나 (c) 근본적으로 다른 종류의 데이터원을 찾는 것뿐. **다음에 이 이슈를
+매번 고득점 군집을 전부 정직하게 REJECT한 것 자체가 설계대로 정상 동작한
+결과다. 남은 방법은 (a) 판정 기준 완화(금지, CLAUDE.md 12항) 외에 (b) 더 오래
+데이터를 쌓거나 (c) 사용자가 직접 자격증명을 제공해야 하는 데이터원(Reddit
+OAuth, GitHub PAT, Canny API 키 등)을 시도하는 것뿐. **다음에 이 이슈를
 다시 만나면 "같은 방법을 더 크게" 실험(볼륨 증가·소스 다양화·유사도 알고리즘
-교체)을 반복하지 말 것** — 세 번 다 같은 실패 패턴으로 이미 확인됨.
+교체·키 없는 새 소스 탐색)을 반복하지 말 것** — 다섯 번 다 같은 실패 패턴으로
+이미 확인됨.
 
 ## 5. 회귀 사례로 고정된 함정 (재발 방지)
 
