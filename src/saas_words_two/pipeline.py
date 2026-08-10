@@ -375,10 +375,23 @@ def _stage_review_opportunities(
 
     if judgment.has_response(run_dir, stage_name):
         response = judgment.read_response(run_dir, stage_name)
+        grades = {
+            row["problem_id"]: row["scarcity_grade"]
+            for row in conn.execute("SELECT problem_id, scarcity_grade FROM opportunities").fetchall()
+        }
         for decision in response["decisions"]:
+            final_decision = decision["decision"]
+            # Design 8.5: "C 등급은 제목을 생성하지 않고 추가 조사 대상으로 저장한다" - a
+            # hard rule, not left to reviewer judgment. Enforce it in code regardless of
+            # what the judgment response says, rather than trusting the instruction alone.
+            if grades.get(decision["problem_id"]) == "C" and final_decision in (
+                "GENERATE_TITLES",
+                "SCARCITY_PRIORITY",
+            ):
+                final_decision = "RESEARCH_MORE"
             conn.execute(
                 "UPDATE opportunities SET decision = ? WHERE problem_id = ?",
-                (decision["decision"], decision["problem_id"]),
+                (final_decision, decision["problem_id"]),
             )
         conn.commit()
         return
@@ -414,7 +427,9 @@ def _stage_review_opportunities(
         "각 기회를 독립 검토해 GENERATE_TITLES, RESEARCH_MORE, REJECT, SCARCITY_PRIORITY 중 "
         "하나로 최종 판정하라. 공급 조사가 충분치 않으면 RESEARCH_MORE, 실제 수요가 없거나 "
         "강력한 경쟁 제품이 다수면 REJECT, 수요는 낮지만 공급이 극도로 부족하고 반복 손실이 "
-        "확인되면 SCARCITY_PRIORITY를 사용하라. provisional_decision은 참고용 코드 판정이다."
+        "확인되면 SCARCITY_PRIORITY를 사용하라. provisional_decision은 참고용 코드 판정이다. "
+        "scarcity_grade가 C인 항목은 GENERATE_TITLES나 SCARCITY_PRIORITY로 판정하지 마라 "
+        "(C 등급은 제목 생성 대상이 아니다 — RESEARCH_MORE 또는 REJECT만 가능)."
     )
     request_path = judgment.write_request(
         run_dir, stage_name, state.run_id, instructions, items, generated_at=ids.now_kst().isoformat()
@@ -431,8 +446,13 @@ def _stage_review_opportunities(
 
 
 def _eligible_opportunities(conn) -> list[dict]:
+    # scarcity_grade != 'C' is defense-in-depth: _stage_review_opportunities already
+    # forces a C-grade decision away from GENERATE_TITLES/SCARCITY_PRIORITY, but this
+    # query is the actual title-generation gate, so it must not rely solely on that
+    # upstream guard staying correct (design 8.5's "C 등급은 제목을 생성하지 않는다").
     rows = conn.execute(
-        "SELECT * FROM opportunities WHERE decision IN ('GENERATE_TITLES', 'SCARCITY_PRIORITY')"
+        "SELECT * FROM opportunities WHERE decision IN ('GENERATE_TITLES', 'SCARCITY_PRIORITY') "
+        "AND scarcity_grade != 'C'"
     ).fetchall()
     return [dict(row) for row in rows]
 

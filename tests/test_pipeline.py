@@ -337,6 +337,85 @@ def test_stage_review_opportunities_consumes_response(tmp_path):
     conn.close()
 
 
+def test_stage_review_opportunities_forces_c_grade_generate_titles_to_research_more(tmp_path):
+    """Regression: design 8.5 says grade C never generates titles - this must
+    be enforced in code, not left to the judgment response alone."""
+    options = make_options(tmp_path, run_id="QA-20260810-190000-KST")
+    state = pipeline._load_or_create_state(options)
+    conn = db.connect(tmp_path)
+    conn.execute(
+        "INSERT INTO problems (problem_id, target_user, task, status) VALUES "
+        "('P-0001', 'small firms', 'track renewals', 'DEMAND_PASSED')"
+    )
+    conn.execute(
+        "INSERT INTO opportunities (problem_id, demand_score, effective_supply, supply_scarcity_score, "
+        "scarcity_grade, priority_score, confidence, decision, evidence_ids, product_ids, updated_at) "
+        "VALUES ('P-0001', 80, 12.0, 40, 'C', 50, 'C', 'RESEARCH_MORE', '[]', '[]', 't0')"
+    )
+    conn.commit()
+    run_dir = pipeline._run_dir(tmp_path, state)
+
+    judgment.write_request(run_dir, "review_opportunities", state.run_id, "test", [], generated_at="t0")
+    judgment.write_response(
+        run_dir, "review_opportunities",
+        [{"problem_id": "P-0001", "decision": "GENERATE_TITLES", "rationale": "looks great"}],
+        judged_at="t1",
+    )
+
+    pipeline._stage_review_opportunities(conn, tmp_path, options, state)
+    row = conn.execute("SELECT decision FROM opportunities WHERE problem_id = 'P-0001'").fetchone()
+    assert row["decision"] == "RESEARCH_MORE"
+    conn.close()
+
+
+def test_stage_review_opportunities_forces_c_grade_scarcity_priority_to_research_more(tmp_path):
+    options = make_options(tmp_path, run_id="QA-20260810-190000-KST")
+    state = pipeline._load_or_create_state(options)
+    conn = db.connect(tmp_path)
+    conn.execute(
+        "INSERT INTO problems (problem_id, target_user, task, status) VALUES "
+        "('P-0001', 'small firms', 'track renewals', 'DEMAND_PASSED')"
+    )
+    conn.execute(
+        "INSERT INTO opportunities (problem_id, demand_score, effective_supply, supply_scarcity_score, "
+        "scarcity_grade, priority_score, confidence, decision, evidence_ids, product_ids, updated_at) "
+        "VALUES ('P-0001', 40, 12.0, 40, 'C', 50, 'C', 'RESEARCH_MORE', '[]', '[]', 't0')"
+    )
+    conn.commit()
+    run_dir = pipeline._run_dir(tmp_path, state)
+
+    judgment.write_request(run_dir, "review_opportunities", state.run_id, "test", [], generated_at="t0")
+    judgment.write_response(
+        run_dir, "review_opportunities",
+        [{"problem_id": "P-0001", "decision": "SCARCITY_PRIORITY", "rationale": "severe loss despite low demand"}],
+        judged_at="t1",
+    )
+
+    pipeline._stage_review_opportunities(conn, tmp_path, options, state)
+    row = conn.execute("SELECT decision FROM opportunities WHERE problem_id = 'P-0001'").fetchone()
+    assert row["decision"] == "RESEARCH_MORE"
+    conn.close()
+
+
+def test_eligible_opportunities_excludes_c_grade_even_if_decision_is_generate_titles(tmp_path):
+    """Defense-in-depth: even if a C-grade row somehow has decision=GENERATE_TITLES
+    (e.g. a future bug upstream, or direct DB manipulation), the title-generation
+    gate itself must still exclude it."""
+    conn = db.connect(tmp_path)
+    conn.execute(
+        "INSERT INTO problems (problem_id, target_user, task, status) VALUES "
+        "('P-0001', 'small firms', 'track renewals', 'DEMAND_PASSED')"
+    )
+    conn.execute(
+        "INSERT INTO opportunities (problem_id, demand_score, effective_supply, supply_scarcity_score, "
+        "scarcity_grade, priority_score, confidence, decision, evidence_ids, product_ids, updated_at) "
+        "VALUES ('P-0001', 80, 12.0, 40, 'C', 90, 'A', 'GENERATE_TITLES', '[]', '[]', 't0')"
+    )
+    conn.commit()
+    assert pipeline._eligible_opportunities(conn) == []
+    conn.close()
+
+
 def test_stage_review_opportunities_skips_when_no_opportunities(tmp_path):
     options = make_options(tmp_path, run_id="QA-20260810-190000-KST")
     state = pipeline._load_or_create_state(options)
