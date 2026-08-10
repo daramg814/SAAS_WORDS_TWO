@@ -78,3 +78,45 @@ def allocate_title_slots(opportunities: list[dict], target_count: int) -> dict[s
             break
 
     return allocation
+
+
+def select_final_titles(approved: list[dict], target_count: int) -> list[dict]:
+    """Pick up to target_count from an approved pool, ranked by opportunity
+    priority_score, capped at 30% per opportunity (docs/pipeline/
+    10-title-generation.md 9.4). Clarity/diversity/distance/pronounceability
+    were already judged when each title was approved, so priority ordering
+    plus the cap is what's left for code to enforce.
+
+    Deliberately never exceeds the cap to force target_count: if the capped
+    pool can't fill target_count, this returns fewer, same as
+    allocate_title_slots - the caller's signal to generate more candidates
+    from underrepresented opportunities rather than overconcentrate.
+    Expects each item to have "problem_id" and "priority_score" keys.
+    """
+    if len(approved) <= target_count:
+        cap = max_titles_per_opportunity(target_count)
+        per_opportunity_count: dict[str, int] = {}
+        within_cap = []
+        for item in sorted(approved, key=lambda entry: entry["priority_score"], reverse=True):
+            pid = item["problem_id"]
+            if per_opportunity_count.get(pid, 0) >= cap:
+                continue
+            within_cap.append(item)
+            per_opportunity_count[pid] = per_opportunity_count.get(pid, 0) + 1
+        return within_cap
+
+    cap = max_titles_per_opportunity(target_count)
+    ordered = sorted(approved, key=lambda item: item["priority_score"], reverse=True)
+
+    selected: list[dict] = []
+    per_opportunity_count = {}
+    for item in ordered:
+        if len(selected) >= target_count:
+            break
+        pid = item["problem_id"]
+        if per_opportunity_count.get(pid, 0) >= cap:
+            continue
+        selected.append(item)
+        per_opportunity_count[pid] = per_opportunity_count.get(pid, 0) + 1
+
+    return selected

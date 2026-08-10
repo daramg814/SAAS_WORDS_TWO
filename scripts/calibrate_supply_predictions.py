@@ -62,18 +62,21 @@ def build_metrics(observations: list[dict]) -> dict:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--project-root", type=Path, default=Path.cwd())
+    parser.add_argument(
+        "--ledger", type=Path, default=None, help="defaults to memory/human_feedback/google_supply_observations.jsonl"
+    )
+    parser.add_argument(
+        "--metrics", type=Path, default=None, help="defaults to memory/human_feedback/google_calibration_metrics.json"
+    )
     args = parser.parse_args(argv)
 
     project_root = args.project_root
-    observations = load_observations(
-        project_root / "memory" / "human_feedback" / "google_supply_observations.jsonl"
-    )
+    ledger_path = args.ledger or project_root / "memory" / "human_feedback" / "google_supply_observations.jsonl"
+    metrics_path = args.metrics or project_root / "memory" / "human_feedback" / "google_calibration_metrics.json"
+    observations = load_observations(ledger_path)
     metrics = build_metrics(observations)
 
-    atomic_write_text(
-        project_root / "memory" / "human_feedback" / "google_calibration_metrics.json",
-        json.dumps(metrics, indent=2, ensure_ascii=False) + "\n",
-    )
+    atomic_write_text(metrics_path, json.dumps(metrics, indent=2, ensure_ascii=False) + "\n")
     print(
         f"CALIBRATION METRICS: total={metrics['total_observations']} "
         f"market={metrics['market_query_observations']} title={metrics['title_query_observations']} "

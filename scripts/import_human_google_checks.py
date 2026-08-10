@@ -139,18 +139,35 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--project-root", type=Path, default=Path.cwd())
     parser.add_argument("--run-id", default=None)
+    parser.add_argument("--input", type=Path, default=None, help="defaults to input/human_google_checks.csv")
+    parser.add_argument(
+        "--queue", type=Path, default=None, help="defaults to output/review/google_validation_queue.csv"
+    )
+    parser.add_argument(
+        "--ledger",
+        type=Path,
+        default=None,
+        help="defaults to memory/human_feedback/google_supply_observations.jsonl",
+    )
+    parser.add_argument(
+        "--report", type=Path, default=None, help="defaults to output/review/google_feedback_import_report.md"
+    )
     args = parser.parse_args(argv)
 
     project_root = args.project_root
     now = ids.now_kst()
     run_id = args.run_id or ids.format_run_id("production", now)
+    input_path = args.input or project_root / "input" / "human_google_checks.csv"
+    queue_path = args.queue or project_root / "output" / "review" / "google_validation_queue.csv"
+    ledger_path = args.ledger or project_root / "memory" / "human_feedback" / "google_supply_observations.jsonl"
+    report_path = args.report or project_root / "output" / "review" / "google_feedback_import_report.md"
 
     conn = db.connect(project_root)
     try:
         summary = import_observations(
-            project_root / "input" / "human_google_checks.csv",
-            project_root / "output" / "review" / "google_validation_queue.csv",
-            project_root / "memory" / "human_feedback" / "google_supply_observations.jsonl",
+            input_path,
+            queue_path,
+            ledger_path,
             import_run_id=run_id,
             id_conn=conn,
             now=now,
@@ -158,10 +175,7 @@ def main(argv: list[str] | None = None) -> int:
     finally:
         conn.close()
 
-    atomic_write_text(
-        project_root / "output" / "review" / "google_feedback_import_report.md",
-        report_to_markdown(summary, now.isoformat()),
-    )
+    atomic_write_text(report_path, report_to_markdown(summary, now.isoformat()))
     print(
         f"GOOGLE FEEDBACK IMPORT: total={summary['total_rows']} imported={summary['imported']} "
         f"duplicate_rejected={summary['duplicate_rejected']} invalid={summary['invalid']}"

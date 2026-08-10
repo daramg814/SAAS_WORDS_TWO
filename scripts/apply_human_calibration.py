@@ -78,12 +78,14 @@ def apply_calibration(conn, observations: list[dict]) -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--project-root", type=Path, default=Path.cwd())
+    parser.add_argument(
+        "--ledger", type=Path, default=None, help="defaults to memory/human_feedback/google_supply_observations.jsonl"
+    )
     args = parser.parse_args(argv)
 
     project_root = args.project_root
-    observations = load_observations(
-        project_root / "memory" / "human_feedback" / "google_supply_observations.jsonl"
-    )
+    ledger_path = args.ledger or project_root / "memory" / "human_feedback" / "google_supply_observations.jsonl"
+    observations = load_observations(ledger_path)
     conn = db.connect(project_root)
     try:
         updated = apply_calibration(conn, observations)

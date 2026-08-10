@@ -151,9 +151,13 @@ def write_queue_csv(path: Path, rows: list[dict]) -> None:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--project-root", type=Path, default=Path.cwd())
+    parser.add_argument(
+        "--output", type=Path, default=None, help="defaults to output/review/google_validation_queue.csv"
+    )
     args = parser.parse_args(argv)
 
     project_root = args.project_root
+    output_path = args.output or project_root / "output" / "review" / "google_validation_queue.csv"
     now = ids.now_kst()
     conn = db.connect(project_root)
     try:
@@ -162,7 +166,7 @@ def main(argv: list[str] | None = None) -> int:
     finally:
         conn.close()
 
-    write_queue_csv(project_root / "output" / "review" / "google_validation_queue.csv", rows)
+    write_queue_csv(output_path, rows)
     market_count = sum(1 for row in rows if row["query_type"] == "MARKET_QUERY")
     title_count = sum(1 for row in rows if row["query_type"] == "TITLE_QUERY")
     print(f"GOOGLE VALIDATION QUEUE: market={market_count} title={title_count} total={len(rows)}")

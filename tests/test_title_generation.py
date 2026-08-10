@@ -74,3 +74,30 @@ def test_allocate_title_slots_falls_short_when_pool_too_small_and_capped():
 
 def test_allocate_title_slots_empty_when_no_opportunities():
     assert tg.allocate_title_slots([], target_count=20) == {}
+
+
+def test_select_final_titles_returns_all_when_pool_not_over_target():
+    approved = [{"problem_id": "P-0001", "priority_score": 50}, {"problem_id": "P-0002", "priority_score": 40}]
+    selected = tg.select_final_titles(approved, target_count=5)
+    assert len(selected) == 2
+
+
+def test_select_final_titles_never_exceeds_cap_even_when_under_target():
+    cap = tg.max_titles_per_opportunity(20)  # 6
+    approved = [{"problem_id": "P-0001", "priority_score": 100 - i} for i in range(10)]
+    selected = tg.select_final_titles(approved, target_count=20)
+    assert len(selected) == cap  # falls short of 20 rather than exceed the cap
+
+
+def test_select_final_titles_trims_to_target_prioritizing_higher_scores():
+    approved = [{"problem_id": f"P-{i % 6}", "priority_score": 100 - i} for i in range(40)]
+    selected = tg.select_final_titles(approved, target_count=20)
+    assert len(selected) == 20
+    counts = {}
+    for item in selected:
+        counts[item["problem_id"]] = counts.get(item["problem_id"], 0) + 1
+    cap = tg.max_titles_per_opportunity(20)
+    assert all(count <= cap for count in counts.values())
+    # highest-priority items should be kept over lower ones
+    kept_scores = {item["priority_score"] for item in selected}
+    assert 99 in kept_scores  # top-scoring candidate (i=0) always survives

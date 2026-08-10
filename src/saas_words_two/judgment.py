@@ -22,7 +22,7 @@ class JudgmentRequired(Exception):
         self.round_no = round_no
         super().__init__(
             f"AWAITING_JUDGMENT stage={stage} round={round_no} request={request_path} "
-            "— write the judgment response and re-run with --resume"
+            "- write the judgment response and re-run with --resume"
         )
 
 

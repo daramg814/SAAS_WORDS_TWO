@@ -33,16 +33,22 @@ def normalize_observation(observation: dict) -> dict:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--project-root", type=Path, default=Path.cwd())
+    parser.add_argument(
+        "--ledger", type=Path, default=None, help="defaults to memory/human_feedback/google_supply_observations.jsonl"
+    )
+    parser.add_argument(
+        "--output", type=Path, default=None, help="defaults to output/logs/google_normalized_observations.json"
+    )
     args = parser.parse_args(argv)
 
     project_root = args.project_root
-    observations = load_observations(
-        project_root / "memory" / "human_feedback" / "google_supply_observations.jsonl"
-    )
+    ledger_path = args.ledger or project_root / "memory" / "human_feedback" / "google_supply_observations.jsonl"
+    output_path = args.output or project_root / "output" / "logs" / "google_normalized_observations.json"
+    observations = load_observations(ledger_path)
     normalized = [normalize_observation(observation) for observation in observations]
 
     atomic_write_text(
-        project_root / "output" / "logs" / "google_normalized_observations.json",
+        output_path,
         json.dumps(normalized, indent=2, ensure_ascii=False) + "\n",
     )
     print(f"NORMALIZED OBSERVATIONS: {len(normalized)}")
