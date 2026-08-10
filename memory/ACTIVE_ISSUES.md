@@ -57,9 +57,55 @@
   DB 스키마 확장(`hn_items.source` 컬럼), `collect_sources.py` 연결, 테스트 27개
   전부 구현·커밋 완료(pytest 240→258 통과, `verify_design_coverage.py` PASS 유지).
   상세는 `memory/HANDOFF.md` §2, §5 참고.
-- **아직 미해결**: 이번 배치는 코드 구현까지만 완료했고, 실제로 GH Archive 데이터를
-  수집해 QA(20개)를 재실행하는 것은 다음 세션의 작업임(`local.db`에 `gh_archive` 행
-  0건 상태). 따라서 DEMAND-001 자체는 여전히 `OPEN`이며, "수요 관문을 통과하는 군집이
-  실제로 늘어났는지"는 아직 검증되지 않았다 — 코드가 동작한다는 것과 문제가
-  해결됐다는 것은 별개이므로 혼동 금지. 다음 세션은 `memory/HANDOFF.md` §4 절차대로
-  실데이터 수집 → QA 재실행 → 이 항목에 실제 결과(성공/실패 무관) 기록.
+
+### A안 실데이터 검증 결과 (2026-08-10) — **A안으로는 DEMAND-001 해소되지 않음**
+
+- `scripts/collect_sources.py`를 실제 네트워크로 4회 반복 실행해 GH Archive
+  36시간치(2026-05-13-00 ~ 2026-05-14-02, `recent_days_max=90` 하한부터 시작)를
+  수집. 수집 도중 봇 필터 결함을 하나 더 발견해 수정함 — 액터 로그인의 `[bot]`
+  접미사만 봤더니 GitHub 자체 Copilot 리뷰 봇처럼 `user.type=="Bot"`이지만 액터
+  로그인엔 접미사가 없는 계정을 놓쳤다(커밋 `09f9f29`). 수정 후 기존 필터-오탐
+  데이터는 삭제하고 재수집.
+- 최종 수집량: `hn_items` 총 44,842건(HN story 4,568 + comment 11,566, gh_archive
+  story 8,908 + comment 19,800). 후보 문장 5,482~5,190개(필터/군집 재실행 시점에
+  따라 약간 변동) — HN 단독 시점(4,133개)보다 훨씬 많음.
+- **실제 파이프라인 QA를 끝까지 실행함**: `run.py --mode qa --target-count 20`
+  (run_id `QA-20260810-233602-KST`). `extract_and_cluster_problems` 판정 단계에서
+  전체 군집 5,190개(대부분 단일 멤버로 기계적으로 5명 미만) 중 `independent_user_count
+  >= 5`인 19개 전부를 직접 읽고 정직하게 REJECT했다 — **19개 전부 다른 저장소·다른
+  주제에 붙은 공용 보일러플레이트/템플릿 문구**였다:
+  - GitHub 기본 이슈 템플릿 문구 그 자체: `"Is your feature request related to a
+    problem?"`(6명), `"Current Workaround"`(6명) — 템플릿을 그대로 쓰는 모든 저장소가
+    똑같이 공유하는 문구라, 서로 완전히 무관한 프로젝트들이 묶임.
+  - README/저장소 보일러플레이트: `"Feedback and feature requests are welcome!"`류
+    변형이 4개 군집(11/15/18/30명)에 걸쳐 나타남 — 실제로는 각기 다른 프로젝트의
+    일반적인 "이슈 환영합니다" 문구.
+  - HN에서 이미 확인된 것과 동일한 질문 템플릿: `"How do you manage X"`(X가 매번
+    다름, 12명), `"What do you use and why?"`(6명).
+  - 일반 불만 표현이 우연히 겹친 경우: `"way too complicated"`(22명),
+    `"far too expensive/complicated"`(5명), `"I would pay for this service"`
+    (5명, 매번 다른 서비스를 가리킴).
+  - 나머지 5,171개 군집은 `independent_user_count < 5`라 기계적으로 탈락(판정으로
+    구제 불가 — 판정은 군집을 쪼개거나 멤버를 제외할 수만 있지, 서로 다른 군집을
+    합칠 수는 없음. 즉 5명 이상 군집 19개가 전부 탈락한 시점에 이 데이터셋에서는
+    수학적으로 더 나올 수 없음).
+  - `problems`/`opportunities` 0건 → `generate_and_review_titles`에서 `RetryRequired`
+    → 최종 상태 `RETRYING`(정상 종료, 코드 예외 아님). 운영
+    `output/history/words.txt` 체크섬 불변 확인(`git diff` 결과 없음).
+- **결론(중요)**: A안의 가설 — "데이터원을 다양화하면 문제가 풀린다" — 은 **반증됨**.
+  볼륨은 3배 이상(HN 단독 4,133개 → 5,190개 후보) 늘었지만 근본 원인은 그대로다:
+  1차 문자열 유사도 군집화는 "비슷한 표현"만 묶고, 다른 표현으로 말한 같은 문제는
+  애초에 못 묶는다(DEMAND-001 원래 진단 그대로). GH Archive는 오히려 HN보다 더
+  강력한 새 오염원(모든 저장소가 공유하는 GitHub 기본 이슈 템플릿)을 추가했다.
+  **결론: 데이터가 부족한 게 아니라 군집화 방법론(1차 문자열 유사도)의 재현율
+  한계다.**
+- **다음 조치(확정)**: B안(의미 기반/임베딩 군집화,
+  `docs/implementation/14-implementation-roadmap.md` "3차 개선" 항목)을 다음
+  세션에서 검토·착수. A안과 같은 방식(볼륨/소스만 늘리기)의 추가 반복은 결과가
+  똑같을 것이 이미 두 번(HN 단독, HN+GH Archive) 확인됐으므로 더 시도하지 말 것.
+  B안은 새 의존성(임베딩 모델/라이브러리)이 필요하므로 CLAUDE.md §8에 따라
+  라이선스·유지보수 위험을 먼저 문서화한 뒤 추가할 것. "5명" 기준 완화는 여전히
+  검토 대상 아님(CLAUDE.md 12항 위반).
+- 관련 실행 기록: `output/runs/QA-20260810-233602-KST/`(judgment 요청/응답 원문
+  포함, `.gitignore` 대상이라 로컬에만 있음), 커밋 `e07769c`(GH Archive 구현),
+  `09f9f29`(봇 필터 수정).
