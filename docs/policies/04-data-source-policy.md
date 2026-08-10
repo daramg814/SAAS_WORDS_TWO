@@ -7,6 +7,17 @@
 2. 선택 데이터원은 샘플 다운로드·파싱·디스크·중복 방지 검사를 모두 통과한 뒤 활성화한다.
 3. 실패 데이터원은 3회 지수 백오프 후 DISABLED 처리하고 보고서에 기록한다.
 4. Common Crawl은 이미 확보한 후보 도메인의 기능·가격·활성 상태 보강에만 사용한다.
+5. **GH Archive는 접근성 검사(PASS, `output/logs/access_test_report.md`)를 거쳐
+   `config/sources.yaml`에서 `enabled: true`로 전환됨(2026-08-10, `DEMAND-001` A안).**
+   IssuesEvent(action=opened)·IssueCommentEvent(action=created)만 정규화하며(PR 이벤트는
+   미포함 — 8절 공급 파이프라인의 향후 과제), 봇 액터(`login`이 `[bot]`로 끝나는 계정)는
+   독립 사용자 신호가 아니므로 제외한다. 정규화 결과는 기존 `hn_items` 테이블에
+   `source='gh_archive'` 컬럼으로 구분되어 저장되며(HN 항목 id는 수천만대, GH 이슈/댓글
+   entity id는 이미 수십억대라 충돌 가능성은 무시할 수 있는 수준 — `src/saas_words_two/db.py`
+   COLUMN_MIGRATIONS 주석 참고), 이후 필터·군집·수요 점수 단계는 기존 로직을 그대로
+   재사용한다. 수집 창은 `sources.yaml`의 `recent_days_max`(90일)를 하드 하한으로 삼아
+   시간 단위 커서(`data/cache/gh_archive_last_hour.txt`)로 점진 수집한다
+   (`src/saas_words_two/collection.py::run_gh_archive_collection`).
 
 ## 원본 설계 세부 규칙
 

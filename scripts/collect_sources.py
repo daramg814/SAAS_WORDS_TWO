@@ -48,6 +48,15 @@ def main(argv: list[str] | None = None) -> int:
             created_after_epoch=cutoff_epoch,
             fetched_at=now.isoformat(),
         )
+
+        gh_summary = None
+        if access_report.results.get("gh_archive", {}).get("status") == "PASS" and sources_config["sources"].get(
+            "gh_archive", {}
+        ).get("enabled"):
+            gh_settings = project_config["collection"]["gh_archive"]
+            gh_summary = collection.run_gh_archive_collection(
+                project_root, conn, sources_config, gh_settings, session, now=now, fetched_at=now.isoformat()
+            )
     finally:
         conn.close()
 
@@ -61,7 +70,15 @@ def main(argv: list[str] | None = None) -> int:
         f"stories={search_summary.fetched_stories} comments={search_summary.fetched_comments} "
         f"skipped_existing={search_summary.skipped_existing}"
     )
-    for error in recency_summary.errors + search_summary.errors:
+    errors = list(recency_summary.errors) + list(search_summary.errors)
+    if gh_summary is not None:
+        print(
+            f"COLLECTED (gh_archive) stories={gh_summary.fetched_stories} "
+            f"comments={gh_summary.fetched_comments} skipped_existing={gh_summary.skipped_existing} "
+            f"hours={len(gh_summary.hours_processed)} cursor={gh_summary.cursor_before}->{gh_summary.cursor_after}"
+        )
+        errors += gh_summary.errors
+    for error in errors:
         print(f"  WARN: {error}")
     return 0
 

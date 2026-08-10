@@ -1,10 +1,10 @@
 # HANDOFF
 
 - 상태: `PAUSED`
-- 요약 한 줄: 1차 구현(파이프라인 15단계) 코드·테스트 전부 완료. 실제 QA(20개)도 끝까지
-  돌렸으나 수요 관문을 통과하는 문제가 없어 `RETRYING`으로 정상 종료(코드 결함 아님,
-  `DEMAND-001`). 사용자와 협의해 **다음 조치는 A안(2차 데이터원 활성화)으로 확정**함
-  — 재논의 없이 바로 착수할 것.
+- 요약 한 줄: `DEMAND-001` A안(GH Archive 2차 데이터원 활성화) **구현·테스트·문서화 완료, 커밋 완료**.
+  아직 안 한 것: 실제로 GH Archive 데이터를 충분히 모아 QA(20개)를 재실행해서
+  DEMAND-001이 실제로 해소되는지 확인하는 것. **다음 세션은 여기(§4 "다음 원자 작업")부터
+  바로 시작할 것** — 재논의 불필요.
 
 ## 1. 지금 이 세션을 새로 열면 가장 먼저 할 일
 
@@ -13,108 +13,104 @@
 2. 환경 확인:
    ```bash
    cd "C:\Share\Claude_project\SAAS_WORDS_TWO_claude_code_project_v2.4"
-   ./.venv/Scripts/python -m pytest -q          # 240 passed 나와야 정상
+   ./.venv/Scripts/python -m pytest -q          # 258 passed 나와야 정상
    ./.venv/Scripts/python tools/verify_design_coverage.py   # PASS 나와야 정상
    ```
-   `.venv`가 없거나 깨졌으면 `python -m venv .venv` 후
-   `./.venv/Scripts/python -m pip install -e ".[dev]"`.
-3. `git log --oneline`으로 커밋 이력 확인. **원격 push는 이미 설정 완료**(아래 §3) —
-   커밋만 하면 자동으로 push되므로 별도 push 명령 불필요.
-4. §4(다음 원자 작업)의 A안부터 바로 시작한다. B안·재논의는 A안 시도 후 여전히
-   부족할 때만 고려(§4 하단 참고).
+3. `git log --oneline`으로 커밋 이력 확인. 원격 push는 자동(post-commit 훅, 아래 §3).
+4. §4부터 바로 시작.
 
-## 2. 완료된 것 (전부 커밋되어 있음, `git log`로 각 배치 확인 가능)
+## 2. 완료된 것 (이번 세션, 전부 커밋됨)
 
-- HN 공식 API 접근성 검사·증분 수집 (Firebase API + Algolia 검색 API 두 가지 모두)
-- 후보 문제 문장 필터, 문자열 유사도 1차 군집화(성능 최적화 완료: 4,133개 후보
-  기준 3초)
-- 수요 점수(100점 배점), 공급 후보 수집·활성 검증, 공급 희소성 등급·희소성 우선
-  점수, 제목 생성 라운드 로직(부족분×2, 최대 5라운드), Google 사람 검증 보정 체계
-  5개 스크립트
-- `run.py`/`pipeline.py`: 15단계 전체 연결. 의미 판정이 필요한 지점(문제 추출,
-  공급 활성/유형 분류, 기회 검토, 제목 생성, 제목 의미중복 검토)마다
-  `output/runs/<run_id>/judgment/<stage>_request.json`을 쓰고 멈춘 뒤, 현재
-  세션이 직접 읽고 판정해서 `_response.json`을 쓰면 `--resume`으로 이어감.
-  별도 API 키·anthropic 패키지 없음(CLAUDE.md 절대 규칙 준수).
-- pytest 240개, `qa/regression/REQUIRED_CASES.md`의 필수 회귀 사례 16개 전부
-  `tests/test_regression_required_cases.py`에 대응 테스트 있음.
+- **GH Archive 접근성 검사 실제 PASS**: `gh_archive_client.access_test()`를 실제
+  네트워크로 실행해 확인(hour=2026-08-10-7, total_events=163763,
+  normalizable_events=29, compressed_bytes=20326143). 디스크에 아무것도 남기지 않음
+  (gzip을 메모리에서 바로 해제·파싱). `config/sources.yaml`의 `gh_archive.enabled`를
+  `true`로 전환함.
+- **신규 `src/saas_words_two/gh_archive_client.py`**: `IssuesEvent`(action=opened)와
+  `IssueCommentEvent`(action=created)만 정규화(PR 이벤트는 이번 배치 범위 밖 — 공급
+  파이프라인의 향후 과제, 8절). 봇 액터(`login`이 `[bot]`로 끝남)는 독립 사용자 신호가
+  아니므로 제외.
+- **`db.py`**: 기존 `hn_items` 테이블에 `source` 컬럼 추가(마이그레이션 포함). GH Archive
+  정규화 결과도 같은 테이블에 `source='gh_archive'`로 저장 — 필터·군집·수요 점수 등
+  나머지 파이프라인 코드를 전혀 건드리지 않고 그대로 재사용하기 위한 설계적 선택.
+  HN item id(현재 수천만대)와 GH 이슈/댓글 entity id(이미 수십억대)는 값 범위가 겹치지
+  않아 충돌 가능성을 무시할 수 있다고 판단 — 근거는 `db.py`의 `COLUMN_MIGRATIONS` 주석에
+  기록.
+- **`collection.py`**: `run_access_test`가 `gh_archive`도 실제로 검사하도록 확장.
+  신규 `run_gh_archive_collection()` — 시간 단위(`YYYY-MM-DD-H`) 커서 기반 점진 수집,
+  `sources.yaml`의 `recent_days_max`(90일)를 backfill 하한으로 사용,
+  `max_hours_per_run`(`project.yaml`, 기본 12) 예산만큼만 매 실행에서 처리.
+  **구현 중 직접 발견해 고친 버그 2개** (회귀 테스트로 고정, §5 참고):
+  1. 파이프라인의 `now`는 KST로 넘어오는데 GH Archive 파일명은 UTC 기준이라 변환 누락 시
+     엉뚱한 시간대 파일을 요청하게 됨 → `now.astimezone(timezone.utc)` 추가.
+  2. 시간 키에 선행 0이 없어(`"...-9"` vs `"...-10"`) 문자열 비교 시 9시가 10시보다
+     "뒤"로 정렬되는 사전식 비교 오류 → `datetime`으로 변환해 비교하도록 수정.
+- **`scripts/collect_sources.py`**: 접근성 PASS + `enabled`일 때만 GH Archive 수집 실행.
+- 테스트 27개 신규(`tests/test_gh_archive_client.py`, `tests/test_collection.py` 확장).
+  pytest 240 → **258개 전부 통과**. `tools/verify_design_coverage.py` PASS 유지.
+- `docs/policies/04-data-source-policy.md` "Claude Code 실행 지침"에 GH Archive 활성화
+  사실·설계 근거 기록.
 
-## 3. Git/원격 설정 (2026-08-10 완료, 재작업 불필요)
+## 3. Git/원격 설정 (재작업 불필요, 이전 세션에서 완료)
 
-- `origin` = `https://github.com/daramg814/SAAS_WORDS_TWO.git` 연결됨, `main` push
-  완료·SHA 일치 확인됨.
-- `.git/hooks/post-commit`이 `main` 커밋마다 자동으로 `git push origin main` 실행
-  (사용자 명시 요청). 훅은 로컬 전용(`git` 미추적) — 새 clone/새 머신에서는 재설치
-  필요.
-- 인증은 만료 없는 Classic PAT(`repo` scope, Windows Credential Manager 저장)로
-  전환 완료. 이 저장소 로컬 설정 `credential.https://github.com.gitHubAuthModes=pat`
-  로 GCM 브라우저 로그인 대신 PAT를 쓰도록 강제해놓음. 완전 무인 push 실제 커밋으로
-  검증됨(브라우저 재로그인 불필요).
-- 실패 시 훅이 stderr에 `post-commit: auto-push ... FAILED`를 출력하고 커밋 자체는
-  `COMMIT_PENDING` 취급 — 사용자에게 알리고 수동 push로 해결할 것.
+- `origin` = `https://github.com/daramg814/SAAS_WORDS_TWO.git`, `main` push 완료.
+- `.git/hooks/post-commit`이 커밋마다 자동 `git push origin main` 실행(로컬 전용, 새
+  clone에서는 재설치 필요). PAT 인증으로 완전 무인.
+- 실패 시 훅이 stderr에 경고 출력, 커밋은 `COMMIT_PENDING` 취급 — 수동 push로 해결.
 
-## 4. 실제 QA 실행에서 확인된 것 (`memory/ACTIVE_ISSUES.md`의 DEMAND-001 참고)
+## 4. 다음 원자 작업 — GH Archive 실데이터 수집 후 QA 재실행
 
-`python run.py --mode qa --target-count 20`을 실제 HN 데이터로 끝까지 실행함.
-- source_access_test → collect_sources → filter_pain_sentences →
-  extract_and_cluster_problems까지는 실제 네트워크·판정으로 전부 정상 동작.
-- 문제: HN에서 후보 문장을 아무리 늘려도(14,910개 원문 / 4,990개 후보 문장,
-  `search_hits_per_pattern`을 40→1000까지 올림) "동일한 구체적 SaaS 문제를
-  독립 사용자 5명 이상이 언급"하는 군집이 실제로는 없었다. 독립 사용자 수 상위
-  16개 군집을 전부 직접 읽어봤는데 HN 관용구("feature requests welcome!")나
-  질문 템플릿("How do you manage X?"에서 X가 매번 다른 주제)이었음.
-- 정직하게 전부 반려 → `problems`/`opportunities`/`titles` 전부 0건 →
-  `generate_and_review_titles`에서 `RetryRequired`로 정상 종료(exit code 4,
-  status=`RETRYING`). `output/history/words.txt`와 `output/generated/`는
-  전혀 건드리지 않음(확인 완료).
-- 마지막 실행: run_id `QA-20260810-215254-KST`. `output/runs/.../run_state.json`은
-  git에 있음. 판정 요청/응답 원문(수 MB, HN 원문 대량 포함)은 `.gitignore`로
-  제외했음(로컬에는 남아있음).
-
-## 5. 다음 원자 작업 — A안(확정): 2차 데이터원 활성화
-
-- `config/sources.yaml`에서 `stack_exchange_dump` 또는 `gh_archive`를
-  `activation_gate: access_test_pass` 절차대로 접근성 검사 후 `enabled: true`로.
-- `.claude/skills/source-access/SKILL.md` 절차(샘플 다운로드→형식 검사→디스크
-  검사→중복 방지 검사) 그대로 따를 것. 새 데이터원마다 `collection.py`에 상응하는
-  수집 함수를 추가해야 함(현재는 HN 전용으로만 구현되어 있음).
-- 근거: Stack Exchange/GH Archive는 Q&A 구조상 동일 문제를 여러 사용자가 각자
-  질문하는 경우가 많아, HN보다 5명 기준을 통과할 원재료가 많을 가능성이 높음
-  (설계서 3.2절 원래 의도).
-- **A안 시도 후에도 여전히 부족하면**: B안(의미 기반/임베딩 군집화, 새 의존성 필요
-  — CLAUDE.md §8에 따라 라이선스·유지보수 위험 문서화 후 추가,
-  `docs/implementation/14-implementation-roadmap.md` "3차 개선" 참고)을 그때 고려.
-  두 안 모두 하지 않고 그냥 재시도만 하면 결과는 똑같다(데이터가 안 바뀌면 판정도
-  똑같이 나옴). **판정 기준(독립 사용자 5명)을 임의로 낮추는 것은 CLAUDE.md 12항
-  위반이므로 하지 말 것.**
-
-## 6. QA를 이어서 실행하는 방법 (A안 적용 후)
+이번 배치는 **코드만** 완성했고 **아직 GH Archive 데이터를 실제로 쌓지 않았다**
+(local.db에 gh_archive 행 0건). 다음 세션은 여기부터:
 
 ```bash
-# 데이터를 더 모은 뒤 새 QA 실행 (기존 run은 RETRYING으로 끝났으므로 새로 시작)
-./.venv/Scripts/python scripts/collect_sources.py     # 필요시 반복 실행(증분 수집)
+cd "C:\Share\Claude_project\SAAS_WORDS_TWO_claude_code_project_v2.4"
+# 1) 여러 번 반복 실행해서 GH Archive 백필을 쌓는다 (1회 = 최대 12시간치,
+#    sources.yaml의 recent_days_max=90일이 하한). 필요한 만큼 반복 — 처음엔
+#    예컨대 10~20회 실행해 5~10일치를 모으고 아래 3)으로 진행 여부를 판단할 것.
+./.venv/Scripts/python scripts/collect_sources.py
+# (반복)
+
+# 2) 확보량 확인
+./.venv/Scripts/python -c "
+from saas_words_two import db
+conn = db.connect(__import__('pathlib').Path('.'))
+print(conn.execute(\"SELECT source, type, COUNT(*) FROM hn_items GROUP BY source, type\").fetchall())
+"
+
+# 3) QA 재실행 (기존 RETRYING run과 별개로 새로 시작)
 ./.venv/Scripts/python run.py --mode qa --target-count 20
-# -> AWAITING_JUDGMENT 로 멈추면 output/runs/<run_id>/judgment/*_request.json 을
-#    직접 읽고 판정한 뒤 같은 폴더에 *_response.json 을 써서
+# -> AWAITING_JUDGMENT면 output/runs/<run_id>/judgment/*_request.json을 읽고 판정 후
+#    같은 폴더에 *_response.json을 써서:
 ./.venv/Scripts/python run.py --mode qa --target-count 20 --resume --run-id <run_id>
-# -> 반복. 20개 확정되면 output/qa/<run_id>/ 에 최종 산출물 저장됨.
 ```
 
-judgment response를 직접 쓸 때는 `saas_words_two.judgment.write_response()`를
-python -c로 호출하는 방식을 이번 세션 내내 사용했음(요청 파일의 `items` 구조를
-그대로 읽어 `decisions` 배열을 만들면 됨). 각 단계별 요청/응답 스키마는
-`src/saas_words_two/pipeline.py`의 각 `_stage_*` 함수 docstring과
-`_write_*_request`/`_consume_*` 함수 쌍을 보면 정확히 알 수 있음.
+- **판정 기준(독립 사용자 5명)을 낮추지 말 것**(CLAUDE.md 12항 위반, `DEMAND-001` 참고).
+- 이번에도 여전히 관문을 통과하는 군집이 없으면: (a) `max_hours_per_run`을 늘려
+  백필 속도를 높이거나, (b) B안(임베딩 기반 군집화)을 고려하되 — 두 경우 모두
+  `ACTIVE_ISSUES.md`의 `DEMAND-001`에 사실대로 기록하고 가짜 판정으로 수량을 채우지
+  말 것.
+- **성공/실패 무관하게** 이 QA 실행 결과는 `ACTIVE_ISSUES.md`(`DEMAND-001`)와 이 파일에
+  정직하게 기록할 것(성공했다고 거짓 보고 금지, 실패도 은폐 금지).
 
-## 7. 주의·금지
+## 5. 회귀 사례로 고정된 함정 (재발 방지)
+
+- 시간/날짜 문자열을 키로 쓰는 증분 수집기를 새로 만들 때, **자릿수가 고정되지 않은
+  키(선행 0 없음)는 절대 문자열로 비교하지 말 것** — 반드시 실제 날짜/시간 타입으로
+  변환해서 비교. (`tests/test_collection.py`의
+  `test_run_gh_archive_collection_crosses_single_to_double_digit_hour_boundary` 참고)
+- 외부 API가 UTC 기준 리소스명을 쓰는데 파이프라인 내부 `now`는 KST로 흐른다 —
+  새 데이터원을 붙일 때마다 시간대 변환 필요 여부를 반드시 확인할 것.
+  (`test_run_gh_archive_collection_converts_kst_now_to_utc_before_selecting_hours` 참고)
+
+## 6. 주의·금지
 
 - 미구현/미완료 상태를 DONE 또는 QA PASS로 기록하지 말 것.
 - 수요 데이터 부족을 감추기 위해 판정을 완화하거나 가짜 문제를 만들지 말 것
   (데이터 무결성 절대 규칙, 최우선순위).
 - 운영 `output/history/words.txt` / `output/generated/`에 검증 안 된 부분 결과를
   쓰지 말 것.
-- `data/local.db`, `output/runs/*/judgment/`는 `.gitignore` 대상(대용량 원문
-  데이터) — 실수로 강제 추가(`git add -f`)하지 말 것.
+- `data/local.db`, `output/runs/*/judgment/`는 `.gitignore` 대상 — 실수로 강제 추가
+  (`git add -f`)하지 말 것.
 - push 자체는 훅이 자동 처리하지만, force-push·히스토리 재작성·브랜치 삭제 등
-  파괴적 작업은 여전히 사용자에게 사전 확인받을 것(§3의 자동화는 일반적인
-  `commit → push`에만 적용되는 예외).
+  파괴적 작업은 여전히 사용자에게 사전 확인받을 것.

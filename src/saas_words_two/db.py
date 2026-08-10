@@ -22,7 +22,8 @@ CREATE TABLE IF NOT EXISTS hn_items (
     descendants INTEGER,
     dead INTEGER NOT NULL DEFAULT 0,
     deleted INTEGER NOT NULL DEFAULT 0,
-    fetched_at TEXT NOT NULL
+    fetched_at TEXT NOT NULL,
+    source TEXT NOT NULL DEFAULT 'hacker_news'
 );
 
 CREATE TABLE IF NOT EXISTS candidate_sentences (
@@ -142,6 +143,12 @@ COLUMN_MIGRATIONS: tuple[tuple[str, str, str], ...] = (
     ("opportunities", "human_observation_count", "INTEGER NOT NULL DEFAULT 0"),
     ("opportunities", "human_adjusted_supply_scarcity_score", "REAL"),
     ("opportunities", "human_calibration_status", "TEXT NOT NULL DEFAULT 'NO_DATA'"),
+    # hn_items now also holds normalized gh_archive events (id ranges do not
+    # overlap: HN item ids are still in the tens of millions as of 2026, GH
+    # issue/comment entity ids are already in the billions - see
+    # gh_archive_client.normalize_event). "source" distinguishes the two for
+    # evidence traceability; it does not gate any query.
+    ("hn_items", "source", "TEXT NOT NULL DEFAULT 'hacker_news'"),
 )
 
 

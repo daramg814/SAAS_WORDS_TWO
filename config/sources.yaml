@@ -11,11 +11,12 @@ sources:
     required: false
     activation_gate: access_test_pass
   gh_archive:
-    enabled: false
+    enabled: true
     required: false
     activation_gate: access_test_pass
     recent_days_min: 30
     recent_days_max: 90
+    incremental_cursor: data/cache/gh_archive_last_hour.txt
   common_crawl:
     enabled: false
     required: false

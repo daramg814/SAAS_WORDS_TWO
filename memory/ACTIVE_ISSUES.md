@@ -46,3 +46,20 @@
   상세 절차는 `memory/HANDOFF.md` §5 참고.
 - 수정 파일: 해당 없음(코드 결함 아님). 관련 실행 기록:
   `output/runs/QA-20260810-215254-KST/`, `output/qa/QA-20260810-215254-KST/`.
+
+### 진행 상황 업데이트 (2026-08-10, A안 구현 배치)
+
+- 사용자가 GH Archive를 A안 데이터원으로 확정. 접근성 검사를 실제 네트워크로 실행해
+  PASS 확인(hour=2026-08-10-7, total_events=163763, normalizable_events=29 —
+  IssuesEvent(opened)/IssueCommentEvent(created) 중 봇 액터 제외). `sources.yaml`의
+  `gh_archive.enabled: true`로 전환.
+- 수집 코드(`gh_archive_client.py`, `collection.py::run_gh_archive_collection`),
+  DB 스키마 확장(`hn_items.source` 컬럼), `collect_sources.py` 연결, 테스트 27개
+  전부 구현·커밋 완료(pytest 240→258 통과, `verify_design_coverage.py` PASS 유지).
+  상세는 `memory/HANDOFF.md` §2, §5 참고.
+- **아직 미해결**: 이번 배치는 코드 구현까지만 완료했고, 실제로 GH Archive 데이터를
+  수집해 QA(20개)를 재실행하는 것은 다음 세션의 작업임(`local.db`에 `gh_archive` 행
+  0건 상태). 따라서 DEMAND-001 자체는 여전히 `OPEN`이며, "수요 관문을 통과하는 군집이
+  실제로 늘어났는지"는 아직 검증되지 않았다 — 코드가 동작한다는 것과 문제가
+  해결됐다는 것은 별개이므로 혼동 금지. 다음 세션은 `memory/HANDOFF.md` §4 절차대로
+  실데이터 수집 → QA 재실행 → 이 항목에 실제 결과(성공/실패 무관) 기록.

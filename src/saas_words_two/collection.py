@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import sqlite3
+import time
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from . import hn_client
+from . import gh_archive_client, hn_client
 from .contracts import atomic_write_text
 
 
@@ -28,6 +30,7 @@ def run_access_test(
     session,
     *,
     generated_at: str,
+    gh_archive_hour: str | None = None,
 ) -> AccessTestReport:
     results: dict[str, dict] = {}
     hn_conf = sources_config["sources"]["hacker_news"]
@@ -43,8 +46,22 @@ def run_access_test(
     else:
         results["hacker_news"] = {"status": "DISABLED", "detail": "required source disabled in config"}
 
+    if "gh_archive" in sources_config["sources"]:
+        gh_result = gh_archive_client.access_test(session, hour=gh_archive_hour)
+        if gh_result.ok:
+            results["gh_archive"] = {
+                "status": "PASS",
+                "detail": (
+                    f"hour={gh_result.data['hour']} total_events={gh_result.data['total_events']} "
+                    f"normalizable_events={gh_result.data['normalizable_events']} "
+                    f"compressed_bytes={gh_result.data['compressed_bytes']}"
+                ),
+            }
+        else:
+            results["gh_archive"] = {"status": "FAIL", "detail": gh_result.error or "unknown error"}
+
     for name in sources_config["sources"]:
-        if name == "hacker_news":
+        if name in ("hacker_news", "gh_archive"):
             continue
         results[name] = {
             "status": "DISABLED",
@@ -94,13 +111,15 @@ def _existing_ids(conn: sqlite3.Connection, candidate_ids: list[int]) -> set[int
     return {row[0] for row in rows}
 
 
-def _insert_normalized(conn: sqlite3.Connection, normalized: dict, fetched_at: str) -> None:
+def _insert_normalized(
+    conn: sqlite3.Connection, normalized: dict, fetched_at: str, *, source: str = "hacker_news"
+) -> None:
     conn.execute(
         "INSERT OR IGNORE INTO hn_items "
-        "(id, type, by, time, text, title, url, parent, score, descendants, dead, deleted, fetched_at) "
+        "(id, type, by, time, text, title, url, parent, score, descendants, dead, deleted, fetched_at, source) "
         "VALUES (:id, :type, :by, :time, :text, :title, :url, :parent, :score, :descendants, "
-        ":dead, :deleted, :fetched_at)",
-        {**normalized, "fetched_at": fetched_at},
+        ":dead, :deleted, :fetched_at, :source)",
+        {**normalized, "fetched_at": fetched_at, "source": source},
     )
 
 
@@ -229,4 +248,121 @@ def run_keyword_search_collection(
             summary.cursor_after = max(summary.cursor_after, item_id)
 
     conn.commit()
+    return summary
+
+
+def _gh_archive_cursor_path(project_root: Path, sources_config: dict) -> Path:
+    rel = sources_config["sources"]["gh_archive"]["incremental_cursor"]
+    return project_root / rel
+
+
+def read_gh_archive_cursor(project_root: Path, sources_config: dict) -> str | None:
+    path = _gh_archive_cursor_path(project_root, sources_config)
+    if not path.exists():
+        return None
+    text = path.read_text(encoding="utf-8").strip()
+    return text or None
+
+
+def write_gh_archive_cursor(project_root: Path, sources_config: dict, value: str) -> None:
+    atomic_write_text(_gh_archive_cursor_path(project_root, sources_config), f"{value}\n")
+
+
+@dataclass
+class GhArchiveCollectionSummary:
+    fetched_stories: int = 0
+    fetched_comments: int = 0
+    skipped_existing: int = 0
+    hours_processed: list[str] = field(default_factory=list)
+    errors: list[str] = field(default_factory=list)
+    cursor_before: str | None = None
+    cursor_after: str | None = None
+
+
+def run_gh_archive_collection(
+    project_root: Path,
+    conn: sqlite3.Connection,
+    sources_config: dict,
+    gh_settings: dict,
+    session,
+    *,
+    now: datetime,
+    fetched_at: str,
+) -> GhArchiveCollectionSummary:
+    """Incrementally collect GH Archive hourly dumps into the same hn_items
+    table HN collection uses (source='gh_archive'), one run at a time.
+
+    Backfill window: sources.yaml's gh_archive.recent_days_max is the hard
+    floor - this never fetches further back than that. recent_days_min
+    documents the minimum useful depth but is not separately enforced: the
+    incremental cursor just keeps walking forward from the floor,
+    max_hours_per_run hours per invocation (mirrors hacker_news's
+    incremental_cursor pattern), until it catches up to `now` minus a
+    publish-delay buffer.
+    """
+    gh_conf = sources_config["sources"]["gh_archive"]
+    summary = GhArchiveCollectionSummary(cursor_before=read_gh_archive_cursor(project_root, sources_config))
+
+    # GH Archive hour files are named in UTC; `now` may be any tz-aware
+    # datetime (the pipeline passes KST) so it must be converted before it is
+    # used to build hour keys, or every fetch targets the wrong hour.
+    now_utc = now.astimezone(timezone.utc)
+    floor_hour = gh_archive_client.hour_key(now_utc - timedelta(days=gh_conf["recent_days_max"]))
+    # GH Archive publishes each hour's file with some delay; stay a couple of
+    # hours behind "now" so we don't repeatedly retry an hour not yet available.
+    ceiling_hour = gh_archive_client.hour_key(now_utc - timedelta(hours=2))
+    # Hour keys have no leading zero ("...-7" vs "...-12"), so they must be
+    # compared as datetimes, not strings - lexicographically "...-7" sorts
+    # *after* "...-12" even though 7am is earlier.
+    floor_dt = gh_archive_client.hour_key_to_datetime(floor_hour)
+    ceiling_dt = gh_archive_client.hour_key_to_datetime(ceiling_hour)
+
+    current_hour = summary.cursor_before or floor_hour
+    current_dt = gh_archive_client.hour_key_to_datetime(current_hour)
+    if current_dt < floor_dt:
+        current_hour, current_dt = floor_hour, floor_dt
+
+    budget = gh_settings.get("max_hours_per_run", 12)
+    while budget > 0 and current_dt <= ceiling_dt:
+        result = gh_archive_client.fetch_hour(session, current_hour, retry_attempts=3, timeout=30.0, sleep_fn=time.sleep)
+        budget -= 1
+        if not result.ok:
+            summary.errors.append(f"hour {current_hour}: {result.error}")
+            current_hour = gh_archive_client.next_hour_key(current_hour)
+            current_dt = gh_archive_client.hour_key_to_datetime(current_hour)
+            continue
+
+        try:
+            events = list(gh_archive_client.iter_hour_events(result.data))
+        except OSError as exc:
+            summary.errors.append(f"hour {current_hour}: gunzip failed: {exc}")
+            current_hour = gh_archive_client.next_hour_key(current_hour)
+            current_dt = gh_archive_client.hour_key_to_datetime(current_hour)
+            continue
+
+        normalized_by_id: dict[int, dict] = {}
+        for event in events:
+            normalized = gh_archive_client.normalize_event(event)
+            if normalized is not None and normalized.get("id") is not None:
+                normalized_by_id[normalized["id"]] = normalized
+
+        existing = _existing_ids(conn, list(normalized_by_id.keys()))
+        for item_id, normalized in normalized_by_id.items():
+            if item_id in existing:
+                summary.skipped_existing += 1
+                continue
+            _insert_normalized(conn, normalized, fetched_at, source="gh_archive")
+            if normalized["type"] == "story":
+                summary.fetched_stories += 1
+            else:
+                summary.fetched_comments += 1
+
+        summary.hours_processed.append(current_hour)
+        current_hour = gh_archive_client.next_hour_key(current_hour)
+        current_dt = gh_archive_client.hour_key_to_datetime(current_hour)
+
+    conn.commit()
+    summary.cursor_after = current_hour
+    if summary.cursor_after != summary.cursor_before:
+        write_gh_archive_cursor(project_root, sources_config, summary.cursor_after)
     return summary
