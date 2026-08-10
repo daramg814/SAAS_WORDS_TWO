@@ -107,7 +107,11 @@ python -c로 호출하는 방식을 이번 세션 내내 사용했음(요청 파
   (데이터 무결성 절대 규칙, 최우선순위).
 - 운영 `output/history/words.txt` / `output/generated/`에 검증 안 된 부분 결과를
   쓰지 말 것.
-- `git push`는 사용자에게 다시 명시적으로 확인받고 진행할 것(이번 세션 결정:
-  로컬 커밋만, 원격 자격 증명 미확인).
+- (2026-08-10 갱신) 원격 `origin`이 `https://github.com/daramg814/SAAS_WORDS_TWO.git`로
+  연결되었고, `.git/hooks/post-commit`에 자동 push 훅을 설치함(사용자 명시 요청).
+  main 브랜치 커밋마다 자동으로 `git push origin main`이 실행되므로 이제 push
+  단계에서 매번 확인받을 필요 없음 — CLAUDE.md §10의 "commit → push origin main"
+  순서를 훅이 자동 수행. 단, 훅은 `.git/hooks/`(로컬 전용, git 추적 안 됨)에만
+  있으므로 새 clone/새 머신에서는 재설치 필요.
 - `data/local.db`, `output/runs/*/judgment/`는 `.gitignore` 대상(대용량 원문
   데이터) — 실수로 강제 추가(`git add -f`)하지 말 것.
