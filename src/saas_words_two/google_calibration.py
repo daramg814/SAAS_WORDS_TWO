@@ -95,6 +95,44 @@ def calibration_status(valid_market_observations: int) -> str:
     return "CALIBRATED" if valid_market_observations >= OBSERVATIONS_FOR_FULL_WEIGHT else "PROVISIONAL"
 
 
+def group_market_observations_by_problem(observations: list[dict]) -> dict[str, list[dict]]:
+    grouped: dict[str, list[dict]] = {}
+    for observation in observations:
+        if observation.get("query_type") != "MARKET_QUERY" or not observation.get("problem_id"):
+            continue
+        grouped.setdefault(observation["problem_id"], []).append(observation)
+    return grouped
+
+
+def compute_supply_adjustment(observations_for_problem: list[dict], base_score: float) -> dict:
+    """4.7: adjusted_supply_scarcity = base x (1-w) + human_google_scarcity x w.
+    Shared by apply_human_calibration.py (recalibrates existing opportunities
+    on demand) and score_opportunities.py (applies it inline on every score,
+    so a freshly recomputed supply_scarcity_score is never left uncalibrated
+    until the next standalone apply_human_calibration.py run)."""
+    count = len(observations_for_problem)
+    if count == 0:
+        return {
+            "observation_count": 0,
+            "human_weight": 0.0,
+            "adjusted_supply_scarcity_score": base_score,
+            "status": "NO_DATA",
+        }
+
+    count_only = all(o.get("top_results_relevant") is None for o in observations_for_problem)
+    weight = human_weight(count, count_only=count_only)
+    bands = [result_band(o["user_result_count"]) for o in observations_for_problem]
+    human_scarcity = sum(human_google_scarcity_score(band) for band in bands) / len(bands)
+    adjusted = adjusted_supply_scarcity(base_score, human_scarcity, weight)
+
+    return {
+        "observation_count": count,
+        "human_weight": weight,
+        "adjusted_supply_scarcity_score": adjusted,
+        "status": calibration_status(count),
+    }
+
+
 REQUIRED_IMPORT_FIELDS = ("validation_id", "user_result_count", "user_checked_at")
 
 
