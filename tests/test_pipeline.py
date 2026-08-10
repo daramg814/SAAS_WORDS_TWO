@@ -593,3 +593,27 @@ def test_stage_publish_mode_outputs_production_appends_to_existing_history(tmp_p
     assert lines[0] == "Old Title"
     assert len(lines) == 21
     conn.close()
+
+
+def test_stage_publish_mode_outputs_resume_does_not_double_append_history(tmp_path):
+    """Regression: if publish succeeds once, then this stage is re-entered
+    (crash + --resume, or an operator re-running it), the same titles must
+    not be appended to words.txt a second time."""
+    options = make_options(tmp_path, mode="production", target_count=20, run_id="RUN-20260810-190000-KST")
+    state = pipeline._load_or_create_state(options)
+    conn = db.connect(tmp_path)
+    seed_approved_titles(conn, state.run_id, 20)
+    pipeline._stage_validate_outputs(conn, tmp_path, options, state)
+
+    pipeline._stage_publish_mode_outputs(conn, tmp_path, options, state)
+    history_path = tmp_path / "output" / "history" / "words.txt"
+    first_pass_lines = history_path.read_text(encoding="utf-8").splitlines()
+    assert len(first_pass_lines) == 20
+
+    # simulate a resume re-entering the same stage with the same final_titles
+    pipeline._stage_publish_mode_outputs(conn, tmp_path, options, state)
+    second_pass_lines = history_path.read_text(encoding="utf-8").splitlines()
+
+    assert second_pass_lines == first_pass_lines
+    assert len(set(second_pass_lines)) == len(second_pass_lines)  # no duplicates
+    conn.close()

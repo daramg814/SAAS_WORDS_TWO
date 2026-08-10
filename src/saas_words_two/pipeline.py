@@ -729,7 +729,17 @@ def _stage_publish_mode_outputs(
 
         history_path = project_root / "output" / "history" / "words.txt"
         history = _read_lines(history_path)
-        atomic_write_text(history_path, "\n".join(history + final_titles) + "\n")
+        # Idempotency guard: if this stage previously wrote final_path but then
+        # failed/crashed before (or during) the history append, a resume would
+        # re-enter this function from the top. Without this check it would
+        # append the same titles to words.txt a second time, corrupting the
+        # operational history with real duplicates.
+        history_norm = {normalize_title(t) for t in history}
+        already_appended = bool(final_titles) and all(
+            normalize_title(t) in history_norm for t in final_titles
+        )
+        if not already_appended:
+            atomic_write_text(history_path, "\n".join(history + final_titles) + "\n")
 
         _write_opportunities_jsonl(conn, project_root / "output" / "final" / "opportunities.jsonl", final_titles)
     else:
