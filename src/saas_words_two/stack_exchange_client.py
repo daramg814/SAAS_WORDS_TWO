@@ -116,6 +116,18 @@ def normalize_row(site: str, row: dict) -> dict | None:
     se_id = row.get("Id")
     if se_id is None:
         return None
+    # Stack Exchange dumps legitimately omit OwnerUserId for posts by
+    # deleted/migrated/anonymized accounts (real, common in the export
+    # format, not a parsing error). hn_items.by feeds demand scoring's
+    # independent-user counting (docs/pipeline/07 6.5) - a post with no
+    # identifiable author can never contribute a real, distinguishable user,
+    # so it is dropped here rather than inserted with a fabricated "unknown"
+    # author (which could either wrongly merge distinct anonymous posters
+    # into one fake identity or pollute the corpus with unattributable
+    # noise). Found via parse_sources.py's real schema validation against
+    # an actual Stack Exchange dump, not synthetic test fixtures.
+    if not row.get("OwnerUserId"):
+        return None
     item_id = make_item_id(site, int(se_id))
 
     if post_type == QUESTION_POST_TYPE:

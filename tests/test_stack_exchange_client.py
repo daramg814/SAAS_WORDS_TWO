@@ -61,6 +61,27 @@ def test_normalize_row_ignores_non_question_answer_post_types():
     assert sec.normalize_row(SITE, row) is None
 
 
+def test_normalize_row_skips_question_with_no_owner_user_id():
+    """Regression: real Stack Exchange dumps omit OwnerUserId for posts by
+    deleted/migrated accounts - found via parse_sources.py's real schema
+    validation (hn_items.by required) against an actual dump, not a
+    synthetic fixture. Such a post can't contribute a real independent
+    user, so it must be dropped, not inserted with a missing 'by'."""
+    row = {
+        "Id": "4", "PostTypeId": "1", "CreationDate": "2026-08-01T10:00:00.000",
+        "Title": "Is there a tool for Y", "Body": "<p>manual process takes hours</p>",
+    }
+    assert sec.normalize_row(SITE, row) is None
+
+
+def test_normalize_row_skips_answer_with_no_owner_user_id():
+    row = {
+        "Id": "5", "PostTypeId": "2", "ParentId": "1", "CreationDate": "2026-08-01T11:00:00.000",
+        "Body": "<p>we still use spreadsheets</p>",
+    }
+    assert sec.normalize_row(SITE, row) is None
+
+
 def test_iter_posts_with_se_id_parses_fixture(tmp_path):
     archive_path = tmp_path / "sample.7z"
     build_fixture_archive(archive_path)
