@@ -64,6 +64,15 @@ def main(argv: list[str] | None = None) -> int:
             gh_summary = collection.run_gh_archive_collection(
                 project_root, conn, sources_config, gh_settings, session, now=now, fetched_at=now.isoformat()
             )
+
+        se_summary = None
+        if access_report.results.get("stack_exchange_dump", {}).get("status") == "PASS" and sources_config[
+            "sources"
+        ].get("stack_exchange_dump", {}).get("enabled"):
+            se_settings = project_config["collection"]["stack_exchange_dump"]
+            se_summary = collection.run_stack_exchange_collection(
+                project_root, conn, sources_config, se_settings, session, fetched_at=now.isoformat()
+            )
     finally:
         conn.close()
 
@@ -85,6 +94,13 @@ def main(argv: list[str] | None = None) -> int:
             f"hours={len(gh_summary.hours_processed)} cursor={gh_summary.cursor_before}->{gh_summary.cursor_after}"
         )
         errors += gh_summary.errors
+    if se_summary is not None:
+        print(
+            f"COLLECTED (stack_exchange_dump) stories={se_summary.fetched_stories} "
+            f"comments={se_summary.fetched_comments} skipped_existing={se_summary.skipped_existing} "
+            f"cursor={se_summary.cursor_before}->{se_summary.cursor_after}"
+        )
+        errors += se_summary.errors
     for error in errors:
         print(f"  WARN: {error}")
     return 0

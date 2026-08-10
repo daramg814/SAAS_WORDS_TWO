@@ -18,6 +18,22 @@
    재사용한다. 수집 창은 `sources.yaml`의 `recent_days_max`(90일)를 하드 하한으로 삼아
    시간 단위 커서(`data/cache/gh_archive_last_hour.txt`)로 점진 수집한다
    (`src/saas_words_two/collection.py::run_gh_archive_collection`).
+6. **Stack Exchange dump는 접근성 검사(PASS, 실제 다운로드·7z 해제·XML 파싱)를 거쳐
+   `enabled: true`로 전환됨(2026-08-11, 설계서 대비 구현 감사 배치).** 대상 사이트는
+   `softwarerecs.stackexchange.com`("Software Recommendations") — "이 작업에 어떤
+   도구를 쓰나요" 질문이 사이트 전체 주제라 이 프로젝트의 수요 신호 패턴
+   (`text_filter.PAIN_PATTERNS`)과 가장 잘 맞는 사이트를 의도적으로 선택했다(전체 SE
+   네트워크가 아닌 "선택 사이트" 하나라는 3.2절 원문 의도 그대로).
+   7z 해제를 위해 표준 라이브러리로 해결할 수 없어 `py7zr`(순수 파이썬, LGPL-2.1+,
+   활발히 유지보수됨, 월 1~200만 다운로드)을 신규 의존성으로 추가함
+   (`pyproject.toml` 주석에 동일 근거 기록). `Posts.xml`만 스트리밍 파싱하며
+   (`ET.iterparse` + `elem.clear()`, 사이트 전체를 메모리에 올리지 않음), Question/Answer
+   두 PostTypeId만 `hn_items`(`source='stack_exchange'`)에 정규화해 저장한다. 원문 Post
+   Id는 사이트별로 작고 겹칠 수 있어 `9` + 3자리 사이트 코드 + 8자리 zero-pad Post Id로
+   구성한 12자리 id로 재매핑해 HN(수천만대)·GH Archive(수십억대) id 범위와 충돌하지
+   않게 했다(`stack_exchange_client.make_item_id`). 덤프는 정적 스냅샷이라 매 실행 재
+   다운로드하지 않고 `data/raw/stack_exchange/`에 캐시하며, 이미 처리한 Post Id까지는
+   커서로 건너뛴다(`collection.py::run_stack_exchange_collection`).
 
 ## 원본 설계 세부 규칙
 

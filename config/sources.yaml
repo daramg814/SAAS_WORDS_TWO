@@ -7,9 +7,11 @@ sources:
     base_url: https://hacker-news.firebaseio.com/v0
     incremental_cursor: data/cache/hacker_news_last_id.txt
   stack_exchange_dump:
-    enabled: false
+    enabled: true
     required: false
     activation_gate: access_test_pass
+    site: softwarerecs.stackexchange.com
+    dump_cache_path: data/raw/stack_exchange/softwarerecs.stackexchange.com.7z
   gh_archive:
     enabled: true
     required: false

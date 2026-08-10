@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import shutil
 import sqlite3
+import tempfile
 import time
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from . import gh_archive_client, hn_client
+from . import gh_archive_client, hn_client, stack_exchange_client
 from .contracts import atomic_write_text
 
 # Below this much free disk space, collection should not proceed - not a
@@ -64,6 +65,7 @@ def run_access_test(
     *,
     generated_at: str,
     gh_archive_hour: str | None = None,
+    stack_exchange_dump_path: Path | None = None,
 ) -> AccessTestReport:
     results: dict[str, dict] = {}
     hn_conf = sources_config["sources"]["hacker_news"]
@@ -93,8 +95,29 @@ def run_access_test(
         else:
             results["gh_archive"] = {"status": "FAIL", "detail": gh_result.error or "unknown error"}
 
+    se_conf = sources_config["sources"].get("stack_exchange_dump")
+    # "site" presence distinguishes a genuinely configured source from a bare
+    # {"enabled": False} placeholder entry - without a site there is nothing
+    # to test a connection against, so there is no real access test to run.
+    if se_conf and "site" in se_conf:
+        site = se_conf["site"]
+        dump_path = stack_exchange_dump_path or (
+            project_root / se_conf.get("dump_cache_path", f"data/raw/stack_exchange/{site}.7z")
+        )
+        se_result = stack_exchange_client.access_test(session, site=site, dest_path=dump_path)
+        if se_result.ok:
+            results["stack_exchange_dump"] = {
+                "status": "PASS",
+                "detail": (
+                    f"site={se_result.data['site']} questions={se_result.data['questions']} "
+                    f"answers={se_result.data['answers']} cached_download={se_result.data['cached_download']}"
+                ),
+            }
+        else:
+            results["stack_exchange_dump"] = {"status": "FAIL", "detail": se_result.error or "unknown error"}
+
     for name in sources_config["sources"]:
-        if name in ("hacker_news", "gh_archive"):
+        if name in results:
             continue
         results[name] = {
             "status": "DISABLED",
@@ -398,4 +421,96 @@ def run_gh_archive_collection(
     summary.cursor_after = current_hour
     if summary.cursor_after != summary.cursor_before:
         write_gh_archive_cursor(project_root, sources_config, summary.cursor_after)
+    return summary
+
+
+def _stack_exchange_cursor_path(project_root: Path, site: str) -> Path:
+    safe_site = site.replace(".", "_")
+    return project_root / "data" / "cache" / f"stack_exchange_{safe_site}_last_id.txt"
+
+
+def read_stack_exchange_cursor(project_root: Path, site: str) -> int:
+    path = _stack_exchange_cursor_path(project_root, site)
+    if not path.exists():
+        return 0
+    text = path.read_text(encoding="utf-8").strip()
+    return int(text) if text else 0
+
+
+def write_stack_exchange_cursor(project_root: Path, site: str, value: int) -> None:
+    atomic_write_text(_stack_exchange_cursor_path(project_root, site), f"{value}\n")
+
+
+@dataclass
+class StackExchangeCollectionSummary:
+    fetched_stories: int = 0
+    fetched_comments: int = 0
+    skipped_existing: int = 0
+    errors: list[str] = field(default_factory=list)
+    cursor_before: int = 0
+    cursor_after: int = 0
+
+
+def run_stack_exchange_collection(
+    project_root: Path,
+    conn: sqlite3.Connection,
+    sources_config: dict,
+    se_settings: dict,
+    session,
+    *,
+    fetched_at: str,
+) -> StackExchangeCollectionSummary:
+    """Stack Exchange dumps are static, infrequent full-site snapshots, not
+    an hourly/incremental feed like GH Archive - "incremental" here means
+    walking Posts.xml once (in ascending Id order, as the dump format
+    guarantees) and resuming from the last Stack Exchange post Id processed,
+    same spirit as hacker_news's incremental_cursor but keyed on the dump's
+    own row order rather than a fetch cursor."""
+    se_conf = sources_config["sources"]["stack_exchange_dump"]
+    site = se_conf.get("site", stack_exchange_client.DEFAULT_SITE)
+    dump_path = project_root / se_conf.get("dump_cache_path", f"data/raw/stack_exchange/{site}.7z")
+
+    summary = StackExchangeCollectionSummary(cursor_before=read_stack_exchange_cursor(project_root, site))
+
+    fetched = stack_exchange_client.download_dump(session, site, dump_path)
+    if not fetched.ok:
+        summary.errors.append(f"download: {fetched.error}")
+        return summary
+
+    budget = se_settings.get("max_items_per_run", 5000)
+    max_se_id_seen = summary.cursor_before
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        try:
+            posts_xml_path = stack_exchange_client.extract_posts_xml(dump_path, Path(tmpdir))
+        except Exception as exc:  # py7zr raises its own exception hierarchy
+            summary.errors.append(f"extract: {exc}")
+            return summary
+
+        batch: list[dict] = []
+        for se_id, normalized in stack_exchange_client.iter_posts_with_se_id(site, posts_xml_path):
+            if se_id is None or se_id <= summary.cursor_before:
+                continue
+            max_se_id_seen = max(max_se_id_seen, se_id)
+            if normalized is None:
+                continue
+            batch.append(normalized)
+            if len(batch) >= budget:
+                break
+
+        existing = _existing_ids(conn, [item["id"] for item in batch])
+        for normalized in batch:
+            if normalized["id"] in existing:
+                summary.skipped_existing += 1
+                continue
+            _insert_normalized(conn, normalized, fetched_at, source="stack_exchange")
+            if normalized["type"] == "story":
+                summary.fetched_stories += 1
+            else:
+                summary.fetched_comments += 1
+
+    conn.commit()
+    summary.cursor_after = max_se_id_seen
+    if summary.cursor_after != summary.cursor_before:
+        write_stack_exchange_cursor(project_root, site, summary.cursor_after)
     return summary

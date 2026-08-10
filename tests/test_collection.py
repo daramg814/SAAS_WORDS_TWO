@@ -1,10 +1,12 @@
 import gzip
+import io
 import json
 from datetime import datetime, timedelta, timezone
 
+import py7zr
 import requests
 
-from saas_words_two import collection, db, gh_archive_client, hn_client
+from saas_words_two import collection, db, gh_archive_client, hn_client, stack_exchange_client
 
 
 class FakeResponse:
@@ -411,3 +413,143 @@ def test_run_gh_archive_collection_converts_kst_now_to_utc_before_selecting_hour
     )
     assert summary.hours_processed == ["2026-08-09-15"]
     conn.close()
+
+
+# ---------------------------------------------------------------------------
+# stack_exchange_dump collection
+# ---------------------------------------------------------------------------
+
+SE_SITE = "softwarerecs.stackexchange.com"
+SE_SOURCES_CONFIG = {
+    "sources": {
+        "stack_exchange_dump": {
+            "enabled": True,
+            "required": False,
+            "site": SE_SITE,
+            "dump_cache_path": "data/raw/stack_exchange/site.7z",
+        }
+    }
+}
+SE_SETTINGS = {"max_items_per_run": 10}
+
+SE_POSTS_XML = """<?xml version="1.0" encoding="utf-8"?>
+<posts>
+  <row Id="1" PostTypeId="1" CreationDate="2026-08-01T10:00:00.000" Score="5" AnswerCount="1" OwnerUserId="42" Title="Is there a tool for X" Body="&lt;p&gt;manual process&lt;/p&gt;" />
+  <row Id="2" PostTypeId="2" ParentId="1" CreationDate="2026-08-01T11:00:00.000" Score="2" OwnerUserId="43" Body="&lt;p&gt;still use spreadsheets&lt;/p&gt;" />
+</posts>
+"""
+
+
+def _build_se_archive_bytes() -> bytes:
+    buffer = io.BytesIO()
+    with py7zr.SevenZipFile(buffer, mode="w") as archive:
+        archive.writef(io.BytesIO(SE_POSTS_XML.encode("utf-8")), "Posts.xml")
+    return buffer.getvalue()
+
+
+class FakeSeStreamResponse:
+    def __init__(self, content: bytes):
+        self._content = content
+
+    def raise_for_status(self):
+        return None
+
+    def iter_content(self, chunk_size):
+        for i in range(0, len(self._content), chunk_size):
+            yield self._content[i : i + chunk_size]
+
+
+class FakeSeSession:
+    def __init__(self, archive_bytes: bytes):
+        self.archive_bytes = archive_bytes
+        self.calls: list[str] = []
+
+    def get(self, url, timeout, stream=False):
+        self.calls.append(url)
+        return FakeSeStreamResponse(self.archive_bytes)
+
+
+def test_run_stack_exchange_collection_inserts_with_source(tmp_path):
+    conn = db.connect(tmp_path)
+    session = FakeSeSession(_build_se_archive_bytes())
+    summary = collection.run_stack_exchange_collection(
+        tmp_path, conn, SE_SOURCES_CONFIG, SE_SETTINGS, session, fetched_at="t0"
+    )
+    assert summary.fetched_stories == 1
+    assert summary.fetched_comments == 1
+    rows = conn.execute("SELECT id, source, type FROM hn_items WHERE source = 'stack_exchange' ORDER BY id").fetchall()
+    assert [(r["id"], r["type"]) for r in rows] == [
+        (stack_exchange_client.make_item_id(SE_SITE, 1), "story"),
+        (stack_exchange_client.make_item_id(SE_SITE, 2), "comment"),
+    ]
+    cursor_file = tmp_path / "data" / "cache" / "stack_exchange_softwarerecs_stackexchange_com_last_id.txt"
+    assert cursor_file.read_text(encoding="utf-8").strip() == "2"
+    conn.close()
+
+
+def test_run_stack_exchange_collection_resumes_from_cursor_and_skips_seen_rows(tmp_path):
+    conn = db.connect(tmp_path)
+    session = FakeSeSession(_build_se_archive_bytes())
+    collection.run_stack_exchange_collection(tmp_path, conn, SE_SOURCES_CONFIG, SE_SETTINGS, session, fetched_at="t0")
+
+    second_session = FakeSeSession(_build_se_archive_bytes())
+    summary2 = collection.run_stack_exchange_collection(
+        tmp_path, conn, SE_SOURCES_CONFIG, SE_SETTINGS, second_session, fetched_at="t1"
+    )
+    assert summary2.fetched_stories == 0
+    assert summary2.fetched_comments == 0
+    conn.close()
+
+
+def test_run_stack_exchange_collection_caches_download_across_runs(tmp_path):
+    conn = db.connect(tmp_path)
+    session = FakeSeSession(_build_se_archive_bytes())
+    collection.run_stack_exchange_collection(tmp_path, conn, SE_SOURCES_CONFIG, SE_SETTINGS, session, fetched_at="t0")
+    assert len(session.calls) == 1
+
+    second_session = FakeSeSession(_build_se_archive_bytes())
+    collection.run_stack_exchange_collection(
+        tmp_path, conn, SE_SOURCES_CONFIG, SE_SETTINGS, second_session, fetched_at="t1"
+    )
+    assert len(second_session.calls) == 0  # dump already cached on disk from the first run
+    conn.close()
+
+
+def test_run_stack_exchange_collection_records_download_error(tmp_path):
+    conn = db.connect(tmp_path)
+
+    class FailingSession:
+        def get(self, url, timeout, stream=False):
+            raise requests.ConnectionError("boom")
+
+    summary = collection.run_stack_exchange_collection(
+        tmp_path, conn, SE_SOURCES_CONFIG, SE_SETTINGS, FailingSession(), fetched_at="t0"
+    )
+    assert summary.fetched_stories == 0
+    assert any("download" in error for error in summary.errors)
+    conn.close()
+
+
+def test_run_access_test_exercises_stack_exchange_and_reports_pass(tmp_path):
+    sources_config = {**SOURCES_CONFIG, "sources": {**SOURCES_CONFIG["sources"], **SE_SOURCES_CONFIG["sources"]}}
+    hn_session = FakeSession(
+        {"maxitem.json": 100, "item/100.json": {"id": 100, "type": "story"}, "search": {"hits": []}}
+    )
+
+    class CombinedHnSeSession:
+        def __init__(self, hn_session, se_bytes):
+            self.hn_session = hn_session
+            self.se_session = FakeSeSession(se_bytes)
+
+        def get(self, url, timeout, stream=False):
+            if url.startswith("https://archive.org/"):
+                return self.se_session.get(url, timeout, stream=stream)
+            return self.hn_session.get(url, timeout)
+
+    dump_path = tmp_path / "data" / "raw" / "stack_exchange" / "site.7z"
+    session = CombinedHnSeSession(hn_session, _build_se_archive_bytes())
+    report = collection.run_access_test(
+        tmp_path, sources_config, session, generated_at="t0", stack_exchange_dump_path=dump_path
+    )
+    assert report.results["stack_exchange_dump"]["status"] == "PASS"
+    assert "questions=1" in report.results["stack_exchange_dump"]["detail"]
