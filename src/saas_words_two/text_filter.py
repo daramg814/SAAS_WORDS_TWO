@@ -34,6 +34,63 @@ PROMO_MARKERS = (
     "buy now",
 )
 
+# design roadmap 3차 개선 "문제 군집 정확도 향상": a generic-courtesy filter,
+# added after two rounds of clustering-algorithm changes (string-similarity,
+# then TF-IDF cosine - see clustering.py's module comment) both failed to
+# fix DEMAND-001's actual precision problem. Root cause found by re-testing
+# against real collected data both times: sentences like "I'd love to hear
+# your feedback and feature requests!" are SHORT and consist almost
+# entirely of generic courtesy words with no topic-specific content at all -
+# no bag-of-words similarity metric (weighted or not) can tell two such
+# near-empty-of-content sentences apart, because there is genuinely almost
+# nothing there to differentiate. This is not a similarity-scoring problem;
+# it is a *candidate-quality* problem, so it is fixed here, at the same
+# filtering stage that already excludes promotional/quoted/URL-only text,
+# rather than by tuning yet another clustering metric.
+GENERIC_COURTESY_TOKENS = frozenset(
+    {
+        "feedback", "feature", "features", "request", "requests", "welcome", "welcomed",
+        "contribution", "contributions", "contribute", "contributing", "appreciate", "appreciated",
+        "comment", "comments", "bug", "bugs", "report", "reports", "idea", "ideas",
+        "suggestion", "suggestions", "curious", "workaround", "workarounds",
+        "thought", "thoughts", "think", "hear", "love", "anyone", "anytime", "anything",
+        "everyone", "open", "issue", "issues", "github", "thanks", "thank", "question", "questions",
+        "creative", "cases", "case", "kinds", "kind", "honest", "amazing", "trying", "try",
+    }
+)
+_GENERIC_COURTESY_STOPWORDS = frozenset(
+    {
+        "the", "a", "an", "is", "are", "was", "were", "to", "of", "for", "and", "or", "in", "on", "at",
+        "it", "its", "this", "that", "we", "i", "you", "your", "our", "my", "with", "do", "does", "did",
+        "be", "been", "has", "have", "had", "not", "no", "but", "so", "if", "as", "by", "from", "just",
+        "will", "can", "could", "would", "should", "get", "got", "any", "some", "all", "both", "me",
+    }
+)
+_WORD_ONLY_RE = re.compile(r"[a-zA-Z]+")
+
+
+def _content_tokens(sentence: str) -> list[str]:
+    return [
+        token.lower()
+        for token in _WORD_ONLY_RE.findall(sentence)
+        if len(token) > 2 and token.lower() not in _GENERIC_COURTESY_STOPWORDS
+    ]
+
+
+def is_generic_courtesy_sentence(sentence: str, *, max_content_tokens: int = 8, min_generic_ratio: float = 0.7) -> bool:
+    """True if a short sentence's content is almost entirely made of generic
+    courtesy vocabulary (GENERIC_COURTESY_TOKENS) - e.g. README/Show-HN
+    "feedback and feature requests welcome!" boilerplate - with essentially
+    no topic-specific words. Length-gated (max_content_tokens) so a longer,
+    genuinely specific sentence that happens to use a couple of these words
+    ("the feature request tracker we built manually tracks vendor renewal
+    dates") is not caught by this."""
+    tokens = _content_tokens(sentence)
+    if not tokens or len(tokens) > max_content_tokens:
+        return False
+    generic_count = sum(1 for token in tokens if token in GENERIC_COURTESY_TOKENS)
+    return generic_count / len(tokens) >= min_generic_ratio
+
 _TAG_RE = re.compile(r"<[^>]+>")
 _CODE_BLOCK_RE = re.compile(r"<pre>.*?</pre>", re.IGNORECASE | re.DOTALL)
 _SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+|\n+")
@@ -83,7 +140,12 @@ def extract_candidate_sentences(item_id: int, raw_text: str | None) -> list[Cand
         return []
     candidates = []
     for sentence in split_sentences(raw_text):
-        if is_quote_line(sentence) or is_promo(sentence) or is_url_only(sentence):
+        if (
+            is_quote_line(sentence)
+            or is_promo(sentence)
+            or is_url_only(sentence)
+            or is_generic_courtesy_sentence(sentence)
+        ):
             continue
         patterns = matched_patterns(sentence)
         if patterns:

@@ -97,3 +97,50 @@ def test_run_filter_pass_is_idempotent_replacing_prior_results(tmp_path):
     rows = conn.execute("SELECT COUNT(*) c FROM candidate_sentences").fetchone()
     assert rows["c"] == summary2.candidates_after_dedupe
     conn.close()
+
+
+# ---------------------------------------------------------------------------
+# is_generic_courtesy_sentence ("B안" companion filter - see the module
+# comment above GENERIC_COURTESY_TOKENS in text_filter.py for why this
+# exists alongside the clustering-algorithm change)
+# ---------------------------------------------------------------------------
+
+
+def test_is_generic_courtesy_sentence_true_for_short_boilerplate():
+    assert text_filter.is_generic_courtesy_sentence("I'd love to hear your feedback and feature requests!")
+    assert text_filter.is_generic_courtesy_sentence("Feedback and feature requests are welcome.")
+    assert text_filter.is_generic_courtesy_sentence("Any feature requests?")
+    assert text_filter.is_generic_courtesy_sentence("Open to feedback and feature requests from anyone.")
+
+
+def test_is_generic_courtesy_sentence_false_for_specific_content():
+    assert not text_filter.is_generic_courtesy_sentence(
+        "We still use spreadsheets to track vendor insurance renewal deadlines."
+    )
+    assert not text_filter.is_generic_courtesy_sentence(
+        "Is there a tool for backing up my Android phone ROM before flashing Cyanogenmod?"
+    )
+
+
+def test_is_generic_courtesy_sentence_false_when_too_long_even_if_generic_words_present():
+    # a long sentence padded with generic words but with real specific
+    # content should not be caught by the length-gated filter
+    sentence = (
+        "We would love your feedback and feature requests on our new vendor insurance "
+        "renewal tracking dashboard that we built after months of manual spreadsheet work"
+    )
+    assert not text_filter.is_generic_courtesy_sentence(sentence)
+
+
+def test_is_generic_courtesy_sentence_false_for_empty_content():
+    assert not text_filter.is_generic_courtesy_sentence("")
+    assert not text_filter.is_generic_courtesy_sentence("a an the is")
+
+
+def test_extract_candidate_sentences_excludes_generic_courtesy_text():
+    candidates = text_filter.extract_candidate_sentences(
+        1, "I'd love to hear your feedback and feature requests! Also, we still use spreadsheets for tracking."
+    )
+    sentences = [c.sentence for c in candidates]
+    assert not any("feedback" in s.lower() for s in sentences)
+    assert any("spreadsheets" in s.lower() for s in sentences)

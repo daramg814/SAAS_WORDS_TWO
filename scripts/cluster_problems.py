@@ -72,6 +72,19 @@ def main(argv: list[str] | None = None) -> int:
     finally:
         conn.close()
 
+    # design roadmap 3차 개선 "문제 군집 정확도 향상" ("B안"): clustering.py also
+    # implements cluster_candidates_tfidf (TF-IDF weighted cosine similarity)
+    # as an attempted fix for DEMAND-001's boilerplate-clustering problem.
+    # Real re-testing against the full collected corpus (73,821 items, 5
+    # sources) showed it does NOT outperform this token-overlap/sequence-
+    # ratio combined_similarity - it produced MORE false-positive 5+-user
+    # clusters (27 vs 19 before, 21 vs 15 after also adding text_filter.py's
+    # generic-courtesy filter), because TF-IDF cannot rescue short sentences
+    # that consist almost entirely of generic/templated words - there is
+    # nothing else in the vector for IDF weighting to lean on. Kept in
+    # clustering.py as tested, documented, real-data-validated-negative
+    # code (see memory/ACTIVE_ISSUES.md DEMAND-001 and PROJECT_PLAYBOOK.md)
+    # rather than the production default.
     clusters = clustering.cluster_candidates(candidates)
     generated_at = ids.now_kst().isoformat()
     atomic_write_text(
