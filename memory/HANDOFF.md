@@ -1,6 +1,6 @@
 # HANDOFF
 
-- 상태: `PAUSED`
+- 상태: `COMMIT_PENDING` (커밋 `e07769c`는 로컬에 있으나 push 실패, 아래 §3 참고)
 - 요약 한 줄: `DEMAND-001` A안(GH Archive 2차 데이터원 활성화) **구현·테스트·문서화 완료, 커밋 완료**.
   아직 안 한 것: 실제로 GH Archive 데이터를 충분히 모아 QA(20개)를 재실행해서
   DEMAND-001이 실제로 해소되는지 확인하는 것. **다음 세션은 여기(§4 "다음 원자 작업")부터
@@ -51,12 +51,24 @@
 - `docs/policies/04-data-source-policy.md` "Claude Code 실행 지침"에 GH Archive 활성화
   사실·설계 근거 기록.
 
-## 3. Git/원격 설정 (재작업 불필요, 이전 세션에서 완료)
+## 3. Git/원격 설정 — **2026-08-10 push 인증이 끊어짐, 재확인 필요**
 
-- `origin` = `https://github.com/daramg814/SAAS_WORDS_TWO.git`, `main` push 완료.
-- `.git/hooks/post-commit`이 커밋마다 자동 `git push origin main` 실행(로컬 전용, 새
-  clone에서는 재설치 필요). PAT 인증으로 완전 무인.
-- 실패 시 훅이 stderr에 경고 출력, 커밋은 `COMMIT_PENDING` 취급 — 수동 push로 해결.
+- `origin` = `https://github.com/daramg814/SAAS_WORDS_TWO.git`.
+- `.git/hooks/post-commit`이 커밋마다 자동 `git push origin main`을 시도한다(로컬 전용
+  훅, 새 clone에서는 재설치 필요).
+- **이번 세션에서 커밋 `e07769c`의 자동 push가 실패함**: `cmdkey /list`로 확인한 결과
+  Windows Credential Manager에 GitHub PAT 항목이 더 이상 없고(이전 세션 §3에서
+  "저장 완료·검증됨"이라고 기록했던 것과 다름), `~/.gitconfig`(사용자 전역 git 설정)도
+  파일 자체가 없는 상태였다. git이 `wincredman`에 자격증명을 저장하려다 실패하고,
+  대화형 프롬프트(`/dev/tty`)도 이 실행 환경에서는 열 수 없어 완전히 실패했다.
+  즉 PAT 자체가 이 머신/프로필에서 사라졌거나 애초에 다른 프로필에 저장됐던 것으로
+  보인다(원인 불명 — 새 프로필/환경 초기화 가능성).
+- **해야 할 일(사용자 확인 필요, AI가 임의로 자격증명이나 전역 git 설정을 만들지
+  않음)**: 사용자가 터미널에서 `! git push origin main`을 직접 실행해 GitHub 인증을
+  다시 통과시키거나, PAT를 다시 발급해 Credential Manager에 등록해야 한다. 그 전까지
+  커밋은 로컬에만 존재하며 원격과 다르다.
+- 재인증 완료 후: `git push origin main`이 성공하는지 확인하고, 이 섹션을 다시
+  "완료" 상태로 갱신할 것.
 
 ## 4. 다음 원자 작업 — GH Archive 실데이터 수집 후 QA 재실행
 
