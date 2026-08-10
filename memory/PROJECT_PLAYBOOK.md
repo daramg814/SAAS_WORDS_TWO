@@ -42,6 +42,14 @@
 - 표준 라이브러리로 못 푸는 파싱(예: 7z)이 필요한 데이터원은 CLAUDE.md §8에 따라
   라이선스·유지보수 근거를 `pyproject.toml` 주석과 `docs/policies/04`에 남긴 뒤
   추가할 것(py7zr, LGPL-2.1+, 이 배치에서 실제로 이렇게 처리함).
+- **설계 로드맵에 이름만 있고 계산 방법이 명시되지 않은 "3차 개선" 항목**(예:
+  "데이터원별 신뢰도 보정")을 구현할 때는, CLAUDE.md 12항(기존 점수 기준 임의 변경
+  금지)을 지키기 위해 기존 점수 공식의 입력을 바꾸지 말고 별도 테이블/스크립트로
+  계산한 뒤 판정 단계의 참고 정보로만 흘려보낼 것 — 실측 근거 없이 점수 공식 자체를
+  바꾸면 회귀 위험이 크고, 이 프로젝트는 아직 그 근거(실제 통과 사례)가 없다.
+  `source_reliability.py`/`calibrate_source_reliability.py`가 이 패턴의 실제 사례:
+  표본 5건 미만은 `human_calibration_status`와 동일하게 `NO_DATA`로 유지한다. 상세는
+  `docs/pipeline/09-opportunity-scoring.md` 6번.
 
 ## 확인된 한계 (validated로 승격하지 않되, 재실험 전에 반드시 참고할 것)
 - HN 검색 수집량을 늘리는 것만으로는(`search_hits_per_pattern` 40→1000, 후보

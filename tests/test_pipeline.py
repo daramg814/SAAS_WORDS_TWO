@@ -604,6 +604,112 @@ def test_stage_review_opportunities_skips_when_no_opportunities(tmp_path):
 
 
 # ---------------------------------------------------------------------------
+# 데이터원별 신뢰도 보정 (source_reliability.py) 판정 컨텍스트 연동
+# ---------------------------------------------------------------------------
+
+
+def test_stage_collect_and_verify_supply_includes_source_reliability_in_product_item(tmp_path, monkeypatch):
+    monkeypatch.setattr(pipeline, "_run_or_raise", lambda *a, **k: None)
+    options = make_options(tmp_path, run_id="QA-20260810-190000-KST")
+    state = pipeline._load_or_create_state(options)
+    conn = db.connect(tmp_path)
+    seed_demand_passed_problem_with_candidate(conn)
+    conn.execute(
+        "INSERT INTO source_reliability (source, demand_problem_total, demand_problem_passed, "
+        "demand_reliability_score, demand_reliability_status, supply_candidate_total, "
+        "supply_candidate_active, supply_reliability_score, supply_reliability_status, updated_at) "
+        "VALUES ('hn_show', 5, 1, 0.2, 'CALIBRATED', 5, 4, 0.8, 'CALIBRATED', 't0')"
+    )
+    conn.commit()
+
+    with pytest.raises(judgment.JudgmentRequired) as excinfo:
+        pipeline._stage_collect_and_verify_supply(conn, tmp_path, options, state)
+    conn.close()
+
+    request_doc = json.loads(excinfo.value.request_path.read_text(encoding="utf-8"))
+    product_items = [item for item in request_doc["items"] if item["kind"] == "product"]
+    assert product_items[0]["source_reliability"]["supply_reliability_score"] == 0.8
+    assert "source_reliability" in request_doc["instructions"]
+
+
+def test_stage_collect_and_verify_supply_source_reliability_none_when_unknown_source(tmp_path, monkeypatch):
+    monkeypatch.setattr(pipeline, "_run_or_raise", lambda *a, **k: None)
+    options = make_options(tmp_path, run_id="QA-20260810-190000-KST")
+    state = pipeline._load_or_create_state(options)
+    conn = db.connect(tmp_path)
+    seed_demand_passed_problem_with_candidate(conn)
+
+    with pytest.raises(judgment.JudgmentRequired) as excinfo:
+        pipeline._stage_collect_and_verify_supply(conn, tmp_path, options, state)
+    conn.close()
+
+    request_doc = json.loads(excinfo.value.request_path.read_text(encoding="utf-8"))
+    product_items = [item for item in request_doc["items"] if item["kind"] == "product"]
+    assert product_items[0]["source_reliability"] is None
+
+
+def test_stage_review_opportunities_includes_evidence_source_reliability(tmp_path):
+    options = make_options(tmp_path, run_id="QA-20260810-190000-KST")
+    state = pipeline._load_or_create_state(options)
+    conn = db.connect(tmp_path)
+    seed_opportunity(conn)
+    conn.execute("INSERT INTO hn_items (id, type, by, time, fetched_at, source) VALUES (1, 'story', 'alice', 100, 't0', 'gh_archive')")
+    conn.execute(
+        "INSERT INTO problem_evidence (evidence_id, problem_id, item_id, author, excerpt) "
+        "VALUES ('E-0001', 'P-0001', 1, 'alice', 'x')"
+    )
+    conn.execute(
+        "UPDATE opportunities SET evidence_ids = '[\"E-0001\"]' WHERE problem_id = 'P-0001'"
+    )
+    conn.execute(
+        "INSERT INTO source_reliability (source, demand_problem_total, demand_problem_passed, "
+        "demand_reliability_score, demand_reliability_status, supply_candidate_total, "
+        "supply_candidate_active, supply_reliability_score, supply_reliability_status, updated_at) "
+        "VALUES ('gh_archive', 10, 0, 0.0, 'CALIBRATED', 0, 0, NULL, 'NO_DATA', 't0')"
+    )
+    conn.commit()
+
+    with pytest.raises(judgment.JudgmentRequired) as excinfo:
+        pipeline._stage_review_opportunities(conn, tmp_path, options, state)
+    conn.close()
+
+    request_doc = json.loads(excinfo.value.request_path.read_text(encoding="utf-8"))
+    item = request_doc["items"][0]
+    assert item["evidence_source_reliability"]["gh_archive"]["demand_reliability_score"] == 0.0
+    assert "evidence_source_reliability" in request_doc["instructions"]
+
+
+def test_stage_review_opportunities_evidence_source_reliability_empty_when_no_evidence(tmp_path):
+    options = make_options(tmp_path, run_id="QA-20260810-190000-KST")
+    state = pipeline._load_or_create_state(options)
+    conn = db.connect(tmp_path)
+    seed_opportunity(conn)  # evidence_ids defaults to '[]'
+
+    with pytest.raises(judgment.JudgmentRequired) as excinfo:
+        pipeline._stage_review_opportunities(conn, tmp_path, options, state)
+    conn.close()
+
+    request_doc = json.loads(excinfo.value.request_path.read_text(encoding="utf-8"))
+    assert request_doc["items"][0]["evidence_source_reliability"] == {}
+
+
+def test_stage_update_memory_and_git_checkpoint_runs_source_reliability_calibration(tmp_path, monkeypatch):
+    calls = []
+    monkeypatch.setattr(
+        pipeline, "_run_or_raise", lambda project_root, script_name, *extra: calls.append(script_name)
+    )
+    options = make_options(tmp_path, run_id="QA-20260810-190000-KST")
+    state = pipeline._load_or_create_state(options)
+    conn = db.connect(tmp_path)
+
+    pipeline._stage_update_memory_and_git_checkpoint(conn, tmp_path, options, state)
+    conn.close()
+
+    assert calls[0] == "calibrate_source_reliability.py"
+    assert "git_checkpoint.py" in calls
+
+
+# ---------------------------------------------------------------------------
 # generate_and_review_titles round loop
 # ---------------------------------------------------------------------------
 

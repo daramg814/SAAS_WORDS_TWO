@@ -8,6 +8,21 @@
 3. S→A→B 등급 순, 공급 부족 내림차순, 유효 공급량 오름차순으로 정렬한다.
 4. 신뢰도 C와 공급 희소성 C는 제목을 생성하지 않는다.
 5. 수요가 중간이어도 공급이 극도로 부족하고 반복 손실이 확인되면 SCARCITY_PRIORITY를 허용한다.
+6. **데이터원별 신뢰도 보정(설계 로드맵 3차 개선)은 `scripts/calibrate_source_reliability.py` +
+   `src/saas_words_two/source_reliability.py`로 구현됨(2026-08-11, 설계서 대비 구현 감사
+   배치).** 매 실행 종료 시(`update_memory_and_git_checkpoint` 단계) 그 시점까지 누적된
+   `problem_evidence`+`demand_scores`(수요 관문 통과 여부)와 `supply_candidates`+
+   `supply_verification`(활성 공급 판정 여부)만으로 데이터원별 통과율을 집계해
+   `source_reliability` 테이블에 원자적으로 갱신(upsert)한다. 표본이 5건 미만인 소스는
+   `NO_DATA`로 유지하고(사람 보정의 `human_calibration_status`와 동일한 패턴), 사람 관측은
+   전혀 쓰지 않는다 — 순수하게 파이프라인 자체의 누적 결과다. 이 값은 위 4번 등급/점수
+   공식의 입력을 바꾸지 않는다(CLAUDE.md 12항: 기존 점수 기준 임의 변경 금지) — 대신
+   `collect_and_verify_supply`의 `kind=product` 판정 항목(`source_reliability` 필드)과
+   `review_opportunities`의 판정 항목(`evidence_source_reliability` 필드)에 참고 정보로만
+   전달되어, 신호가 약할 때 해당 데이터원의 과거 track record를 감안해 더 엄격히 볼지를
+   현재 세션/서브에이전트가 판단하도록 돕는다. 이 프로젝트가 아직 수요 관문을 통과한
+   문제가 0건이라(`DEMAND-001`) 실행 시점 기준 모든 소스가 `NO_DATA`인 것이 현재의 정직한
+   상태이며, 실제 통과 사례가 쌓이기 전까지는 이 값이 어떤 판정도 편향시키지 않는다.
 
 ## 원본 설계 세부 규칙
 

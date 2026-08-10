@@ -365,7 +365,11 @@ def _stage_collect_and_verify_supply(
         if len(rows) >= 2
     ]
 
-    items = [{"kind": "product", **dict(row)} for row in candidate_rows]
+    reliability_by_source = _load_source_reliability(conn)
+    items = [
+        {"kind": "product", **dict(row), "source_reliability": reliability_by_source.get(row["source"])}
+        for row in candidate_rows
+    ]
     items += [{"kind": "problem_gap", **dict(row)} for row in problem_rows]
     items += merge_review_items
     if not items:
@@ -378,6 +382,10 @@ def _stage_collect_and_verify_supply(
         "웹페이지 발췌, 기능·가격·활성 상태 확인용 보강 증거)로 확인 가능한 것을 "
         "signals 객체(불리언)로 판정하고, supply_type을 direct/partial/generic/"
         "noncompeting 중 하나로 분류하라. "
+        "source_reliability는 이 후보가 나온 데이터원이 지금까지 이 파이프라인에서 "
+        "실제로 활성 공급으로 확인된 비율이다(status가 NO_DATA면 표본이 아직 부족하다는 "
+        "뜻이고, 그 자체로 signals나 supply_type 판정을 대신하지 않는다 — 신호가 "
+        "약할 때 추가로 의심할지 참고하는 보조 정보일 뿐이다). "
         "kind=problem_gap 항목마다 supply_gap_user_specific(특정 사용자 전용 제품 부족), "
         "supply_gap_no_strong_incumbent(강력한 기존 제품 부재), "
         "supply_gap_no_recent_entrants(최근 24개월 신규 공급 부족), "
@@ -393,6 +401,29 @@ def _stage_collect_and_verify_supply(
         run_dir, stage_name, state.run_id, instructions, items, generated_at=ids.now_kst().isoformat()
     )
     _pause_for_judgment(project_root, state, stage_name, request_path)
+
+
+def _load_source_reliability(conn) -> dict[str, dict]:
+    """design roadmap 3차 개선 "데이터원별 신뢰도 보정" (source_reliability.py):
+    read the most recently persisted per-source reliability snapshot
+    (calibrate_source_reliability.py) for use as informative judgment
+    context. Empty until that script has run at least once (e.g. a brand
+    new local.db) - callers must treat a missing source as simply unknown,
+    not as a signal of anything."""
+    rows = conn.execute("SELECT * FROM source_reliability").fetchall()
+    return {row["source"]: dict(row) for row in rows}
+
+
+def _evidence_sources_for_ids(conn, evidence_ids: list[str]) -> list[str]:
+    if not evidence_ids:
+        return []
+    placeholders = ",".join("?" for _ in evidence_ids)
+    rows = conn.execute(
+        f"SELECT DISTINCT hi.source AS source FROM problem_evidence pe "
+        f"JOIN hn_items hi ON hi.id = pe.item_id WHERE pe.evidence_id IN ({placeholders})",
+        evidence_ids,
+    ).fetchall()
+    return sorted(row["source"] for row in rows)
 
 
 def _group_candidates_by_problem(candidate_rows) -> dict[str, list]:
@@ -514,21 +545,27 @@ def _stage_review_opportunities(
         return
 
     problems_by_id = {row["problem_id"]: dict(row) for row in conn.execute("SELECT * FROM problems").fetchall()}
-    items = [
-        {
-            "problem_id": opp["problem_id"],
-            "target_user": problems_by_id.get(opp["problem_id"], {}).get("target_user"),
-            "task": problems_by_id.get(opp["problem_id"], {}).get("task"),
-            "pain": problems_by_id.get(opp["problem_id"], {}).get("pain"),
-            "demand_score": opp["demand_score"],
-            "supply_scarcity_score": opp["supply_scarcity_score"],
-            "scarcity_grade": opp["scarcity_grade"],
-            "priority_score": opp["priority_score"],
-            "confidence": opp["confidence"],
-            "provisional_decision": opp["decision"],
-        }
-        for opp in top
-    ]
+    reliability_by_source = _load_source_reliability(conn)
+    items = []
+    for opp in top:
+        evidence_sources = _evidence_sources_for_ids(conn, json.loads(opp["evidence_ids"]))
+        items.append(
+            {
+                "problem_id": opp["problem_id"],
+                "target_user": problems_by_id.get(opp["problem_id"], {}).get("target_user"),
+                "task": problems_by_id.get(opp["problem_id"], {}).get("task"),
+                "pain": problems_by_id.get(opp["problem_id"], {}).get("pain"),
+                "demand_score": opp["demand_score"],
+                "supply_scarcity_score": opp["supply_scarcity_score"],
+                "scarcity_grade": opp["scarcity_grade"],
+                "priority_score": opp["priority_score"],
+                "confidence": opp["confidence"],
+                "provisional_decision": opp["decision"],
+                "evidence_source_reliability": {
+                    source: reliability_by_source.get(source) for source in evidence_sources
+                },
+            }
+        )
     instructions = (
         _brief_context(project_root)
         + "각 기회를 독립 검토해 GENERATE_TITLES, RESEARCH_MORE, REJECT, SCARCITY_PRIORITY 중 "
@@ -537,7 +574,10 @@ def _stage_review_opportunities(
         "확인되면 SCARCITY_PRIORITY를 사용하라. provisional_decision은 참고용 코드 판정이다. "
         "scarcity_grade가 C인 항목은 GENERATE_TITLES나 SCARCITY_PRIORITY로 판정하지 마라 "
         "(C 등급은 제목 생성 대상이 아니다 — RESEARCH_MORE 또는 REJECT만 가능). "
-        "브리프에 제외 시장으로 명시된 대상이면 REJECT하라."
+        "브리프에 제외 시장으로 명시된 대상이면 REJECT하라. "
+        "evidence_source_reliability는 이 기회의 근거가 나온 데이터원별로 지금까지 "
+        "이 파이프라인에서 실제로 수요 관문을 통과한 비율이다(NO_DATA는 표본 부족, "
+        "숫자 자체를 판정 기준으로 강제하지 않는다 — 근거 신뢰도를 가늠하는 참고 정보다)."
     )
     request_path = judgment.write_request(
         run_dir, stage_name, state.run_id, instructions, items, generated_at=ids.now_kst().isoformat()
@@ -1031,6 +1071,12 @@ def _stage_import_and_apply_human_feedback(
 def _stage_update_memory_and_git_checkpoint(
     conn, project_root: Path, options: RunOptions, state: run_state.RunState
 ) -> None:
+    # design roadmap 3차 개선 "데이터원별 신뢰도 보정": recompute the
+    # per-source reliability snapshot from this run's accumulated DB state so
+    # the next run's collect_and_verify_supply/review_opportunities judgment
+    # items carry an up-to-date reference (see source_reliability.py).
+    _run_or_raise(project_root, "calibrate_source_reliability.py")
+
     selected_count = conn.execute(
         "SELECT COUNT(*) c FROM titles WHERE run_id = ? AND status = 'selected'", (state.run_id,)
     ).fetchone()["c"]

@@ -116,6 +116,19 @@ CREATE TABLE IF NOT EXISTS opportunities (
     updated_at TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS source_reliability (
+    source TEXT PRIMARY KEY,
+    demand_problem_total INTEGER NOT NULL DEFAULT 0,
+    demand_problem_passed INTEGER NOT NULL DEFAULT 0,
+    demand_reliability_score REAL,
+    demand_reliability_status TEXT NOT NULL DEFAULT 'NO_DATA',
+    supply_candidate_total INTEGER NOT NULL DEFAULT 0,
+    supply_candidate_active INTEGER NOT NULL DEFAULT 0,
+    supply_reliability_score REAL,
+    supply_reliability_status TEXT NOT NULL DEFAULT 'NO_DATA',
+    updated_at TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS titles (
     title TEXT NOT NULL,
     normalized TEXT NOT NULL,
