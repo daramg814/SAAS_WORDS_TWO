@@ -45,6 +45,10 @@ CREATE TABLE IF NOT EXISTS problems (
     risk_severity TEXT NOT NULL DEFAULT 'none',
     purchase_intent TEXT NOT NULL DEFAULT 'none',
     has_manual_or_complaint_evidence INTEGER NOT NULL DEFAULT 0,
+    supply_gap_user_specific INTEGER NOT NULL DEFAULT 0,
+    supply_gap_no_strong_incumbent INTEGER NOT NULL DEFAULT 0,
+    supply_gap_no_recent_entrants INTEGER NOT NULL DEFAULT 0,
+    supply_gap_unresolved_complaints INTEGER NOT NULL DEFAULT 0,
     status TEXT NOT NULL DEFAULT 'CANDIDATE',
     first_seen TEXT,
     last_seen TEXT
