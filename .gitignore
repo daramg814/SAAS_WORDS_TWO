@@ -30,3 +30,9 @@ output/intermediate/*
 *.tmp
 .DS_Store
 Thumbs.db
+
+# Judgment request/response payloads bundle raw HN text at bulk scale
+# (a single request file can run into the megabytes) - same rationale as
+# data/raw and data/local.db being excluded. run_state.json itself (small,
+# structured) stays tracked for session-resume traceability.
+output/runs/*/judgment/
