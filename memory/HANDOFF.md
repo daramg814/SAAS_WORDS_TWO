@@ -1,27 +1,29 @@
 # HANDOFF
 
 - 상태: `PAUSED`
-- 요약 한 줄: **"설계서 대비 전체 구현 감사"에서 발견된 항목을 전부 수정하는
-  배치를 진행 중(사용자 지시: "모든 것을 전부 고쳐줘").** #8~#24(17개) 완료,
-  **#25(데이터원별 신뢰도 보정) 방금 완료**, 남은 것은 **#26(전체 회귀 QA +
-  최종 인수 기준 재검증)뿐**. `DEMAND-001`(수요 관문 통과 군집 0건)은 여전히
-  미해결 — A안(GH Archive 등 소스 다양화)과 B안(TF-IDF 군집화) 둘 다 실측으로
-  검증했고 둘 다 근본 원인을 못 풀었다(상세: `ACTIVE_ISSUES.md` `DEMAND-001`).
-  이건 이번 감사 배치의 범위 밖 별개 이슈이며, 감사 배치 자체는 #26만 남았다.
+- 요약 한 줄: **"설계서 대비 전체 구현 감사" 배치(사용자 지시: "모든 것을 전부
+  고쳐줘") 완료 — #8~#26 전부 끝났다.** 전체 회귀 QA(pytest 403 passed,
+  `verify_design_coverage.py` PASS, 실제 `run.py --mode qa` 파이프라인 재실행)와
+  `final-qa-runner` 독립 검증까지 마쳤다. 남은 것은 이 배치 범위 밖의 별개
+  이슈인 **`DEMAND-001`(수요 관문 통과 군집 0건, 4회 실측 확인, 미해결)뿐** —
+  상세는 `ACTIVE_ISSUES.md` `DEMAND-001`.
 
 ## 1. 지금 이 세션을 새로 열면 가장 먼저 할 일
+
+이번 감사 배치는 끝났다. 새로 열면 사용자에게 다음 작업을 물어볼 것 — 단,
+`DEMAND-001`을 다시 다룰 경우 아래 §4를 먼저 읽고 "같은 방법을 더 크게" 실험을
+반복하지 말 것.
 
 1. `CLAUDE.md` → `memory/KNOWLEDGE_MANIFEST.yaml` → 이 파일 → `memory/PROJECT_PLAYBOOK.md`
    → `memory/ACTIVE_ISSUES.md`(`DEMAND-001` 전체) 순서로 읽는다.
 2. 환경 확인:
    ```bash
    cd "C:\Share\Claude_project\SAAS_WORDS_TWO_claude_code_project_v2.4"
-   ./.venv/Scripts/python -m pytest -q          # 401 passed 나와야 정상
+   ./.venv/Scripts/python -m pytest -q          # 403 passed 나와야 정상
    ./.venv/Scripts/python tools/verify_design_coverage.py   # PASS 나와야 정상
    ```
 3. `git log --oneline`으로 로컬 커밋 확인. **push는 PC에서 사용자가 요청할 때만**
    (아래 §3 — SSH/원격 세션에서는 자동 push가 원래 실패하며 이는 정상임, 차단 아님).
-4. §2의 "남은 작업"(#26)부터 바로 시작 — 사용자 확인 불필요(진행 중인 표준 지시).
 
 ## 2. 이번 감사 배치("모든 것을 전부 고쳐줘")의 전체 진행 상황
 
@@ -59,19 +61,38 @@
     (`DEMAND-001`) 모든 소스가 정직하게 `NO_DATA` — 이는 버그가 아니라 예상된
     현재 상태.
 
-**남은 작업: #26 (전체 회귀 QA 및 최종 인수 기준 재검증)** — 다음 세션이 바로
-시작할 것:
-1. `pytest -q` 전체 재확인(401 이상), `tools/verify_design_coverage.py` PASS 재확인.
-2. `python run.py --mode qa --target-count 20` 실행해 이번 배치의 모든 변경이
-   동일 파이프라인에서 실제로 동작하는지 end-to-end 확인(judgment 체크포인트마다
-   현재 세션이 직접 판정 — 결과가 RETRYING이어도 정직하게 기록할 것, `DEMAND-001`은
-   여전히 미해결이므로 RETRYING이 나오는 게 오히려 정상).
-3. 운영 `output/history/words.txt` 체크섬 QA 전후 불변 확인.
-4. CLAUDE.md §11 완료 정의 8개 항목을 하나씩 재확인.
-5. `final-qa-runner` 서브에이전트로 독립 검증 1회 디스패치.
-6. 이 배치 전체를 요약하는 최종 커밋 + `memory/ACTIVE_ISSUES.md`/`PROJECT_PLAYBOOK.md`
-   정리 + 이 HANDOFF.md를 "감사 배치 완료, DEMAND-001만 별도 미해결 이슈로 남음"
-   상태로 최종 갱신.
+16. **#26 (완료)** 전체 회귀 QA 및 최종 인수 기준 재검증:
+    1. `pytest -q` → **403 passed**(#26 도중 SE 버그 수정으로 2개 증가).
+       `tools/verify_design_coverage.py` → **PASS, 92 headings, 0 missing**.
+    2. `python run.py --mode qa --target-count 20`을 실제로 처음부터 재실행
+       (`QA-20260811-020116-KST`). 도중 `collect_sources` 단계에서 실제
+       스키마 검증 FAIL 발견 → 진짜 버그였음(아래 별도 항목). 수정 후
+       재실행해 `extract_and_cluster_problems` 판정까지 도달, 5,599개 군집 중
+       `independent_user_count>=5`인 16개를 전부 직접 읽고 정직하게 REJECT.
+       결과: `CAPABILITY_STAGNATION`(0 problems) — `DEMAND-001` 4번째 확인
+       (상세: `ACTIVE_ISSUES.md`). `output/history/words.txt` 체크섬
+       (`e3b0c442...`, 빈 파일) 실행 전후 동일 확인.
+    3. **커밋 `c5e254b`(#26 도중 실측으로 발견한 진짜 버그 수정)**:
+       `stack_exchange_client.normalize_row`가 `OwnerUserId`가 없는 게시물
+       (실제 SE 덤프에서 삭제/이전 계정 게시물은 흔히 이 필드가 없음 — 정상
+       데이터 특성, 파싱 오류 아님)을 `hn_items.by = NULL`로 그대로 넣어
+       `parse_sources.py` 스키마 검증이 270건에서 FAIL했다. 합성 테스트
+       픽스처는 항상 `OwnerUserId`를 채웠기 때문에 그동안 발견되지 않았음.
+       저자 없는 게시물은 애초에 "독립 사용자" 집계에 기여할 수 없으므로
+       정규화 단계에서 스킵하도록 수정(가짜 저자를 채우지 않음). 이미
+       수집된 로컬 DB의 오염 데이터 270건 + 참조하던 `candidate_sentences`
+       3건도 정리함(로컬 전용, git 대상 아님).
+    4. `final-qa-runner` 서브에이전트로 독립 검증 디스패치 — **PASS**
+       (테스트/설계 커버리지/점수 공식 불변/CLAUDE.md 1항 준수/체크섬 불변
+       전부 직접 재확인함). 단, **메모리 문서 마감 누락**을 지적함
+       (`HANDOFF.md`가 `c5e254b` 이전 상태로 정체, `ACTIVE_ISSUES.md`의
+       "네 번째 확인" 서술이 아직 커밋 안 됨) — 이 문서를 포함한 최종 커밋으로
+       바로잡음(현재 커밋이 그 커밋).
+    5. 결론: 이번 감사 배치(#8~#26) 자체는 **완료**. CLAUDE.md §11의 8개 완료
+       정의 중 "500개 정확히 게시"류는 프로젝트 전체(제목 500개 생산)의 기준이지
+       이 감사 배치의 기준이 아니다 — 이 배치의 기준은 "발견된 모든 설계-코드
+       격차가 실제로 고쳐지고 테스트·문서·실행으로 검증됨"이며 이는 충족됐다.
+       남은 유일한 이슈는 `DEMAND-001`(별도, 사전에 추적되던, 이 배치 범위 밖).
 
 ## 3. Git/원격 설정 — SSH(원격) 세션에서는 push가 원래 안 됨, 정상 동작
 
@@ -91,12 +112,15 @@
 
 ## 4. DEMAND-001 (별도 미해결 이슈 — 이번 감사 배치의 범위 밖)
 
-수요 관문(`독립 사용자 5명 이상`)을 통과하는 군집이 아직 0건이다. 세 가지 실측
+수요 관문(`독립 사용자 5명 이상`)을 통과하는 군집이 아직 0건이다. 네 가지 실측
 실험 전부 근본 원인을 못 풀었다:
 1. **볼륨 증가**(HN `search_hits_per_pattern` 40→1000): 실패.
 2. **A안(소스 다양화, GH Archive 추가)**: 후보 5,200개로 증가했지만 실패
    (오히려 새로운 보일러플레이트 오염원 추가).
 3. **B안(TF-IDF 가중 코사인 유사도)**: 기존 문자열 유사도보다 오히려 나쁨.
+4. **#26 최종 QA(5개 소스 전부 활성화 + 일반 인사말 필터 + SE 버그 수정 후
+   재실행)**: 여전히 동일 패턴(GitHub 이슈 템플릿, HN 질문 템플릿, 고립
+   불만/인사말 문구) — `ACTIVE_ISSUES.md` `DEMAND-001` "네 번째 확인" 참고.
 
 **결론(`PROJECT_PLAYBOOK.md` "확인된 한계" 누적 기록)**: 짧은 보일러플레이트
 문장은 내용어가 거의 없어 어떤 1차 유사도 지표로도 서로 구분이 안 된다 — 이건

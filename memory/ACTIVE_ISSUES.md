@@ -189,3 +189,33 @@
   (a) 계속 더 많은 원시 데이터를 쌓아 우연히 5명 이상이 겹치는 진짜 문제가
   나타나길 기다리거나, (b) 완전히 다른 종류(더 구조화된/덜 정형화된)의 데이터원을
   찾는 것뿐이다.** 두 선택지 모두 이번 세션의 범위를 넘는 후속 작업으로 남긴다.
+
+- **네 번째 확인(2026-08-11, 설계서 대비 구현 감사 배치 #26 최종 회귀 QA,
+  `QA-20260811-020116-KST`)**: 감사 배치로 5개 선택 데이터원(GH Archive, Stack
+  Exchange, npm Registry, Common Crawl, 공식 RSS/Atom)을 전부 활성화하고
+  `text_filter.is_generic_courtesy_sentence` 필터와 데이터원별 신뢰도 보정까지
+  붙인 뒤 `python run.py --mode qa --target-count 20`을 처음부터 다시 실제
+  실행함(`data/local.db` 총 89,909건: HN 16,057 + GH Archive/Stack Exchange/기타
+  4개 소스). 이 실행 도중 **별개의 진짜 버그를 실측으로 발견**: Stack Exchange
+  덤프의 삭제/이전된 계정 게시물은 `OwnerUserId`가 원래 없는데(정상적인 덤프
+  export 특성), `stack_exchange_client.normalize_row`가 이를 그대로
+  `hn_items.by = NULL`로 넣어 `parse_sources.py`의 스키마 검증(`by` 필수)이
+  270건에서 FAIL했다 — 합성 테스트 픽스처는 항상 `OwnerUserId`를 채워 넣었기
+  때문에 그동안 안 걸렸던 것. `normalize_row`가 저자 없는 게시물을 아예
+  스킵하도록 수정(커밋 `c5e254b`) 후 재실행.
+  5,599개 군집 중 `independent_user_count>=5`인 16개(직전 확인의 19개보다 적음 —
+  데이터셋이 달라졌기 때문, 우려할 변화 아님)를 전부 직접 읽고 REJECT — 여전히
+  전부 같은 패턴(GitHub 이슈 템플릿 "## Workaround" 헤더, HN "Ask HN: How do
+  you manage X" 질문 템플릿, "way too complicated/expensive" 고립 불만,
+  "feedback/feature requests welcome" 인사말)이었다. `text_filter`의 일반
+  인사말 필터가 이미 적용된 상태에서도 GitHub 이슈 템플릿류(`## Workaround`,
+  `Is your feature request related to a problem?`)는 필터 사전에 없어 여전히
+  통과했다 — 이는 필터 사전 확장으로 부분적으로 더 줄일 수 있는 항목이지만,
+  근본 원인(짧고 내용이 거의 없는 문장은 유사도로 구분 불가)은 그대로다.
+  결과: `problems`/`demand_scores` 0건, `CAPABILITY_STAGNATION`,
+  `output/history/words.txt` 체크섬 실행 전후 동일(`e3b0c442...`, 변화 없음),
+  `output/intermediate/QA-20260811-020116-KST_shortfall_titles.txt` 0줄로 정상
+  기록. **결론(네 번째 확인)**: 소스 5개 전부 활성화 + 필터 추가라는, 이번
+  세션이 시도할 수 있는 조합을 전부 적용한 뒤에도 동일한 근본 원인이 그대로
+  재확인됨. 위 "결론(세 번째 확인)"의 판단이 그대로 유효하다 — 데이터/필터를
+  더 다듬는 "같은 방법을 더 크게" 시도를 반복하지 말 것.
