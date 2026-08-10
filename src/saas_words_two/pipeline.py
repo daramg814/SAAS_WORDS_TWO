@@ -128,7 +128,12 @@ def _stage_load_state(conn, project_root: Path, options: RunOptions, state: run_
     if state.mode == "qa" and "qa_history_snapshot_path" not in state.context:
         history_path = project_root / "output" / "history" / "words.txt"
         snapshot_path = project_root / "output" / "qa" / state.run_id / "qa_history_snapshot.txt"
-        atomic_write_text(snapshot_path, "\n".join(_read_lines(history_path)) + "\n")
+        lines = _read_lines(history_path)
+        # An empty operational history must snapshot to a truly empty file -
+        # "\n".join([]) + "\n" would instead write a single "\n", which
+        # _read_lines()/splitlines() reads back as [''] (one blank line) not
+        # [] (no lines), a mismatch with the real file it is meant to mirror.
+        atomic_write_text(snapshot_path, "\n".join(lines) + "\n" if lines else "")
         state.context["qa_history_snapshot_path"] = str(snapshot_path)
 
 

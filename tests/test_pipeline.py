@@ -103,6 +103,22 @@ def test_stage_load_state_snapshots_history_for_qa(tmp_path):
     assert state.context["qa_history_snapshot_path"] == str(snapshot_path)
 
 
+def test_stage_load_state_snapshots_empty_history_as_truly_empty(tmp_path):
+    """Regression: an empty output/history/words.txt must snapshot to a
+    0-byte file, not "\n" - otherwise _read_lines() reads the snapshot back
+    as [''] (one blank line) instead of [] (no lines), a mismatch with the
+    real file the snapshot is supposed to mirror."""
+    options = make_options(tmp_path, run_id="QA-20260810-190000-KST")
+    state = pipeline._load_or_create_state(options)
+    conn = db.connect(tmp_path)
+    pipeline._stage_load_state(conn, tmp_path, options, state)
+    conn.close()
+
+    snapshot_path = tmp_path / "output" / "qa" / state.run_id / "qa_history_snapshot.txt"
+    assert snapshot_path.read_bytes() == b""
+    assert pipeline._read_lines(snapshot_path) == []
+
+
 def test_stage_load_state_noop_for_production(tmp_path):
     options = make_options(tmp_path, mode="production", target_count=500, run_id="RUN-20260810-190000-KST")
     state = pipeline._load_or_create_state(options)
