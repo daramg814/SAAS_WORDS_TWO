@@ -1,0 +1,39 @@
+
+sources:
+  hacker_news:
+    enabled: true
+    required: true
+    type: official_api
+    base_url: https://hacker-news.firebaseio.com/v0
+    incremental_cursor: data/cache/hacker_news_last_id.txt
+  stack_exchange_dump:
+    enabled: false
+    required: false
+    activation_gate: access_test_pass
+  gh_archive:
+    enabled: false
+    required: false
+    activation_gate: access_test_pass
+    recent_days_min: 30
+    recent_days_max: 90
+  common_crawl:
+    enabled: false
+    required: false
+    activation_gate: access_test_pass
+    scope: known_candidate_domains_only
+  npm_registry:
+    enabled: false
+    required: false
+    activation_gate: access_test_pass
+  official_feeds:
+    enabled: false
+    required: false
+    activation_gate: access_test_pass
+
+prohibited:
+  - google_keyword_planner
+  - google_trends_dependency
+  - google_serp_scraping
+  - captcha_bypass
+  - browser_automation_for_google_results
+  - indiscriminate_web_crawling

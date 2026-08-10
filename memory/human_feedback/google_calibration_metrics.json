@@ -1,0 +1,10 @@
+{
+  "total_observations": 0,
+  "market_query_observations": 0,
+  "title_query_observations": 0,
+  "supply_underestimated_rate": null,
+  "supply_overestimated_rate": null,
+  "title_collision_underestimated_rate": null,
+  "query_noise_rate": null,
+  "status": "PROVISIONAL"
+}

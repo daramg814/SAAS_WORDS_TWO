@@ -1,0 +1,2 @@
+validation_id,query_type,problem_id,title,google_query,predicted_effective_supply,predicted_scarcity_score,predicted_result_band,priority_reason,user_result_count,user_checked_at,country,language,search_context,top_results_relevant,user_notes
+GVQ-20260804-0001,MARKET_QUERY,P-0001,,"vendor insurance tracking software",1.8,91,LOW,scarcity boundary,18400,2026-08-04T20:15:00+09:00,KR,en,normal,7,sample

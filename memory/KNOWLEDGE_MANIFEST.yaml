@@ -1,0 +1,26 @@
+version: 1
+read_order:
+  - CLAUDE.md
+  - memory/HANDOFF.md
+  - memory/PROJECT_PLAYBOOK.md
+  - memory/ACTIVE_ISSUES.md
+  - current_run_state
+  - recent_quality_trends
+  - output/history/words.txt
+  - memory/human_feedback/google_calibration_metrics.json
+canonical_documents:
+  charter: docs/project/01-project-charter.md
+  io_contract: docs/contracts/02-input-output-contracts.md
+  schemas: docs/contracts/03-schema-reference.md
+  data_sources: docs/policies/04-data-source-policy.md
+  human_feedback: docs/policies/05-human-google-calibration.md
+  roles: docs/architecture/06-agents-and-role-separation.md
+  demand: docs/pipeline/07-demand-pipeline.md
+  supply: docs/pipeline/08-supply-pipeline.md
+  opportunity: docs/pipeline/09-opportunity-scoring.md
+  titles: docs/pipeline/10-title-generation.md
+  state_memory: docs/operations/11-workflow-state-memory.md
+  git_recovery: docs/operations/12-git-and-recovery.md
+  qa_acceptance: docs/qa/13-qa-and-acceptance.md
+  roadmap: docs/implementation/14-implementation-roadmap.md
+  source_design: docs/design/source/claude_code_saas_high_demand_low_supply_two_word_design_v2.4.md

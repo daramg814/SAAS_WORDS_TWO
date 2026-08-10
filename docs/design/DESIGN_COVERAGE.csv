@@ -1,0 +1,93 @@
+source_heading,target_document,status
+# Claude Code 프로젝트 통합 설계서,docs/design/source/claude_code_saas_high_demand_low_supply_two_word_design_v2.4.md,COVERED
+## 고수요·저공급 SaaS 기회 발굴 및 영어 2단어 제목 생성 시스템,docs/design/source/claude_code_saas_high_demand_low_supply_two_word_design_v2.4.md,COVERED
+# 1. 작업 컨텍스트,docs/project/01-project-charter.md,COVERED
+## 1.1 배경,docs/project/01-project-charter.md,COVERED
+## 1.2 목적,docs/project/01-project-charter.md,COVERED
+## 1.3 핵심 원칙,docs/project/01-project-charter.md,COVERED
+## 1.4 포함 범위,docs/project/01-project-charter.md,COVERED
+## 1.5 제외 범위,docs/project/01-project-charter.md,COVERED
+## 1.6 성공 기준,docs/project/01-project-charter.md,COVERED
+## 1.7 실패 기준,docs/project/01-project-charter.md,COVERED
+# 2. 입력과 출력,docs/contracts/02-input-output-contracts.md,COVERED
+## 2.1 입력,docs/contracts/02-input-output-contracts.md,COVERED
+## 2.2 실행 모드,docs/contracts/02-input-output-contracts.md,COVERED
+## 2.3 핵심 출력,docs/contracts/02-input-output-contracts.md,COVERED
+### 실행별 신규 제목,docs/contracts/02-input-output-contracts.md,COVERED
+### 전체 누적 제목,docs/contracts/02-input-output-contracts.md,COVERED
+### QA 출력,docs/contracts/02-input-output-contracts.md,COVERED
+### 사용자 Google 검증 출력,docs/contracts/02-input-output-contracts.md,COVERED
+### 기회 데이터,docs/contracts/02-input-output-contracts.md,COVERED
+# 3. 데이터원 정책,docs/policies/04-data-source-policy.md,COVERED
+## 3.1 기본 데이터원,docs/policies/04-data-source-policy.md,COVERED
+### Hacker News 공식 API,docs/policies/04-data-source-policy.md,COVERED
+## 3.2 선택 데이터원,docs/policies/04-data-source-policy.md,COVERED
+## 3.3 접근성 테스트,docs/policies/04-data-source-policy.md,COVERED
+# 4. 사용자 Google 검증 자산화,docs/policies/05-human-google-calibration.md,COVERED
+## 4.1 목적,docs/policies/05-human-google-calibration.md,COVERED
+## 4.2 사용자가 입력하는 방식,docs/policies/05-human-google-calibration.md,COVERED
+## 4.3 검증 대상 추천 방식,docs/policies/05-human-google-calibration.md,COVERED
+## 4.4 append-only 검증 원장,docs/policies/05-human-google-calibration.md,COVERED
+## 4.5 Google 결과 수의 정규화,docs/policies/05-human-google-calibration.md,COVERED
+## 4.6 AI 예측과 사람 관측 비교,docs/policies/05-human-google-calibration.md,COVERED
+## 4.7 공급 점수 보정,docs/policies/05-human-google-calibration.md,COVERED
+## 4.8 제목 충돌 점수 보정,docs/policies/05-human-google-calibration.md,COVERED
+## 4.9 누적 자기개선,docs/policies/05-human-google-calibration.md,COVERED
+## 4.10 편향 방지,docs/policies/05-human-google-calibration.md,COVERED
+## 4.11 처리 상태,docs/policies/05-human-google-calibration.md,COVERED
+# 5. 최소 에이전트 구조,docs/architecture/06-agents-and-role-separation.md,COVERED
+## 4.1 선택 근거,docs/architecture/06-agents-and-role-separation.md,COVERED
+## 4.2 에이전트,docs/architecture/06-agents-and-role-separation.md,COVERED
+# 6. 판단과 코드 역할 분리,CLAUDE.md + docs/architecture/06-agents-and-role-separation.md,COVERED
+# 7. 수요 예측 파이프라인,docs/pipeline/07-demand-pipeline.md,COVERED
+## 6.1 원문 수집,docs/pipeline/07-demand-pipeline.md,COVERED
+## 6.2 후보 문제 문장 필터,docs/pipeline/07-demand-pipeline.md,COVERED
+## 6.3 문제 구조 추출,docs/pipeline/07-demand-pipeline.md,COVERED
+## 6.4 동일 문제 군집화,docs/pipeline/07-demand-pipeline.md,COVERED
+## 6.5 수요 점수,docs/pipeline/07-demand-pipeline.md,COVERED
+# 8. 공급 예측 파이프라인,docs/pipeline/08-supply-pipeline.md,COVERED
+## 7.1 공급 후보 수집,docs/pipeline/08-supply-pipeline.md,COVERED
+## 7.2 제품 중복 제거,docs/pipeline/08-supply-pipeline.md,COVERED
+## 7.3 활성 제품 검증,docs/pipeline/08-supply-pipeline.md,COVERED
+## 7.4 공급 유형 분류,docs/pipeline/08-supply-pipeline.md,COVERED
+## 7.5 공급 부족 점수,docs/pipeline/08-supply-pipeline.md,COVERED
+## 7.6 공급 희소성 등급,docs/pipeline/08-supply-pipeline.md,COVERED
+# 9. 공급 희소성 우선 기회 판정,docs/pipeline/09-opportunity-scoring.md,COVERED
+## 8.1 희소성 우선 점수,docs/pipeline/09-opportunity-scoring.md,COVERED
+## 8.2 신뢰도,docs/pipeline/09-opportunity-scoring.md,COVERED
+## 8.3 제목 생성 조건,docs/pipeline/09-opportunity-scoring.md,COVERED
+## 8.4 최종 정렬 순서,docs/pipeline/09-opportunity-scoring.md,COVERED
+## 8.5 검토 판정,docs/pipeline/09-opportunity-scoring.md,COVERED
+# 10. 영어 2단어 제목 생성,docs/pipeline/10-title-generation.md,COVERED
+## 9.1 실행 목표,docs/pipeline/10-title-generation.md,COVERED
+## 9.2 핵심 개념 추출,docs/pipeline/10-title-generation.md,COVERED
+## 9.3 500개 확보 반복,docs/pipeline/10-title-generation.md,COVERED
+## 9.4 최종 목표 수량 선택,docs/pipeline/10-title-generation.md,COVERED
+# 11. 워크플로우와 상태 전이,docs/operations/11-workflow-state-memory.md,COVERED
+# 12. 폴더 구조,docs/implementation/14-implementation-roadmap.md,COVERED
+# 13. 영속 메모리와 토큰 절약,docs/operations/11-workflow-state-memory.md,COVERED
+## 12.1 세션 시작 읽기 순서,docs/operations/11-workflow-state-memory.md,COVERED
+## 12.2 간소화 원칙,docs/operations/11-workflow-state-memory.md,COVERED
+## 12.3 원자 작업 단위,docs/operations/11-workflow-state-memory.md,COVERED
+# 14. 이슈와 노하우,docs/operations/11-workflow-state-memory.md,COVERED
+## 13.1 이슈 기록,docs/operations/11-workflow-state-memory.md,COVERED
+## 13.2 노하우 기록,docs/operations/11-workflow-state-memory.md,COVERED
+# 15. Git 원칙,docs/operations/12-git-and-recovery.md,COVERED
+# 16. QA,CLAUDE.md + docs/qa/13-qa-and-acceptance.md,COVERED
+## 15.1 원칙,CLAUDE.md + docs/qa/13-qa-and-acceptance.md,COVERED
+## 15.2 QA 실행 방식,CLAUDE.md + docs/qa/13-qa-and-acceptance.md,COVERED
+## 15.3 운영 데이터 보호,CLAUDE.md + docs/qa/13-qa-and-acceptance.md,COVERED
+## 15.4 QA 성공 기준,CLAUDE.md + docs/qa/13-qa-and-acceptance.md,COVERED
+## 15.5 필수 회귀 사례,CLAUDE.md + docs/qa/13-qa-and-acceptance.md,COVERED
+# 17. 구현 우선순위,docs/implementation/14-implementation-roadmap.md,COVERED
+## 1차 구현,docs/implementation/14-implementation-roadmap.md,COVERED
+## 2차 구현,docs/implementation/14-implementation-roadmap.md,COVERED
+## 3차 개선,docs/implementation/14-implementation-roadmap.md,COVERED
+# 18. 최종 인수 기준,docs/qa/13-qa-and-acceptance.md,COVERED
+# 19. 핵심 요약,docs/project/01-project-charter.md,COVERED
+# 20. 버전 변경 이력,docs/design/15-version-history.md,COVERED
+## v2.4,docs/design/15-version-history.md,COVERED
+## v2.3,docs/design/15-version-history.md,COVERED
+## v2.2,docs/design/15-version-history.md,COVERED
+## v2.1,docs/design/15-version-history.md,COVERED
+## v2.0,docs/design/15-version-history.md,COVERED
