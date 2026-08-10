@@ -88,6 +88,26 @@ BOT_ISSUE_COMMENT = {
 
 PUSH_EVENT = {"id": "4", "type": "PushEvent", "actor": {"login": "carol"}, "payload": {}}
 
+# GitHub's Copilot review bot (and similar app-based bots) show up as a
+# top-level actor with no "[bot]" suffix, but the comment's own embedded
+# `user.type` is "Bot" - this is only caught by checking the content author.
+COPILOT_COMMENT_EVENT = {
+    "id": "5",
+    "type": "IssueCommentEvent",
+    "actor": {"login": "Copilot"},
+    "created_at": "2026-08-10T07:10:00Z",
+    "payload": {
+        "action": "created",
+        "issue": {"id": 5000000001},
+        "comment": {
+            "id": 5000000005,
+            "body": "This looks fine to me.",
+            "html_url": "https://x/z",
+            "user": {"login": "Copilot", "type": "Bot"},
+        },
+    },
+}
+
 
 def test_hour_key_and_next_hour_key_roll_over_day_and_month():
     assert gh_archive_client.hour_key(gh_archive_client.hour_key_to_datetime("2026-08-10-23")) == "2026-08-10-23"
@@ -113,8 +133,35 @@ def test_normalize_event_maps_issue_comment_to_comment_with_parent():
     assert normalized["by"] == "bob"
 
 
+def test_normalize_event_prefers_content_authors_login_over_actor_login():
+    """The content author (issue/comment `user`) is who actually wrote the
+    text, which can differ from the event's top-level `actor`."""
+    event = {
+        "id": "6",
+        "type": "IssueCommentEvent",
+        "actor": {"login": "some-integration-actor"},
+        "created_at": "2026-08-10T07:11:00Z",
+        "payload": {
+            "action": "created",
+            "issue": {"id": 5000000001},
+            "comment": {
+                "id": 5000000006,
+                "body": "manual process pain",
+                "html_url": "https://x/w",
+                "user": {"login": "real-human", "type": "User"},
+            },
+        },
+    }
+    normalized = gh_archive_client.normalize_event(event)
+    assert normalized["by"] == "real-human"
+
+
 def test_normalize_event_excludes_bot_actors():
     assert gh_archive_client.normalize_event(BOT_ISSUE_COMMENT) is None
+
+
+def test_normalize_event_excludes_bot_content_author_even_with_non_bot_actor_login():
+    assert gh_archive_client.normalize_event(COPILOT_COMMENT_EVENT) is None
 
 
 def test_normalize_event_excludes_unrelated_event_types():

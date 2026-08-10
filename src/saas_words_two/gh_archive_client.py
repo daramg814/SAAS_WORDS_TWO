@@ -88,6 +88,22 @@ def is_bot_actor(actor: dict | None) -> bool:
     return login.endswith("[bot]")
 
 
+def _is_bot_content_author(user: dict | None) -> bool:
+    """The event's top-level `actor` (who triggered the API event) is not
+    always the same identity as the issue/comment's own embedded `user`
+    (who actually wrote the text) - e.g. GitHub's Copilot review bot shows up
+    as actor login "Copilot" with no "[bot]" suffix, but the comment's own
+    `user.type` is "Bot". Checking both the actor and the content author's
+    login suffix *and* the content author's `user.type` catches more
+    automation than either check alone - though it is still not exhaustive
+    (service accounts like "codecov-commenter" report user.type "User");
+    residual cases are left for the existing ambiguous-cluster judgment step
+    to catch, same as any other non-independent templated text."""
+    user = user or {}
+    login = user.get("login") or ""
+    return login.endswith("[bot]") or user.get("type") == "Bot"
+
+
 def _parse_created_at(value: str | None) -> int | None:
     if not value:
         return None
@@ -114,10 +130,13 @@ def normalize_event(event: dict) -> dict | None:
 
     if event_type == ISSUES_EVENT and payload.get("action") == "opened":
         issue = payload.get("issue") or {}
+        issue_user = issue.get("user") or {}
+        if _is_bot_content_author(issue_user):
+            return None
         return {
             "id": issue.get("id"),
             "type": "story",
-            "by": actor.get("login"),
+            "by": issue_user.get("login") or actor.get("login"),
             "time": _parse_created_at(event.get("created_at")),
             "text": issue.get("body"),
             "title": issue.get("title"),
@@ -130,11 +149,14 @@ def normalize_event(event: dict) -> dict | None:
         }
     if event_type == ISSUE_COMMENT_EVENT and payload.get("action") == "created":
         comment = payload.get("comment") or {}
+        comment_user = comment.get("user") or {}
+        if _is_bot_content_author(comment_user):
+            return None
         issue = payload.get("issue") or {}
         return {
             "id": comment.get("id"),
             "type": "comment",
-            "by": actor.get("login"),
+            "by": comment_user.get("login") or actor.get("login"),
             "time": _parse_created_at(event.get("created_at")),
             "text": comment.get("body"),
             "title": None,
