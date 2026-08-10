@@ -23,6 +23,15 @@ OBSERVATIONS_FOR_FULL_WEIGHT = 20
 MARKET_QUEUE_SIZE = 20
 TITLE_QUEUE_SIZE = 30
 
+# 4.9/4.10: "동일 규칙이 최소 5건 이상에서 반복되고 QA를 통과해야 검증 노하우로
+# 승격한다" - mirrors config/project.yaml's human_google_calibration.
+# minimum_repetitions_for_rule_promotion, same convention as the other
+# constants in this module duplicating their config/project.yaml value rather
+# than reading the file at runtime. Only counts repetitions; the QA-pass
+# check and the actual promotion decision stay with a human/session
+# (human-feedback-calibrator), per docs/architecture/06 role separation.
+MINIMUM_REPETITIONS_FOR_RULE_PROMOTION = 5
+
 
 def google_footprint(user_result_count: int) -> float:
     return math.log10(user_result_count + 1)
@@ -119,10 +128,21 @@ TITLE_COLLISION_ADJUSTMENTS = {
 }
 
 
+_BRAND_CONFLICT_MARKERS = ("TITLE_BRAND_CONFLICT", "BRAND", "CONFLICT", "동일 제품", "동일 브랜드")
+
+
 def title_brand_conflict_flagged(user_notes: str | None) -> bool:
-    """4.8: '사용자가 메모로 직접 충돌을 표시하면 TITLE_BRAND_CONFLICT로 즉시 재검토' -
-    the documented convention is the literal marker string in user_notes."""
-    return bool(user_notes) and "TITLE_BRAND_CONFLICT" in user_notes.upper()
+    """4.8: '사용자가 메모로 직접 충돌을 표시하면 TITLE_BRAND_CONFLICT로 즉시 재검토'.
+    Matches either the explicit TITLE_BRAND_CONFLICT marker or a looser set of
+    conflict-indicating keywords, so a free-text note like "브랜드 충돌 발견"
+    is recognized without requiring the exact enum string. Single shared
+    definition - calibrate_supply_predictions.py used to have its own,
+    narrower private copy of this same idea; consolidated here so the two
+    call sites can't silently disagree on what counts as a conflict."""
+    if not user_notes:
+        return False
+    upper = user_notes.upper()
+    return any(marker.upper() in upper for marker in _BRAND_CONFLICT_MARKERS)
 
 
 def classify_title_collision(

@@ -110,6 +110,7 @@ def build_opportunity_row(conn, problem_row, demand_row, market_observations_by_
             adjustment["adjusted_supply_scarcity_score"] if adjustment["observation_count"] else None
         ),
         "human_calibration_status": adjustment["status"],
+        "direct_competitor_count": direct_competitor_count,
     }
 
 
@@ -117,8 +118,9 @@ def persist_opportunity(conn, row: dict, updated_at: str) -> None:
     conn.execute(
         "INSERT INTO opportunities (problem_id, demand_score, effective_supply, supply_scarcity_score, "
         "scarcity_grade, priority_score, confidence, decision, evidence_ids, product_ids, "
-        "human_observation_count, human_adjusted_supply_scarcity_score, human_calibration_status, updated_at) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+        "human_observation_count, human_adjusted_supply_scarcity_score, human_calibration_status, "
+        "direct_competitor_count, updated_at) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
         "ON CONFLICT(problem_id) DO UPDATE SET "
         "demand_score=excluded.demand_score, effective_supply=excluded.effective_supply, "
         "supply_scarcity_score=excluded.supply_scarcity_score, scarcity_grade=excluded.scarcity_grade, "
@@ -126,7 +128,8 @@ def persist_opportunity(conn, row: dict, updated_at: str) -> None:
         "evidence_ids=excluded.evidence_ids, product_ids=excluded.product_ids, "
         "human_observation_count=excluded.human_observation_count, "
         "human_adjusted_supply_scarcity_score=excluded.human_adjusted_supply_scarcity_score, "
-        "human_calibration_status=excluded.human_calibration_status, updated_at=excluded.updated_at",
+        "human_calibration_status=excluded.human_calibration_status, "
+        "direct_competitor_count=excluded.direct_competitor_count, updated_at=excluded.updated_at",
         (
             row["problem_id"],
             row["demand_score"],
@@ -141,6 +144,7 @@ def persist_opportunity(conn, row: dict, updated_at: str) -> None:
             row["human_observation_count"],
             row["human_adjusted_supply_scarcity_score"],
             row["human_calibration_status"],
+            row["direct_competitor_count"],
             updated_at,
         ),
     )

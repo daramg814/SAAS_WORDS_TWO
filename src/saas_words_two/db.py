@@ -110,6 +110,7 @@ CREATE TABLE IF NOT EXISTS opportunities (
     human_observation_count INTEGER NOT NULL DEFAULT 0,
     human_adjusted_supply_scarcity_score REAL,
     human_calibration_status TEXT NOT NULL DEFAULT 'NO_DATA',
+    direct_competitor_count INTEGER NOT NULL DEFAULT 0,
     updated_at TEXT NOT NULL
 );
 
@@ -157,6 +158,7 @@ COLUMN_MIGRATIONS: tuple[tuple[str, str, str], ...] = (
     ("titles", "google_title_collision_class", "TEXT"),
     ("titles", "human_title_validation_count", "INTEGER NOT NULL DEFAULT 0"),
     ("titles", "title_collision_adjustment", "REAL NOT NULL DEFAULT 0.0"),
+    ("opportunities", "direct_competitor_count", "INTEGER NOT NULL DEFAULT 0"),
 )
 
 
