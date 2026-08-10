@@ -555,13 +555,18 @@ def test_generate_and_review_titles_completes_in_one_round_when_enough_approved(
     conn.close()
 
 
-def test_generate_and_review_titles_raises_retry_when_no_eligible_opportunities(tmp_path):
+def test_generate_and_review_titles_no_eligible_opportunities_is_capability_stagnation(tmp_path):
+    """design 11: zero opportunities to generate from at all - across zero
+    approved titles - is CAPABILITY_STAGNATION, not plain RETRYING (this
+    run's current data/approach cannot produce anything, not just "not
+    enough yet"). Still raised as RetryRequired (same retry mechanics)."""
     options = make_options(tmp_path, target_count=20, run_id="QA-20260810-190000-KST")
     state = pipeline._load_or_create_state(options)
     conn = db.connect(tmp_path)
-    with pytest.raises(pipeline.RetryRequired):
+    with pytest.raises(pipeline.RetryRequired) as excinfo:
         pipeline._stage_generate_and_review_titles(conn, tmp_path, options, state)
-    assert state.status == "RETRYING"
+    assert state.status == "CAPABILITY_STAGNATION"
+    assert excinfo.value.status == "CAPABILITY_STAGNATION"
     # design 2.3/9.3: a shortfall must persist whatever partial result exists
     # to output/intermediate/, never silently only in the DB.
     intermediate = tmp_path / "output" / "intermediate" / f"{state.run_id}_shortfall_titles.txt"
@@ -569,7 +574,10 @@ def test_generate_and_review_titles_raises_retry_when_no_eligible_opportunities(
     conn.close()
 
 
-def test_generate_and_review_titles_exhausts_max_rounds_and_retries(tmp_path):
+def test_generate_and_review_titles_exhausts_max_rounds_with_zero_progress_is_capability_stagnation(tmp_path):
+    """design 11: exhausting every round while landing zero titles the whole
+    time is CAPABILITY_STAGNATION, not RETRYING - the opportunity pool
+    produced nothing no matter how many rounds it got."""
     options = make_options(tmp_path, target_count=20, run_id="QA-20260810-190000-KST")
     state = pipeline._load_or_create_state(options)
     with_qa_history_snapshot(tmp_path, state)
@@ -591,6 +599,46 @@ def test_generate_and_review_titles_exhausts_max_rounds_and_retries(tmp_path):
             run_state.save(tmp_path, state)
             current_round = state.context["title_round"]
             respond_to_generation(run_dir, state.run_id, current_round, make_no_titles)
+            continue
+        except pipeline.RetryRequired:
+            retried = True
+            break
+
+    assert retried, "expected RetryRequired after exhausting max rounds"
+    assert state.status == "CAPABILITY_STAGNATION"
+
+
+def test_generate_and_review_titles_exhausts_max_rounds_with_partial_progress_stays_retrying(tmp_path):
+    """Contrast case: SOME titles were approved before rounds ran out - the
+    pool clearly can produce something, just not enough yet, so this stays
+    ordinary RETRYING rather than escalating to CAPABILITY_STAGNATION."""
+    options = make_options(tmp_path, target_count=20, run_id="QA-20260810-190000-KST")
+    state = pipeline._load_or_create_state(options)
+    with_qa_history_snapshot(tmp_path, state)
+    conn = db.connect(tmp_path)
+    seed_eligible_opportunities(conn, 5)
+    run_dir = pipeline._run_dir(tmp_path, state)
+
+    first_round = True
+
+    def make_a_few_then_nothing(problem_id, slot_count, round_no):
+        nonlocal first_round
+        if first_round:
+            first_round = False
+            return make_word_pair_titles(problem_id, slot_count, round_no)
+        return []
+
+    retried = False
+    for _ in range(pipeline.title_generation.MAX_ROUNDS + 2):
+        try:
+            pipeline._stage_generate_and_review_titles(conn, tmp_path, options, state)
+        except judgment.JudgmentRequired:
+            run_state.save(tmp_path, state)
+            current_round = state.context["title_round"]
+            if state.context["title_phase"] == "review":
+                respond_to_review(run_dir, state.run_id, current_round, approve_all=True)
+            else:
+                respond_to_generation(run_dir, state.run_id, current_round, make_a_few_then_nothing)
             continue
         except pipeline.RetryRequired:
             retried = True
@@ -780,6 +828,34 @@ def test_stage_publish_mode_outputs_production_updates_history_atomically(tmp_pa
     assert len(history_path.read_text(encoding="utf-8").splitlines()) == 20
 
     assert (tmp_path / "output" / "final" / "opportunities.jsonl").exists()
+    conn.close()
+
+
+def test_stage_publish_mode_outputs_history_mismatch_raises_recovery_required(tmp_path, monkeypatch):
+    """design 11 RECOVERY_REQUIRED: if the on-disk history file's new tail
+    doesn't match what this run was supposed to append (simulated here via a
+    monkeypatched write that "corrupts" the result), the stage must halt
+    rather than silently treating the run as complete or blindly retrying."""
+    options = make_options(tmp_path, mode="production", target_count=20, run_id="RUN-20260810-190000-KST")
+    state = pipeline._load_or_create_state(options)
+    conn = db.connect(tmp_path)
+    seed_approved_titles(conn, state.run_id, 20)
+    pipeline._stage_validate_outputs(conn, tmp_path, options, state)
+
+    real_atomic_write_text = pipeline.atomic_write_text
+    history_path = tmp_path / "output" / "history" / "words.txt"
+
+    def corrupting_write(path, content):
+        if path == history_path:
+            real_atomic_write_text(path, "Unexpected Content\n")
+            return
+        real_atomic_write_text(path, content)
+
+    monkeypatch.setattr(pipeline, "atomic_write_text", corrupting_write)
+
+    with pytest.raises(pipeline.RecoveryRequired):
+        pipeline._stage_publish_mode_outputs(conn, tmp_path, options, state)
+    assert state.status == "RECOVERY_REQUIRED"
     conn.close()
 
 

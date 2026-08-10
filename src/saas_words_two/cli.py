@@ -5,7 +5,7 @@ import argparse
 from pathlib import Path
 
 from .judgment import JudgmentRequired
-from .pipeline import ImplementationPendingError, RetryRequired, RunOptions, run_pipeline
+from .pipeline import ImplementationPendingError, RecoveryRequired, RetryRequired, RunOptions, run_pipeline
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -34,8 +34,11 @@ def main(argv: list[str] | None = None) -> int:
         print(f"AWAITING_JUDGMENT: {exc}")
         return 3
     except RetryRequired as exc:
-        print(f"RETRYING: {exc}")
+        print(f"{exc.status}: {exc}")
         return 4
+    except RecoveryRequired as exc:
+        print(f"RECOVERY_REQUIRED: {exc}")
+        return 5
     except (ValueError, ImplementationPendingError, RuntimeError) as exc:
         print(f"ERROR: {exc}")
         return 2

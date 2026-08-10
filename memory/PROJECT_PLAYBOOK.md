@@ -8,6 +8,19 @@
 
 ## candidate
 - 초기 HN 필터 표현과 공급 검색 동의어는 실제 측정 및 QA 후 validated로 승격한다.
+- **`CAPABILITY_STAGNATION`/`RECOVERY_REQUIRED` 상태 전이 조건은 원본 설계서에 이름만
+  있고 트리거 조건이 명시되어 있지 않아, 2026-08-11 감사 배치에서 다음과 같이 해석해
+  구현했다(추후 반례가 나오면 재검토할 것):
+  - `CAPABILITY_STAGNATION`: 제목 생성 라운드가 전부 소진되거나 기회 풀이 비었는데
+    **그 시점까지 승인된 제목이 0개**인 경우(=이 실행의 현재 데이터/방식으로는 아무것도
+    못 만든다는 신호). 일부라도 진행됐으면(0개가 아니면) 그대로 `RETRYING` 유지.
+  - `RECOVERY_REQUIRED`: 운영 이력(`output/history/words.txt`) 원자적 쓰기 직후
+    증가분을 재검증했는데 기대한 제목과 실제로 파일에 쓰인 내용이 다른 경우 — 자동
+    재시도가 안전하지 않은(중복 append 위험) 상황이라 사람 확인 없이는 다음 단계로
+    진행하지 않는다.
+  - 둘 다 기존 `RetryRequired`(`CAPABILITY_STAGNATION`) 또는 신규
+    `RecoveryRequired`(`RECOVERY_REQUIRED`) 예외로 표현되며, `run.py` 종료 코드는
+    각각 4, 5. 상세는 `src/saas_words_two/pipeline.py`의 두 예외 클래스 docstring 참고.
 
 ## candidate (구현 패턴, 재사용 시 참고)
 - 새 데이터원을 추가할 때 기존 `hn_items` 같은 정규화 테이블을 그대로 재사용하고

@@ -27,11 +27,35 @@ class RetryRequired(RuntimeError):
     too small to proceed. Run state is left RETRYING (not FAILED, not DONE);
     final outputs are not published. See docs/pipeline/10-title-generation.md
     9.3: "부족 원인이 기회 부족이면 수요·공급 조사 단계로 복귀한다."
+
+    status defaults to RETRYING but can be CAPABILITY_STAGNATION (design 11's
+    state list) when the shortfall reflects zero progress at all - not "try
+    a bit more", but "this run's current data/approach cannot produce
+    anything and needs a structural change" (e.g. DEMAND-001: no amount of
+    re-running the same pipeline against the same source helped; only
+    changing the data source or clustering approach did). Neither status
+    changes retry mechanics - both are raised as this same exception type -
+    only what gets persisted and reported to distinguish the two cases for
+    HANDOFF/ACTIVE_ISSUES purposes.
     """
+
+    def __init__(self, reason: str, *, status: str = "RETRYING"):
+        self.reason = reason
+        self.status = status
+        super().__init__(f"{status}: {reason}")
+
+
+class RecoveryRequired(RuntimeError):
+    """design 11's RECOVERY_REQUIRED: an atomic operation's own postcondition
+    check failed after the write (e.g. output/history/words.txt's on-disk
+    tail doesn't match what was just atomically written). Retrying
+    automatically is not safe here - continuing could double-append or
+    otherwise compound the corruption - so this is a distinct exception from
+    RetryRequired/JudgmentRequired that halts the run for manual inspection."""
 
     def __init__(self, reason: str):
         self.reason = reason
-        super().__init__(f"RETRYING: {reason}")
+        super().__init__(f"RECOVERY_REQUIRED: {reason}")
 
 
 @dataclass(frozen=True)
@@ -619,13 +643,19 @@ def _stage_generate_and_review_titles(
             return
 
         if round_no > title_generation.MAX_ROUNDS:
-            state.status = "RETRYING"
+            # Zero progress across every round is a stronger signal than "ran
+            # out of rounds while still gaining ground" - it means this run's
+            # current opportunity pool cannot produce anything at all, not
+            # just not enough (design 11's CAPABILITY_STAGNATION vs RETRYING).
+            status = "CAPABILITY_STAGNATION" if not approved else "RETRYING"
+            state.status = status
             state.context["title_round"] = round_no
             run_state.save(project_root, state)
             _write_shortfall_intermediate(project_root, state, [item["title"] for item in approved])
             raise RetryRequired(
                 f"reached max rounds ({title_generation.MAX_ROUNDS}) with only "
-                f"{len(approved)}/{target_count} approved titles"
+                f"{len(approved)}/{target_count} approved titles",
+                status=status,
             )
 
         if phase == "generate":
@@ -638,10 +668,19 @@ def _stage_generate_and_review_titles(
 
             request_path = _write_generation_request(conn, run_dir, state, round_no, target_count, len(approved))
             if request_path is None:
-                state.status = "RETRYING"
+                # No eligible opportunities/slots at all in a round where
+                # nothing has been approved yet means the upstream demand/
+                # supply pipeline produced nothing usable for this run - not
+                # a "try once more" situation (design 11 CAPABILITY_STAGNATION).
+                # If earlier rounds DID land some titles, this is ordinary
+                # exhaustion of the pool and stays RETRYING.
+                status = "CAPABILITY_STAGNATION" if not approved else "RETRYING"
+                state.status = status
                 run_state.save(project_root, state)
                 _write_shortfall_intermediate(project_root, state, [item["title"] for item in approved])
-                raise RetryRequired("no eligible opportunities or slots available for title generation")
+                raise RetryRequired(
+                    "no eligible opportunities or slots available for title generation", status=status
+                )
             state.context["title_round"] = round_no
             state.context["title_phase"] = phase
             _pause_for_judgment(project_root, state, "generate_titles", request_path)
@@ -848,6 +887,22 @@ def _stage_publish_mode_outputs(
         )
         if not already_appended:
             atomic_write_text(history_path, "\n".join(history + final_titles) + "\n")
+            # design 2.3: "현재 실행 결과와 정확히 일치하는 증가분 검증" - verify the
+            # write actually took effect as intended before treating this run
+            # as complete. A mismatch here means atomic_write_text's own
+            # postcondition failed (e.g. a concurrent writer, a filesystem
+            # anomaly) - retrying automatically is not safe (could double-
+            # append), so this halts for manual inspection (design 11
+            # RECOVERY_REQUIRED) rather than raising a generic error.
+            history_after = _read_lines(history_path)
+            if history_after[len(history):] != final_titles:
+                state.status = "RECOVERY_REQUIRED"
+                run_state.save(project_root, state)
+                raise RecoveryRequired(
+                    f"output/history/words.txt increment did not match this run's final_titles "
+                    f"after atomic write (expected {len(final_titles)} new lines, "
+                    f"found {len(history_after) - len(history)})"
+                )
 
         _write_opportunities_jsonl(conn, project_root / "output" / "final" / "opportunities.jsonl", final_titles)
     else:
@@ -1010,7 +1065,7 @@ def run_pipeline(options: RunOptions) -> int:
                 raise ImplementationPendingError(f"no handler registered for stage: {stage}")
             try:
                 handler(conn, project_root, options, state)
-            except (JudgmentRequired, RetryRequired):
+            except (JudgmentRequired, RetryRequired, RecoveryRequired):
                 raise
             except Exception as exc:
                 state.status = "FAILED"
