@@ -553,3 +553,41 @@ def test_run_access_test_exercises_stack_exchange_and_reports_pass(tmp_path):
     )
     assert report.results["stack_exchange_dump"]["status"] == "PASS"
     assert "questions=1" in report.results["stack_exchange_dump"]["detail"]
+
+
+# ---------------------------------------------------------------------------
+# npm_registry access test
+# ---------------------------------------------------------------------------
+
+NPM_SOURCES_CONFIG = {"sources": {"npm_registry": {"enabled": True, "required": False}}}
+
+
+def test_run_access_test_exercises_npm_registry_and_reports_pass(tmp_path):
+    from saas_words_two import npm_client
+
+    sources_config = {**SOURCES_CONFIG, "sources": {**SOURCES_CONFIG["sources"], **NPM_SOURCES_CONFIG["sources"]}}
+    hn_session = FakeSession(
+        {"maxitem.json": 100, "item/100.json": {"id": 100, "type": "story"}, "search": {"hits": []}}
+    )
+
+    class NpmHitResponse:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {"objects": [{"package": {"name": "vendor-guard", "links": {}}}], "total": 1}
+
+    class CombinedHnNpmSession:
+        def __init__(self, hn_session):
+            self.hn_session = hn_session
+
+        def get(self, url, timeout):
+            if url.startswith(npm_client.BASE_URL + "/"):
+                return NpmHitResponse()
+            return self.hn_session.get(url, timeout)
+
+    report = collection.run_access_test(
+        tmp_path, sources_config, CombinedHnNpmSession(hn_session), generated_at="t0"
+    )
+    assert report.results["npm_registry"]["status"] == "PASS"
+    assert "sample_name=vendor-guard" in report.results["npm_registry"]["detail"]

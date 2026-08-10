@@ -166,3 +166,71 @@ def test_collect_gh_archive_mentions_skips_problems_without_task_or_user(tmp_pat
     )
     assert inserted == 0
     conn.close()
+
+
+class FakeNpmResponse:
+    def __init__(self, json_data):
+        self._json_data = json_data
+
+    def raise_for_status(self):
+        return None
+
+    def json(self):
+        return self._json_data
+
+
+class FakeNpmSession:
+    def __init__(self, objects):
+        self.objects = objects
+        self.calls: list[str] = []
+
+    def get(self, url, timeout):
+        self.calls.append(url)
+        return FakeNpmResponse({"objects": self.objects, "total": len(self.objects)})
+
+
+def test_collect_npm_mentions_inserts_normalized_packages(tmp_path):
+    conn = db.connect(tmp_path)
+    seed_problem(conn)
+    problem_row = conn.execute("SELECT * FROM problems WHERE problem_id = 'P-0001'").fetchone()
+
+    session = FakeNpmSession(
+        [{"package": {"name": "vendor-guard", "links": {"npm": "https://www.npmjs.com/package/vendor-guard"}}}]
+    )
+    inserted = collect_supply_candidates.collect_npm_mentions_for_problem(
+        conn, problem_row, session, hits_per_problem=10
+    )
+    conn.commit()
+    assert inserted == 1
+    rows = conn.execute(
+        "SELECT * FROM supply_candidates WHERE problem_id = 'P-0001' AND source = 'npm_registry'"
+    ).fetchall()
+    assert len(rows) == 1
+    assert rows[0]["name"] == "vendor-guard"
+    conn.close()
+
+
+def test_collect_npm_mentions_skips_problems_without_task_or_user(tmp_path):
+    conn = db.connect(tmp_path)
+    conn.execute("INSERT INTO problems (problem_id, status) VALUES ('P-0002', 'DEMAND_PASSED')")
+    conn.commit()
+    problem_row = conn.execute("SELECT * FROM problems WHERE problem_id = 'P-0002'").fetchone()
+    inserted = collect_supply_candidates.collect_npm_mentions_for_problem(
+        conn, problem_row, FakeNpmSession([]), hits_per_problem=10
+    )
+    assert inserted == 0
+    conn.close()
+
+
+def test_collect_npm_mentions_deduped_against_existing_candidate(tmp_path):
+    conn = db.connect(tmp_path)
+    seed_problem(conn)
+    problem_row = conn.execute("SELECT * FROM problems WHERE problem_id = 'P-0001'").fetchone()
+    hit = {"package": {"name": "vendor-guard", "links": {"npm": "https://www.npmjs.com/package/vendor-guard"}}}
+
+    session = FakeNpmSession([hit, hit])  # same package returned twice in one search
+    inserted = collect_supply_candidates.collect_npm_mentions_for_problem(
+        conn, problem_row, session, hits_per_problem=10
+    )
+    assert inserted == 1
+    conn.close()

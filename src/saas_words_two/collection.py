@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from . import gh_archive_client, hn_client, stack_exchange_client
+from . import gh_archive_client, hn_client, npm_client, stack_exchange_client
 from .contracts import atomic_write_text
 
 # Below this much free disk space, collection should not proceed - not a
@@ -115,6 +115,16 @@ def run_access_test(
             }
         else:
             results["stack_exchange_dump"] = {"status": "FAIL", "detail": se_result.error or "unknown error"}
+
+    if "npm_registry" in sources_config["sources"]:
+        npm_result = npm_client.access_test(session)
+        if npm_result.ok:
+            results["npm_registry"] = {
+                "status": "PASS",
+                "detail": f"total={npm_result.data['total']} sample_name={npm_result.data['sample_name']}",
+            }
+        else:
+            results["npm_registry"] = {"status": "FAIL", "detail": npm_result.error or "unknown error"}
 
     for name in sources_config["sources"]:
         if name in results:

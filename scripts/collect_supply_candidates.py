@@ -1,4 +1,4 @@
-"""수요를 통과한 문제만 대상으로 Show HN·GH Archive 제품 언급 공급 후보를 수집한다."""
+"""수요를 통과한 문제만 대상으로 Show HN·GH Archive·npm 제품 언급 공급 후보를 수집한다."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from pathlib import Path
 
 import requests
 
-from saas_words_two import config, db, hn_client, ids, supply
+from saas_words_two import config, db, hn_client, ids, npm_client, supply
 
 _DOMAIN_RE = re.compile(r"https?://(?:www\.)?([^/]+)")
 _GITHUB_REPO_RE = re.compile(r"github\.com/([^/]+)/([^/]+)")
@@ -116,6 +116,35 @@ def collect_gh_archive_mentions_for_problem(conn, problem_row, *, hits_per_probl
     return inserted
 
 
+def collect_npm_mentions_for_problem(conn, problem_row, session, *, hits_per_problem: int) -> int:
+    """design 3.2/7.1: npm Registry supports "개발자 도구·오픈소스 대체재 공급 보조".
+    Searches the same query built for HN/GH Archive against npm's package
+    search - like those, this casts a wide net at collection time and leaves
+    relevance judgment (is this actually a competing product, or an
+    unrelated dependency?) to the existing active-signal verification
+    step, rather than trying to code-classify "is this a developer problem"
+    up front."""
+    query = build_query(problem_row)
+    if not query:
+        return 0
+
+    result = npm_client.search_packages(session, query, size=hits_per_problem)
+    if not result.ok or not isinstance(result.data, dict):
+        return 0
+
+    inserted = 0
+    for hit in result.data.get("objects", []):
+        normalized = npm_client.normalize_hit(hit)
+        if normalized is None:
+            continue
+        domain = extract_domain(normalized["url"]) or f"npmjs.com/package/{normalized['name']}"
+        if _insert_candidate_if_new(
+            conn, problem_row["problem_id"], normalized["name"], domain, "npm_registry", normalized["url"]
+        ):
+            inserted += 1
+    return inserted
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--project-root", type=Path, default=Path.cwd())
@@ -123,7 +152,9 @@ def main(argv: list[str] | None = None) -> int:
 
     project_root = args.project_root
     project_config = config.load_project_config(project_root)
+    sources_config = config.load_sources_config(project_root)
     hits_per_problem = project_config["collection"]["hacker_news"].get("supply_hits_per_problem", 20)
+    npm_enabled = sources_config["sources"].get("npm_registry", {}).get("enabled", False)
 
     conn = db.connect(project_root)
     try:
@@ -137,6 +168,10 @@ def main(argv: list[str] | None = None) -> int:
             total_inserted += collect_gh_archive_mentions_for_problem(
                 conn, problem_row, hits_per_problem=hits_per_problem
             )
+            if npm_enabled:
+                total_inserted += collect_npm_mentions_for_problem(
+                    conn, problem_row, session, hits_per_problem=hits_per_problem
+                )
         conn.commit()
     finally:
         conn.close()

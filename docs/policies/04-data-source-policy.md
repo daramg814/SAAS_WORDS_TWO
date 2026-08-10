@@ -34,6 +34,15 @@
    않게 했다(`stack_exchange_client.make_item_id`). 덤프는 정적 스냅샷이라 매 실행 재
    다운로드하지 않고 `data/raw/stack_exchange/`에 캐시하며, 이미 처리한 Post Id까지는
    커서로 건너뛴다(`collection.py::run_stack_exchange_collection`).
+7. **npm Registry는 접근성 검사(PASS, 실제 검색 API 호출)를 거쳐 `enabled: true`로
+   전환됨(2026-08-11).** 공식 검색 API(`registry.npmjs.org/-/v1/search`, 키·로그인
+   불필요, npmjs.com 자체 검색창과 동일 엔드포인트)를 사용한다. 수요가 아닌 공급
+   보조 데이터원이라(3.2절 "개발자 도구·오픈소스 대체재 공급 보조") 데이터원 접근성
+   검사(`collection.run_access_test`)에서는 검증만 하고, 실제 수집은
+   `scripts/collect_supply_candidates.py`가 수요를 통과한 문제별로 npm 패키지를
+   검색해 공급 후보로 추가하는 방식으로 이루어진다(HN Show/mention, GH Archive
+   mention과 동일하게 넓게 모으고 관련성 판정은 기존 활성 신호 검증 판정 단계에
+   맡긴다 — "이게 개발자 문제인가"를 코드가 미리 분류하지 않는다).
 
 ## 원본 설계 세부 규칙
 
