@@ -270,6 +270,109 @@ def seed_demand_passed_problem_with_candidate(conn):
     conn.commit()
 
 
+def seed_demand_passed_problem_with_two_candidates(conn):
+    conn.execute(
+        "INSERT INTO problems (problem_id, target_user, task, status) VALUES "
+        "('P-0001', 'small firms', 'track renewals', 'DEMAND_PASSED')"
+    )
+    conn.execute(
+        "INSERT INTO supply_candidates (product_id, problem_id, name, domain, dedupe_key, source) VALUES "
+        "('S-0001', 'P-0001', 'VendorGuard', 'vendorguard.com', 'vendorguardcom', 'hn_show')"
+    )
+    conn.execute(
+        "INSERT INTO supply_candidates (product_id, problem_id, name, domain, dedupe_key, source) VALUES "
+        "('S-0002', 'P-0001', 'VendorGuard EU', 'vendorguard.eu', 'vendorguardeu', 'hn_mention')"
+    )
+    conn.commit()
+
+
+def test_stage_collect_and_verify_supply_includes_merge_candidates_item_when_two_or_more(tmp_path, monkeypatch):
+    # Candidates are seeded directly below; skip the real collect_supply_
+    # candidates.py subprocess (it would hit the live HN Algolia API) since
+    # this test only cares about the merge_candidates item this stage builds
+    # from what's already in the DB.
+    monkeypatch.setattr(pipeline, "_run_or_raise", lambda *a, **k: None)
+    options = make_options(tmp_path, run_id="QA-20260810-190000-KST")
+    state = pipeline._load_or_create_state(options)
+    conn = db.connect(tmp_path)
+    seed_demand_passed_problem_with_two_candidates(conn)
+
+    with pytest.raises(judgment.JudgmentRequired) as excinfo:
+        pipeline._stage_collect_and_verify_supply(conn, tmp_path, options, state)
+    conn.close()
+
+    request_doc = json.loads(excinfo.value.request_path.read_text(encoding="utf-8"))
+    merge_items = [item for item in request_doc["items"] if item["kind"] == "merge_candidates"]
+    assert len(merge_items) == 1
+    assert merge_items[0]["problem_id"] == "P-0001"
+    assert {c["product_id"] for c in merge_items[0]["candidates"]} == {"S-0001", "S-0002"}
+
+
+def test_stage_collect_and_verify_supply_no_merge_candidates_item_with_single_candidate(tmp_path, monkeypatch):
+    monkeypatch.setattr(pipeline, "_run_or_raise", lambda *a, **k: None)
+    options = make_options(tmp_path, run_id="QA-20260810-190000-KST")
+    state = pipeline._load_or_create_state(options)
+    conn = db.connect(tmp_path)
+    seed_demand_passed_problem_with_candidate(conn)
+
+    with pytest.raises(judgment.JudgmentRequired) as excinfo:
+        pipeline._stage_collect_and_verify_supply(conn, tmp_path, options, state)
+    conn.close()
+
+    request_doc = json.loads(excinfo.value.request_path.read_text(encoding="utf-8"))
+    assert not [item for item in request_doc["items"] if item["kind"] == "merge_candidates"]
+
+
+def test_stage_collect_and_verify_supply_applies_merge_group_decision(tmp_path):
+    """design 7.2: two candidates the reviewer judges to be the same
+    underlying product (here: a rebrand/regional-site pair) merge into one -
+    the duplicate is excluded from downstream competitor counting, not
+    deleted (its evidence stays attached, just no longer counted separately)."""
+    options = make_options(tmp_path, run_id="QA-20260810-190000-KST")
+    state = pipeline._load_or_create_state(options)
+    conn = db.connect(tmp_path)
+    seed_demand_passed_problem_with_two_candidates(conn)
+    run_dir = pipeline._run_dir(tmp_path, state)
+
+    signals = {
+        "official_name": True, "target_user": True, "core_feature": True, "signup_or_demo": False,
+        "pricing": False, "recent_activity": False, "product_docs": False, "customer_references": False,
+    }
+    judgment.write_request(run_dir, "collect_and_verify_supply", state.run_id, "test", [], generated_at="t0")
+    judgment.write_response(
+        run_dir,
+        "collect_and_verify_supply",
+        [
+            {"kind": "merge_group", "problem_id": "P-0001", "canonical_product_id": "S-0001",
+             "duplicate_product_ids": ["S-0002"]},
+            {"kind": "product", "product_id": "S-0001", "signals": signals, "supply_type": "direct"},
+            {"kind": "product", "product_id": "S-0002", "signals": signals, "supply_type": "direct"},
+            {"kind": "problem_gap", "problem_id": "P-0001", "supply_gap_user_specific": True,
+             "supply_gap_no_strong_incumbent": True, "supply_gap_no_recent_entrants": False,
+             "supply_gap_unresolved_complaints": True},
+        ],
+        judged_at="t1",
+    )
+
+    pipeline._stage_collect_and_verify_supply(conn, tmp_path, options, state)
+
+    duplicate = conn.execute("SELECT merged_into_product_id FROM supply_candidates WHERE product_id = 'S-0002'").fetchone()
+    assert duplicate["merged_into_product_id"] == "S-0001"
+    canonical = conn.execute("SELECT merged_into_product_id FROM supply_candidates WHERE product_id = 'S-0001'").fetchone()
+    assert canonical["merged_into_product_id"] is None
+
+    # both still get verified (harmless - the merge only affects downstream counting)
+    assert conn.execute("SELECT COUNT(*) c FROM supply_verification").fetchone()["c"] == 2
+
+    import sys
+    sys.path.insert(0, str(REPO_ROOT / "scripts"))
+    import score_opportunities
+
+    verifications = score_opportunities.load_supply_verification(conn, "P-0001")
+    assert [v["product_id"] for v in verifications] == ["S-0001"]  # S-0002 excluded, merged away
+    conn.close()
+
+
 def test_stage_collect_and_verify_supply_skips_when_no_demand_passed_problems(tmp_path):
     options = make_options(tmp_path, run_id="QA-20260810-190000-KST")
     state = pipeline._load_or_create_state(options)

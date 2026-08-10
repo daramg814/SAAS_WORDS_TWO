@@ -18,10 +18,14 @@ def load_observations(ledger_path: Path) -> list[dict]:
 
 
 def load_supply_verification(conn, problem_id: str) -> list[dict]:
+    # design 7.2: a candidate merged into another (same product under a
+    # different domain/rebrand/tier/reseller) must not also be counted as a
+    # separate competitor - only unmerged candidates and each merge group's
+    # canonical entry count toward effective_supply/direct_competitor_count.
     rows = conn.execute(
         "SELECT sv.* FROM supply_verification sv "
         "JOIN supply_candidates sc ON sc.product_id = sv.product_id "
-        "WHERE sc.problem_id = ?",
+        "WHERE sc.problem_id = ? AND sc.merged_into_product_id IS NULL",
         (problem_id,),
     ).fetchall()
     return [dict(row) for row in rows]

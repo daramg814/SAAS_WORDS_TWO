@@ -338,14 +338,35 @@ def _stage_collect_and_verify_supply(
     candidate_rows = conn.execute(
         "SELECT sc.product_id, sc.problem_id, sc.name, sc.domain, sc.source, sc.evidence_url "
         "FROM supply_candidates sc "
-        "WHERE sc.product_id NOT IN (SELECT product_id FROM supply_verification)"
+        "WHERE sc.product_id NOT IN (SELECT product_id FROM supply_verification) "
+        "AND sc.merged_into_product_id IS NULL"
     ).fetchall()
     problem_rows = conn.execute(
         "SELECT problem_id, task, target_user FROM problems WHERE status = 'DEMAND_PASSED'"
     ).fetchall()
 
+    # design 7.2: candidates for the same problem may be the same underlying
+    # product under a different domain/name (rebrand, country site, free/paid
+    # tier, reseller, multi-domain company) - reviewed here as its own item
+    # kind so the merge decision happens before/alongside signal judgment,
+    # not as a separate unreviewed pipeline stage (the supply-analysis
+    # skill's step 1 previously had no actual judgment checkpoint backing it).
+    merge_review_items = [
+        {
+            "kind": "merge_candidates",
+            "problem_id": problem_id,
+            "candidates": [
+                {"product_id": row["product_id"], "name": row["name"], "domain": row["domain"]}
+                for row in rows
+            ],
+        }
+        for problem_id, rows in _group_candidates_by_problem(candidate_rows).items()
+        if len(rows) >= 2
+    ]
+
     items = [{"kind": "product", **dict(row)} for row in candidate_rows]
     items += [{"kind": "problem_gap", **dict(row)} for row in problem_rows]
+    items += merge_review_items
     if not items:
         return
 
@@ -357,7 +378,13 @@ def _stage_collect_and_verify_supply(
         "kind=problem_gap 항목마다 supply_gap_user_specific(특정 사용자 전용 제품 부족), "
         "supply_gap_no_strong_incumbent(강력한 기존 제품 부재), "
         "supply_gap_no_recent_entrants(최근 24개월 신규 공급 부족), "
-        "supply_gap_unresolved_complaints(기존 제품의 반복 미해결 불만)를 판정하라."
+        "supply_gap_unresolved_complaints(기존 제품의 반복 미해결 불만)를 판정하라. "
+        "kind=merge_candidates 항목은 같은 문제에 딸린 후보 제품들이다 - 같은 회사의 "
+        "여러 도메인, 리브랜딩 전후, 국가별 사이트, 무료·유료 버전, 파트너 재판매처럼 "
+        "실제로는 동일 제품이면 kind=merge_group 결정을 추가해 canonical_product_id "
+        "(대표로 남길 product_id)와 duplicate_product_ids(나머지, 대표에 합쳐질 "
+        "product_id 배열)를 채워라. 병합할 대상이 없으면 해당 problem_id에 대한 "
+        "merge_group 결정을 생략하라."
     )
     request_path = judgment.write_request(
         run_dir, stage_name, state.run_id, instructions, items, generated_at=ids.now_kst().isoformat()
@@ -365,8 +392,31 @@ def _stage_collect_and_verify_supply(
     _pause_for_judgment(project_root, state, stage_name, request_path)
 
 
+def _group_candidates_by_problem(candidate_rows) -> dict[str, list]:
+    grouped: dict[str, list] = {}
+    for row in candidate_rows:
+        grouped.setdefault(row["problem_id"], []).append(row)
+    return grouped
+
+
 def _consume_supply_judgment(conn, response: dict) -> None:
     from . import supply
+
+    # Applied before the product/problem_gap decisions in the same response
+    # so that a duplicate's merged_into_product_id is already set by the time
+    # anything downstream looks at it - order within response["decisions"]
+    # is not guaranteed to put merge_group entries first.
+    for decision in response["decisions"]:
+        if decision.get("kind") != "merge_group":
+            continue
+        canonical_id = decision["canonical_product_id"]
+        for duplicate_id in decision.get("duplicate_product_ids", []):
+            if duplicate_id == canonical_id:
+                continue
+            conn.execute(
+                "UPDATE supply_candidates SET merged_into_product_id = ? WHERE product_id = ?",
+                (canonical_id, duplicate_id),
+            )
 
     for decision in response["decisions"]:
         kind = decision.get("kind")
