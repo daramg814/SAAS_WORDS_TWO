@@ -1,6 +1,7 @@
 # HANDOFF
 
-- 상태: `COMMIT_PENDING` (커밋 `e07769c`는 로컬에 있으나 push 실패, 아래 §3 참고)
+- 상태: `PAUSED` (로컬 커밋이 origin보다 앞서 있음 — 정상, 아래 §3 참고. push는
+  사용자가 PC에서 직접 요청할 때만 수행)
 - 요약 한 줄: `DEMAND-001` A안(GH Archive 2차 데이터원 활성화) **구현·테스트·문서화 완료, 커밋 완료**.
   아직 안 한 것: 실제로 GH Archive 데이터를 충분히 모아 QA(20개)를 재실행해서
   DEMAND-001이 실제로 해소되는지 확인하는 것. **다음 세션은 여기(§4 "다음 원자 작업")부터
@@ -51,24 +52,29 @@
 - `docs/policies/04-data-source-policy.md` "Claude Code 실행 지침"에 GH Archive 활성화
   사실·설계 근거 기록.
 
-## 3. Git/원격 설정 — **2026-08-10 push 인증이 끊어짐, 재확인 필요**
+## 3. Git/원격 설정 — **SSH(원격) 세션에서는 push가 원래 안 됨, 정상 동작**
 
 - `origin` = `https://github.com/daramg814/SAAS_WORDS_TWO.git`.
 - `.git/hooks/post-commit`이 커밋마다 자동 `git push origin main`을 시도한다(로컬 전용
   훅, 새 clone에서는 재설치 필요).
-- **이번 세션에서 커밋 `e07769c`의 자동 push가 실패함**: `cmdkey /list`로 확인한 결과
-  Windows Credential Manager에 GitHub PAT 항목이 더 이상 없고(이전 세션 §3에서
-  "저장 완료·검증됨"이라고 기록했던 것과 다름), `~/.gitconfig`(사용자 전역 git 설정)도
-  파일 자체가 없는 상태였다. git이 `wincredman`에 자격증명을 저장하려다 실패하고,
-  대화형 프롬프트(`/dev/tty`)도 이 실행 환경에서는 열 수 없어 완전히 실패했다.
-  즉 PAT 자체가 이 머신/프로필에서 사라졌거나 애초에 다른 프로필에 저장됐던 것으로
-  보인다(원인 불명 — 새 프로필/환경 초기화 가능성).
-- **해야 할 일(사용자 확인 필요, AI가 임의로 자격증명이나 전역 git 설정을 만들지
-  않음)**: 사용자가 터미널에서 `! git push origin main`을 직접 실행해 GitHub 인증을
-  다시 통과시키거나, PAT를 다시 발급해 Credential Manager에 등록해야 한다. 그 전까지
-  커밋은 로컬에만 존재하며 원격과 다르다.
-- 재인증 완료 후: `git push origin main`이 성공하는지 확인하고, 이 섹션을 다시
-  "완료" 상태로 갱신할 것.
+- **근본 원인 확인됨(2026-08-10)**: PAT가 사라진 게 아니다. `query session`으로 확인한
+  결과 SSH(Termius 등 폰 원격) 접속은 Windows 세션 0(`services`, 비대화형)에서 실행되고,
+  PC 앞에서 직접 작업할 때는 세션 3(`console`, 대화형)에서 실행된다. Windows Credential
+  Manager(`wincredman`)는 DPAPI로 보호되어 있어 대화형 로그인에서 나온 키가 있어야
+  읽고 쓸 수 있는데, SSH 공개키 인증 세션은 이 키에 접근할 수 없다. 게다가 `/dev/tty`가
+  없어 GCM의 프롬프트 대체 수단도 막힌다. 그래서 SSH 세션에서는 `cmdkey /list`에도
+  아무것도 안 보이고 push가 항상 실패한다 — PC 세션에서는 이 문제가 아예 없다.
+- **결정된 운영 방식(2026-08-10, 사용자 확정)**: SSH/원격 세션에서는 배치마다 평소대로
+  커밋만 하고, `post-commit` 훅의 push 실패는 정상으로 취급해 **다음 배치를 막는 사유로
+  보지 않는다**. push는 사용자가 PC 앞에서 명시적으로 요청할 때만 수행한다. git config은
+  임의로 바꾸지 않는다(사용자가 요청하면 `credential.helper=cache`나 평문
+  `~/.git-credentials` 같은 대안을 그때 검토).
+- **로컬 전용 커밋의 안전성**: 매 배치가 `--amend` 없이 독립 커밋이라 `git log`/
+  `git reflog`가 그 자체로 복귀 지점이다(reflog 기본 보존 90일/도달 불가능 30일).
+  단, push 전까지는 이 저장소가 유일한 사본이므로 로컬 디스크 손상에는 백업이 안 됨 —
+  이건 되돌리기 문제가 아니라 백업 문제.
+- PC에서 push 요청을 받으면: `git push origin main` 실행 후 origin이 로컬과 일치하는지
+  `git log --oneline origin/main -1`로 확인할 것.
 
 ## 4. 다음 원자 작업 — GH Archive 실데이터 수집 후 QA 재실행
 
