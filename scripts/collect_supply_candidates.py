@@ -1,4 +1,4 @@
-"""수요를 통과한 문제만 대상으로 Show HN 제품·댓글 언급 공급 후보를 수집한다."""
+"""수요를 통과한 문제만 대상으로 Show HN·GH Archive 제품 언급 공급 후보를 수집한다."""
 
 from __future__ import annotations
 
@@ -11,6 +11,8 @@ import requests
 from saas_words_two import config, db, hn_client, ids, supply
 
 _DOMAIN_RE = re.compile(r"https?://(?:www\.)?([^/]+)")
+_GITHUB_REPO_RE = re.compile(r"github\.com/([^/]+)/([^/]+)")
+_QUERY_TERM_RE = re.compile(r"[a-zA-Z]+")
 
 
 def extract_domain(url: str | None) -> str | None:
@@ -20,9 +22,35 @@ def extract_domain(url: str | None) -> str | None:
     return match.group(1) if match else None
 
 
+def extract_github_repo(url: str | None) -> tuple[str, str] | None:
+    """Parses (owner, repo) out of a GH Archive issue/comment html_url, used
+    as the product identity for design 7.1's "GH Archive·GitHub에서 확인된
+    제품·오픈소스 도구" supply tier."""
+    if not url:
+        return None
+    match = _GITHUB_REPO_RE.search(url)
+    return (match.group(1), match.group(2)) if match else None
+
+
 def build_query(problem_row) -> str:
     parts = [problem_row["task"], problem_row["target_user"]]
     return " ".join(part for part in parts if part).strip()
+
+
+def _insert_candidate_if_new(conn, problem_id: str, name: str, domain: str | None, source: str, evidence_url) -> bool:
+    key = supply.dedupe_key(name, domain)
+    existing = conn.execute(
+        "SELECT 1 FROM supply_candidates WHERE problem_id = ? AND dedupe_key = ?", (problem_id, key)
+    ).fetchone()
+    if existing:
+        return False
+    product_id = ids.next_product_id(conn)
+    conn.execute(
+        "INSERT INTO supply_candidates (product_id, problem_id, name, domain, dedupe_key, source, evidence_url) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (product_id, problem_id, name, domain, key, source, evidence_url),
+    )
+    return True
 
 
 def collect_for_problem(conn, problem_row, session, *, hits_per_problem: int) -> int:
@@ -42,21 +70,48 @@ def collect_for_problem(conn, problem_row, session, *, hits_per_problem: int) ->
             name = supply.normalize_product_name(title)
             if not name:
                 continue
-            domain = extract_domain(hit.get("url"))
-            key = supply.dedupe_key(name, domain)
-            existing = conn.execute(
-                "SELECT 1 FROM supply_candidates WHERE problem_id = ? AND dedupe_key = ?",
-                (problem_row["problem_id"], key),
-            ).fetchone()
-            if existing:
-                continue
-            product_id = ids.next_product_id(conn)
-            conn.execute(
-                "INSERT INTO supply_candidates "
-                "(product_id, problem_id, name, domain, dedupe_key, source, evidence_url) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (product_id, problem_row["problem_id"], name, domain, key, source, hit.get("url")),
-            )
+            if _insert_candidate_if_new(
+                conn, problem_row["problem_id"], name, extract_domain(hit.get("url")), source, hit.get("url")
+            ):
+                inserted += 1
+    return inserted
+
+
+def collect_gh_archive_mentions_for_problem(conn, problem_row, *, hits_per_problem: int) -> int:
+    """design 7.1 supply-collection tier 3: 'GH Archive·GitHub에서 확인된
+    제품·오픈소스 도구'. GH Archive issue/comment text is already collected
+    locally as part of demand-side collection (source='gh_archive' in
+    hn_items) - reusing it here needs no new network call, unlike the HN
+    Algolia search above. A repo mentioned in an issue/comment whose text
+    matches the problem's query terms is treated as a supply candidate, with
+    the GitHub repo itself (owner/repo, parsed from the item's html_url) as
+    the product identity."""
+    query = build_query(problem_row)
+    terms = [term for term in _QUERY_TERM_RE.findall(query) if len(term) > 2]
+    if not terms:
+        return 0
+
+    like_clause = " OR ".join(["title LIKE ? OR text LIKE ?"] * len(terms))
+    params: list[str] = []
+    for term in terms:
+        pattern = f"%{term}%"
+        params.extend([pattern, pattern])
+    rows = conn.execute(
+        f"SELECT DISTINCT url FROM hn_items WHERE source = 'gh_archive' AND url IS NOT NULL AND ({like_clause}) "
+        "LIMIT ?",
+        (*params, hits_per_problem),
+    ).fetchall()
+
+    inserted = 0
+    for row in rows:
+        repo = extract_github_repo(row["url"])
+        if repo is None:
+            continue
+        owner, repo_name = repo
+        domain = f"github.com/{owner}/{repo_name}"
+        if _insert_candidate_if_new(
+            conn, problem_row["problem_id"], repo_name, domain, "gh_archive_mention", row["url"]
+        ):
             inserted += 1
     return inserted
 
@@ -78,6 +133,9 @@ def main(argv: list[str] | None = None) -> int:
         for problem_row in problems:
             total_inserted += collect_for_problem(
                 conn, problem_row, session, hits_per_problem=hits_per_problem
+            )
+            total_inserted += collect_gh_archive_mentions_for_problem(
+                conn, problem_row, hits_per_problem=hits_per_problem
             )
         conn.commit()
     finally:
