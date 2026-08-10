@@ -56,6 +56,18 @@
    `""`=시도했지만 못 찾음), 추출된 발췌문은 `collect_and_verify_supply` 판정 단계의
    `kind=product` 항목에 `common_crawl_excerpt`로 포함되어 HN 텍스트를 보강하는
    추가 증거로만 쓰인다.
+9. **공식 RSS·Atom 피드는 접근성 검사(PASS, 실제 피드 요청·XML 파싱)를 거쳐
+   `enabled: true`로 전환됨(2026-08-11).** 3.2절 "고정 피드 URL"대로
+   `config/sources.yaml`의 `official_feeds.feed_urls`에 명시된 목록만 수집하며
+   (임의 발견·크롤링 없음), 초기 목록은 GitHub 공식 블로그·체인지로그
+   (`github.blog/feed/`, `github.blog/changelog/feed/`) — 이 프로젝트 자체가
+   특정 산업을 아직 선택하지 않은 상태(`input/brief.md`: "포함 시장: 별도 제한 없음")라
+   실제로 동작하며 안정적인 공식 피드의 예시로 선택했다. 산업이 정해지면
+   `feed_urls`를 그에 맞게 교체·추가할 것. RSS 2.0과 Atom 둘 다 표준 라이브러리
+   `xml.etree.ElementTree`만으로 파싱 가능해(둘 다 순수 XML) 새 의존성이 필요
+   없었다. 피드는 보통 최근 항목만 나열하므로 커서 없이 매 실행 전체를 다시
+   가져오고, guid/id가 정수가 아니라 해시 기반 12자리 id(`8` 접두 — Stack Exchange의
+   `9` 접두와 겹치지 않게)로 재매핑해 중복 방지에 사용한다(`rss_client.make_item_id`).
 
 ## 원본 설계 세부 규칙
 

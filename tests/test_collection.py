@@ -648,3 +648,103 @@ def test_run_access_test_exercises_common_crawl_and_reports_pass(tmp_path):
     )
     assert report.results["common_crawl"]["status"] == "PASS"
     assert "index=CC-MAIN-2026-30" in report.results["common_crawl"]["detail"]
+
+
+# ---------------------------------------------------------------------------
+# official_feeds access test + collection
+# ---------------------------------------------------------------------------
+
+FEEDS_SOURCES_CONFIG = {
+    "sources": {"official_feeds": {"enabled": True, "required": False, "feed_urls": ["https://example.com/feed"]}}
+}
+
+FEED_RSS_XML = """<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel>
+  <item>
+    <title>Is there a tool for X</title>
+    <link>https://example.com/posts/1</link>
+    <guid>https://example.com/?p=1</guid>
+    <description>manual process takes hours</description>
+  </item>
+</channel></rss>
+"""
+
+
+class FakeFeedResponse:
+    def __init__(self, text):
+        self.text = text
+
+    def raise_for_status(self):
+        return None
+
+
+class FakeFeedSession:
+    def __init__(self, xml_text):
+        self.xml_text = xml_text
+        self.calls: list[str] = []
+
+    def get(self, url, timeout):
+        self.calls.append(url)
+        return FakeFeedResponse(self.xml_text)
+
+
+def test_run_access_test_exercises_official_feeds_and_reports_pass(tmp_path):
+    sources_config = {**SOURCES_CONFIG, "sources": {**SOURCES_CONFIG["sources"], **FEEDS_SOURCES_CONFIG["sources"]}}
+    hn_session = FakeSession(
+        {"maxitem.json": 100, "item/100.json": {"id": 100, "type": "story"}, "search": {"hits": []}}
+    )
+
+    class CombinedHnFeedSession:
+        def __init__(self, hn_session, xml_text):
+            self.hn_session = hn_session
+            self.feed_session = FakeFeedSession(xml_text)
+
+        def get(self, url, timeout):
+            if url.startswith("https://example.com/"):
+                return self.feed_session.get(url, timeout)
+            return self.hn_session.get(url, timeout)
+
+    report = collection.run_access_test(
+        tmp_path, sources_config, CombinedHnFeedSession(hn_session, FEED_RSS_XML), generated_at="t0"
+    )
+    assert report.results["official_feeds"]["status"] == "PASS"
+    assert "feeds=1 total_entries=1" in report.results["official_feeds"]["detail"]
+
+
+def test_run_official_feeds_collection_inserts_with_source(tmp_path):
+    conn = db.connect(tmp_path)
+    session = FakeFeedSession(FEED_RSS_XML)
+    summary = collection.run_official_feeds_collection(
+        conn, ["https://example.com/feed"], session, fetched_at="t0"
+    )
+    assert summary.fetched_stories == 1
+    rows = conn.execute("SELECT source, title FROM hn_items WHERE source = 'official_feeds'").fetchall()
+    assert len(rows) == 1
+    assert rows[0]["title"] == "Is there a tool for X"
+    conn.close()
+
+
+def test_run_official_feeds_collection_dedupes_across_runs(tmp_path):
+    conn = db.connect(tmp_path)
+    collection.run_official_feeds_collection(conn, ["https://example.com/feed"], FakeFeedSession(FEED_RSS_XML), fetched_at="t0")
+    summary2 = collection.run_official_feeds_collection(
+        conn, ["https://example.com/feed"], FakeFeedSession(FEED_RSS_XML), fetched_at="t1"
+    )
+    assert summary2.fetched_stories == 0
+    assert summary2.skipped_existing == 1
+    conn.close()
+
+
+def test_run_official_feeds_collection_records_fetch_error(tmp_path):
+    conn = db.connect(tmp_path)
+
+    class FailingFeedSession:
+        def get(self, url, timeout):
+            raise requests.ConnectionError("boom")
+
+    summary = collection.run_official_feeds_collection(
+        conn, ["https://example.com/feed"], FailingFeedSession(), fetched_at="t0"
+    )
+    assert summary.fetched_stories == 0
+    assert len(summary.errors) == 1
+    conn.close()

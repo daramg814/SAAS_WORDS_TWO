@@ -73,6 +73,13 @@ def main(argv: list[str] | None = None) -> int:
             se_summary = collection.run_stack_exchange_collection(
                 project_root, conn, sources_config, se_settings, session, fetched_at=now.isoformat()
             )
+
+        feeds_summary = None
+        feeds_conf = sources_config["sources"].get("official_feeds", {})
+        if access_report.results.get("official_feeds", {}).get("status") == "PASS" and feeds_conf.get("enabled"):
+            feeds_summary = collection.run_official_feeds_collection(
+                conn, feeds_conf["feed_urls"], session, fetched_at=now.isoformat()
+            )
     finally:
         conn.close()
 
@@ -101,6 +108,12 @@ def main(argv: list[str] | None = None) -> int:
             f"cursor={se_summary.cursor_before}->{se_summary.cursor_after}"
         )
         errors += se_summary.errors
+    if feeds_summary is not None:
+        print(
+            f"COLLECTED (official_feeds) stories={feeds_summary.fetched_stories} "
+            f"skipped_existing={feeds_summary.skipped_existing}"
+        )
+        errors += feeds_summary.errors
     for error in errors:
         print(f"  WARN: {error}")
     return 0

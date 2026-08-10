@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from . import common_crawl_client, gh_archive_client, hn_client, npm_client, stack_exchange_client
+from . import common_crawl_client, gh_archive_client, hn_client, npm_client, rss_client, stack_exchange_client
 from .contracts import atomic_write_text
 
 # Below this much free disk space, collection should not proceed - not a
@@ -138,6 +138,20 @@ def run_access_test(
             }
         else:
             results["common_crawl"] = {"status": "FAIL", "detail": cc_result.error or "unknown error"}
+
+    feeds_conf = sources_config["sources"].get("official_feeds")
+    # "feed_urls" presence distinguishes a genuinely configured source from a
+    # bare {"enabled": False} placeholder - same rationale as stack_exchange_
+    # dump's "site" gate above.
+    if feeds_conf and feeds_conf.get("feed_urls"):
+        feeds_result = rss_client.access_test(session, feed_urls=feeds_conf["feed_urls"])
+        if feeds_result.ok:
+            results["official_feeds"] = {
+                "status": "PASS",
+                "detail": f"feeds={len(feeds_conf['feed_urls'])} total_entries={feeds_result.data['total_entries']}",
+            }
+        else:
+            results["official_feeds"] = {"status": "FAIL", "detail": feeds_result.error or "unknown error"}
 
     for name in sources_config["sources"]:
         if name in results:
@@ -536,4 +550,45 @@ def run_stack_exchange_collection(
     summary.cursor_after = max_se_id_seen
     if summary.cursor_after != summary.cursor_before:
         write_stack_exchange_cursor(project_root, site, summary.cursor_after)
+    return summary
+
+
+@dataclass
+class OfficialFeedsCollectionSummary:
+    fetched_stories: int = 0
+    fetched_comments: int = 0
+    skipped_existing: int = 0
+    errors: list[str] = field(default_factory=list)
+
+
+def run_official_feeds_collection(
+    conn: sqlite3.Connection,
+    feed_urls: list[str],
+    session,
+    *,
+    fetched_at: str,
+) -> OfficialFeedsCollectionSummary:
+    """design 3.2: fixed feed URLs, incremental via natural dedup - a feed
+    typically only ever lists its most recent items, so there is no cursor
+    to advance (unlike GH Archive's hours or Stack Exchange's Post Id order);
+    re-fetching each feed every run and relying on rss_client.make_item_id's
+    deterministic id + the existing INSERT OR IGNORE dedup is sufficient."""
+    summary = OfficialFeedsCollectionSummary()
+    all_entries: list[dict] = []
+    for feed_url in feed_urls:
+        result = rss_client.fetch_feed(session, feed_url)
+        if not result.ok:
+            summary.errors.append(f"{feed_url}: {result.error}")
+            continue
+        all_entries.extend(result.data)
+
+    existing = _existing_ids(conn, [entry["id"] for entry in all_entries])
+    for entry in all_entries:
+        if entry["id"] in existing:
+            summary.skipped_existing += 1
+            continue
+        _insert_normalized(conn, entry, fetched_at, source="official_feeds")
+        summary.fetched_stories += 1
+
+    conn.commit()
     return summary
