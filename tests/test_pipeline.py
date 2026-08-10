@@ -511,6 +511,10 @@ def test_generate_and_review_titles_raises_retry_when_no_eligible_opportunities(
     with pytest.raises(pipeline.RetryRequired):
         pipeline._stage_generate_and_review_titles(conn, tmp_path, options, state)
     assert state.status == "RETRYING"
+    # design 2.3/9.3: a shortfall must persist whatever partial result exists
+    # to output/intermediate/, never silently only in the DB.
+    intermediate = tmp_path / "output" / "intermediate" / f"{state.run_id}_shortfall_titles.txt"
+    assert intermediate.exists()
     conn.close()
 
 
@@ -543,6 +547,8 @@ def test_generate_and_review_titles_exhausts_max_rounds_and_retries(tmp_path):
 
     assert retried, "expected RetryRequired after exhausting max rounds"
     assert state.status == "RETRYING"
+    intermediate = tmp_path / "output" / "intermediate" / f"{state.run_id}_shortfall_titles.txt"
+    assert intermediate.exists()
     conn.close()
 
 
@@ -625,6 +631,11 @@ def test_stage_validate_outputs_retries_when_cap_prevents_reaching_target(tmp_pa
     with pytest.raises(pipeline.RetryRequired):
         pipeline._stage_validate_outputs(conn, tmp_path, options, state)
     assert state.status == "RETRYING"
+    intermediate = tmp_path / "output" / "intermediate" / f"{state.run_id}_shortfall_titles.txt"
+    assert intermediate.exists()
+    # 12 titles survive the 30%-per-opportunity cap (2 opportunities x 6 each), short of 20
+    saved = [line for line in intermediate.read_text(encoding="utf-8").splitlines() if line]
+    assert len(saved) == 12
     conn.close()
 
 

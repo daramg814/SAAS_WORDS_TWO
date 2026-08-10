@@ -109,6 +109,17 @@ def _read_lines(path: Path) -> list[str]:
     return path.read_text(encoding="utf-8").splitlines() if path.exists() else []
 
 
+def _write_shortfall_intermediate(project_root: Path, state: run_state.RunState, titles: list[str]) -> Path:
+    """Design 2.3/9.3: a run that ends short of its target count must save
+    what it has to /output/intermediate/, never to the published outputs.
+    Called at every RetryRequired shortfall point so the partial result
+    survives the run (recoverable for inspection or a future --resume-style
+    continuation) instead of being visible only inside data/local.db."""
+    path = project_root / "output" / "intermediate" / f"{state.run_id}_shortfall_titles.txt"
+    atomic_write_text(path, "\n".join(titles) + "\n" if titles else "")
+    return path
+
+
 def _pause_for_judgment(
     project_root: Path, state: run_state.RunState, stage_name: str, request_path: Path
 ) -> None:
@@ -591,6 +602,7 @@ def _stage_generate_and_review_titles(
             state.status = "RETRYING"
             state.context["title_round"] = round_no
             run_state.save(project_root, state)
+            _write_shortfall_intermediate(project_root, state, [item["title"] for item in approved])
             raise RetryRequired(
                 f"reached max rounds ({title_generation.MAX_ROUNDS}) with only "
                 f"{len(approved)}/{target_count} approved titles"
@@ -608,6 +620,7 @@ def _stage_generate_and_review_titles(
             if request_path is None:
                 state.status = "RETRYING"
                 run_state.save(project_root, state)
+                _write_shortfall_intermediate(project_root, state, [item["title"] for item in approved])
                 raise RetryRequired("no eligible opportunities or slots available for title generation")
             state.context["title_round"] = round_no
             state.context["title_phase"] = phase
@@ -659,6 +672,7 @@ def _stage_validate_outputs(conn, project_root: Path, options: RunOptions, state
     if len(selected) != options.target_count:
         state.status = "RETRYING"
         run_state.save(project_root, state)
+        _write_shortfall_intermediate(project_root, state, [item["title"] for item in selected])
         raise RetryRequired(
             f"only {len(selected)}/{options.target_count} titles survive final selection "
             "under the 30%-per-opportunity cap"
