@@ -219,3 +219,64 @@
   세션이 시도할 수 있는 조합을 전부 적용한 뒤에도 동일한 근본 원인이 그대로
   재확인됨. 위 "결론(세 번째 확인)"의 판단이 그대로 유효하다 — 데이터/필터를
   더 다듬는 "같은 방법을 더 크게" 시도를 반복하지 말 것.
+
+- **다섯 번째 확인(2026-08-11, "다른 종류의 데이터원 찾기" 탐색 결과)**:
+  사용자가 "볼륨/필터를 더 다듬지 말고 근본적으로 다른 종류의 데이터원을
+  찾으라"고 명시적으로 지시해, 지금까지의 모든 소스(HN/GH Archive/Stack
+  Exchange/npm/Common Crawl/RSS)가 공유하는 "개발자·소프트웨어 커뮤니티 텍스트"
+  범주를 완전히 벗어난 후보를 실측으로 탐색함. 키 없이(로그인·API 키·CAPTCHA
+  우회 없이) 접근 가능한 후보를 하나씩 실제 HTTP 요청으로 검증:
+  - **Reddit 공개 JSON**(`*.json` 엔드포인트, 검색 API 포함): 실측 403. 웹 검색으로
+    교차 확인 — 2026-05-28 Reddit이 비인증 JSON 접근을 전면 차단(TLS 지문/IP
+    평판 기반)했고 OAuth만 남음. OAuth는 앱 등록(사용자가 직접 자격증명을
+    발급해 제공해야 함)이 필요해 이 세션이 자체적으로 해결 불가 — 기각.
+  - **CFPB Consumer Complaint Database**: 공식 검색 UI API(`consumerfinance.gov/.../api/v1/`)는
+    Akamai 봇 차단으로 403(헤더를 바꿔가며 우회 시도하지 않음 — CLAUDE.md 3항
+    정신 위반). 과거 Socrata 오픈데이터 엔드포인트(`data.consumerfinance.gov`)는
+    실측으로 플랫폼이 이전되어 폐기됨을 확인(404, Salesforce 기반 페이지로
+    리다이렉트) — 기각.
+  - **Product Hunt GraphQL**: 실측 401(`invalid_oauth_token`), 전부 OAuth 토큰
+    필수 — 기각.
+  - **Canny(공개 피드백 보드) API**: 실측 400(`invalid api key`) — 기각.
+  - **GitHub Issue 전문 검색 API**(`api.github.com/search/issues`, GH Archive의
+    시간창 firehose가 아니라 특정 문구를 전체 이력에서 직접 검색): 접근은
+    가능(200 OK, 키 불필요)하지만 실측 검색("still use a spreadsheet" in:body)
+    결과 22건이 전부 **서로 무관한 저장소의 서로 다른 기능 요청**이었다 — GH
+    Archive와 동일한 구조적 문제(GitHub 이슈는 애초에 특정 저장소에 대한 기술
+    요청이지, 여러 사람이 독립적으로 말하는 같은 시장 문제가 아님). 접근성은
+    PASS했지만 내용 자체가 가설을 반증해 구현하지 않고 기각.
+  - **Apple App Store 고객 리뷰**(iTunes Search API + `customerreviews` RSS,
+    둘 다 공식·키 불필요, 실측 200 OK): **유일하게 실제로 구현·활성화한 후보.**
+    `app_store_client.py` 신규(검색어로 앱 동적 발견 → 리뷰 수집,
+    id는 `7`+12자리 zero-pad로 재매핑), `collection.py::run_app_store_reviews_collection`,
+    `config/sources.yaml`의 `app_store_reviews.search_terms`에 인보이싱·CRM·
+    일정관리 등 SMB SaaS 카테고리 12개 설정, `collect_sources.py` 연결, 테스트
+    22개 신규(전체 pytest 403→419). 실제 접근성 검사 PASS
+    (`app_id=584606479 review_count=50`) 후 `enabled: true` 전환, 실제 수집
+    3회 반복 실행(총 hn_items 2,377건, 56개 앱). **실측 결과(핵심 발견)**:
+    `filter_pain_sentences.py` 통과율이 다른 소스보다 훨씬 낮음(2,377건 중
+    15건, 0.6% — HN/GH Archive는 보통 몇 % 수준). 남은 15건도 대부분
+    "too expensive"(가격 불만) 또는 "workaround"/"feature request"(그 앱
+    한정 기능 요청)였고, 서로 다른 앱에 대한 서로 무관한 불만이라 어떤
+    군집에도 들어가지 못함 — **실제 파이프라인 재실행(`QA-20260811-031153-KST`)
+    결과 `independent_user_count>=5`인 34개 군집 중 `app_store_reviews`가
+    기여한 군집은 정확히 0개**(SQL로 직접 확인, 모든 34개 군집이 여전히
+    `hacker_news`/`gh_archive`/`stack_exchange`뿐). 원인 추정: 앱 리뷰는
+    "이 앱이 없다"가 아니라 "이미 쓰고 있는 이 앱이 별로다"(버그·가격 불만)에
+    본질적으로 치우쳐 있어, 수요 파이프라인이 찾는 "미해결 시장 문제" 신호와
+    구조적으로 다르다 — 오히려 기존 공급 후보의 `supply_gap_unresolved_complaints`
+    판정 보조 증거로는 잠재적 가치가 있을 수 있다(이번 배치에서는 연결하지
+    않음, 후속 과제로 남김). 34개 군집 전부 직접 읽고 정직하게 REJECT,
+    `CAPABILITY_STAGNATION`, 체크섬 불변 확인.
+  - **결론(다섯 번째 확인)**: 이번 세션이 실제로 접근 가능한 "다른 종류의
+    데이터원" 후보(로그인·API 키·봇 차단 우회 없이) 6개를 전부 실측했다.
+    5개는 접근 자체가 막혀 있었고(자격증명 필요 4개, 봇 차단 1개), 1개는
+    접근은 가능했지만 실제 데이터 내용이 이 프로젝트가 찾는 "여러 사람이
+    독립적으로 말하는 같은 시장 문제" 신호와 근본적으로 다른 종류의 콘텐츠였다.
+    `app_store_reviews`는 실패로 되돌리지 않고 유지한다(B안 TF-IDF와 달리
+    다른 소스에 해가 되지 않고, 데이터 다양성 자체는 정당한 목표이며, 후속
+    supply-side 활용 가능성이 남아있음). **다음에 이 이슈를 다시 만나면**:
+    (a) 사용자가 직접 자격증명(Reddit OAuth 앱, GitHub PAT, Canny API 키 등)을
+    발급해 제공하면 그 경로들을 재시도할 수 있고, (b) 그렇지 않다면 남은
+    선택지는 여전히 시간 경과에 따른 데이터 축적 또는 근본적으로 다른 판정
+    방식(현재 세션/서브에이전트의 애매 군집 판정 확대)뿐이다.

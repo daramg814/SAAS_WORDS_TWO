@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from . import common_crawl_client, gh_archive_client, hn_client, npm_client, rss_client, stack_exchange_client
+from . import app_store_client, common_crawl_client, gh_archive_client, hn_client, npm_client, rss_client, stack_exchange_client
 from .contracts import atomic_write_text
 
 # Below this much free disk space, collection should not proceed - not a
@@ -152,6 +152,20 @@ def run_access_test(
             }
         else:
             results["official_feeds"] = {"status": "FAIL", "detail": feeds_result.error or "unknown error"}
+
+    as_conf = sources_config["sources"].get("app_store_reviews")
+    # "search_terms" presence distinguishes a genuinely configured source from
+    # a bare {"enabled": False} placeholder - same rationale as stack_exchange_
+    # dump's "site" gate and official_feeds' "feed_urls" gate above.
+    if as_conf and as_conf.get("search_terms"):
+        as_result = app_store_client.access_test(session)
+        if as_result.ok:
+            results["app_store_reviews"] = {
+                "status": "PASS",
+                "detail": f"app_id={as_result.data['app_id']} review_count={as_result.data['review_count']}",
+            }
+        else:
+            results["app_store_reviews"] = {"status": "FAIL", "detail": as_result.error or "unknown error"}
 
     for name in sources_config["sources"]:
         if name in results:
@@ -589,6 +603,78 @@ def run_official_feeds_collection(
             continue
         _insert_normalized(conn, entry, fetched_at, source="official_feeds")
         summary.fetched_stories += 1
+
+    conn.commit()
+    return summary
+
+
+@dataclass
+class AppStoreReviewsCollectionSummary:
+    fetched_stories: int = 0
+    skipped_existing: int = 0
+    apps_seen: int = 0
+    errors: list[str] = field(default_factory=list)
+
+
+def run_app_store_reviews_collection(
+    conn: sqlite3.Connection,
+    as_settings: dict,
+    session,
+    *,
+    fetched_at: str,
+) -> AppStoreReviewsCollectionSummary:
+    """DEMAND-001 follow-up (2026-08-11, design roadmap "다른 종류의
+    데이터원"): each search term is a SaaS/business-tool category (e.g.
+    "small business invoicing", "expense tracking app"); for each, discover
+    the top N apps via the iTunes Search API, then pull each app's most-
+    recent customer reviews. No cursor - like official_feeds, the review
+    feed only ever exposes recent reviews and INSERT OR IGNORE (keyed by
+    app_store_client.make_item_id, which encodes Apple's own review id)
+    handles incremental dedup naturally across runs."""
+    summary = AppStoreReviewsCollectionSummary()
+    search_terms = as_settings.get("search_terms", [])
+    apps_per_term = as_settings.get("apps_per_term", 5)
+    country = as_settings.get("country", "us")
+    budget = as_settings.get("max_items_per_run", 3000)
+
+    seen_app_ids: set[int] = set()
+    for term in search_terms:
+        search_result = app_store_client.search_apps(session, term, country=country, limit=apps_per_term)
+        if not search_result.ok:
+            summary.errors.append(f"search '{term}': {search_result.error}")
+            continue
+        hits = search_result.data.get("results", []) if isinstance(search_result.data, dict) else []
+        for hit in hits:
+            app = app_store_client.normalize_app_hit(hit)
+            if app is None or app["app_id"] in seen_app_ids:
+                continue
+            seen_app_ids.add(app["app_id"])
+
+    for app_id in seen_app_ids:
+        if budget <= 0:
+            break
+        summary.apps_seen += 1
+        reviews_result = app_store_client.fetch_reviews(session, app_id, country=country)
+        if not reviews_result.ok:
+            summary.errors.append(f"reviews for app {app_id}: {reviews_result.error}")
+            continue
+        entries = reviews_result.data.get("feed", {}).get("entry", []) if isinstance(reviews_result.data, dict) else []
+        normalized_by_id: dict[int, dict] = {}
+        for entry in entries:
+            normalized = app_store_client.normalize_review(app_id, entry)
+            if normalized is not None:
+                normalized_by_id[normalized["id"]] = normalized
+
+        existing = _existing_ids(conn, list(normalized_by_id.keys()))
+        for item_id, normalized in normalized_by_id.items():
+            if budget <= 0:
+                break
+            if item_id in existing:
+                summary.skipped_existing += 1
+                continue
+            _insert_normalized(conn, normalized, fetched_at, source="app_store_reviews")
+            summary.fetched_stories += 1
+            budget -= 1
 
     conn.commit()
     return summary

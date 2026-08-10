@@ -32,6 +32,8 @@ collection:
     max_hours_per_run: 12
   stack_exchange_dump:
     max_items_per_run: 5000
+  app_store_reviews:
+    max_items_per_run: 3000
 
 thresholds:
   demand_score_min: 45

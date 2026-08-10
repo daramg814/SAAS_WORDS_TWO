@@ -80,6 +80,18 @@ def main(argv: list[str] | None = None) -> int:
             feeds_summary = collection.run_official_feeds_collection(
                 conn, feeds_conf["feed_urls"], session, fetched_at=now.isoformat()
             )
+
+        app_store_summary = None
+        as_conf = sources_config["sources"].get("app_store_reviews", {})
+        if access_report.results.get("app_store_reviews", {}).get("status") == "PASS" and as_conf.get("enabled"):
+            # search_terms/apps_per_term/country (which apps to look at) live in
+            # sources.yaml alongside the other per-source config; max_items_per_run
+            # (how much to collect this run) lives in project.yaml like gh_archive's
+            # max_hours_per_run / stack_exchange_dump's max_items_per_run.
+            as_settings = {**as_conf, **project_config["collection"]["app_store_reviews"]}
+            app_store_summary = collection.run_app_store_reviews_collection(
+                conn, as_settings, session, fetched_at=now.isoformat()
+            )
     finally:
         conn.close()
 
@@ -114,6 +126,12 @@ def main(argv: list[str] | None = None) -> int:
             f"skipped_existing={feeds_summary.skipped_existing}"
         )
         errors += feeds_summary.errors
+    if app_store_summary is not None:
+        print(
+            f"COLLECTED (app_store_reviews) stories={app_store_summary.fetched_stories} "
+            f"apps_seen={app_store_summary.apps_seen} skipped_existing={app_store_summary.skipped_existing}"
+        )
+        errors += app_store_summary.errors
     for error in errors:
         print(f"  WARN: {error}")
     return 0

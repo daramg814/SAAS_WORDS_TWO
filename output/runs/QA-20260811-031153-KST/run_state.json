@@ -1,0 +1,14 @@
+{
+  "awaiting_judgment": null,
+  "context": {
+    "generated_filename": "saas_words_20260811_031153_KST.txt",
+    "qa_history_snapshot_path": "C:\\Share\\Claude_project\\SAAS_WORDS_TWO_claude_code_project_v2.4\\output\\qa\\QA-20260811-031153-KST\\qa_history_snapshot.txt"
+  },
+  "created_at": "2026-08-11T03:11:53.182055+09:00",
+  "mode": "qa",
+  "run_id": "QA-20260811-031153-KST",
+  "stage": "generate_and_review_titles",
+  "status": "CAPABILITY_STAGNATION",
+  "target_title_count": 20,
+  "updated_at": "2026-08-11T03:16:54.269243+09:00"
+}

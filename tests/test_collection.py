@@ -731,6 +731,108 @@ def test_run_official_feeds_collection_dedupes_across_runs(tmp_path):
         conn, ["https://example.com/feed"], FakeFeedSession(FEED_RSS_XML), fetched_at="t1"
     )
     assert summary2.fetched_stories == 0
+
+
+# ---------------------------------------------------------------------------
+# app_store_reviews access test + collection
+# ---------------------------------------------------------------------------
+
+AS_SOURCES_CONFIG = {
+    "sources": {
+        "app_store_reviews": {"enabled": True, "required": False, "search_terms": ["invoicing"], "apps_per_term": 2}
+    }
+}
+
+AS_SEARCH_HIT = {"trackId": 111, "trackName": "Invoice Maker", "genres": ["Business"]}
+AS_REVIEW_ENTRY = {
+    "author": {"name": {"label": "alice"}},
+    "updated": {"label": "2026-06-11T09:46:26-07:00"},
+    "im:rating": {"label": "5"},
+    "id": {"label": "555000001"},
+    "title": {"label": "still a manual process"},
+    "content": {"label": "I still use spreadsheets to track invoices - wish this app synced them"},
+}
+
+
+class FakeAppStoreSession:
+    def __init__(self, search_response, reviews_by_app_id):
+        self.search_response = search_response
+        self.reviews_by_app_id = reviews_by_app_id
+        self.calls: list[str] = []
+
+    def get(self, url, timeout):
+        self.calls.append(url)
+
+        class Resp:
+            def __init__(self, data):
+                self._data = data
+
+            def raise_for_status(self):
+                return None
+
+            def json(self):
+                return self._data
+
+        if url.startswith("https://itunes.apple.com/search"):
+            return Resp(self.search_response)
+        for app_id, feed in self.reviews_by_app_id.items():
+            if f"id={app_id}" in url:
+                return Resp(feed)
+        return Resp({"feed": {"entry": []}})
+
+
+def test_run_access_test_exercises_app_store_reviews_and_reports_pass(tmp_path):
+    sources_config = {**SOURCES_CONFIG, "sources": {**SOURCES_CONFIG["sources"], **AS_SOURCES_CONFIG["sources"]}}
+    hn_session = FakeSession(
+        {"maxitem.json": 100, "item/100.json": {"id": 100, "type": "story"}, "search": {"hits": []}}
+    )
+
+    class CombinedSession:
+        def get(self, url, timeout):
+            if url.startswith("https://itunes.apple.com"):
+                return FakeAppStoreSession(
+                    {"results": [AS_SEARCH_HIT], "resultCount": 1}, {111: {"feed": {"entry": [AS_REVIEW_ENTRY]}}}
+                ).get(url, timeout)
+            return hn_session.get(url, timeout)
+
+    report = collection.run_access_test(tmp_path, sources_config, CombinedSession(), generated_at="t0")
+    assert report.results["app_store_reviews"]["status"] == "PASS"
+
+
+def test_run_app_store_reviews_collection_inserts_with_source(tmp_path):
+    conn = db.connect(tmp_path)
+    session = FakeAppStoreSession(
+        {"results": [AS_SEARCH_HIT], "resultCount": 1}, {111: {"feed": {"entry": [AS_REVIEW_ENTRY]}}}
+    )
+    summary = collection.run_app_store_reviews_collection(
+        conn, {"search_terms": ["invoicing"], "apps_per_term": 2, "max_items_per_run": 100}, session, fetched_at="t0"
+    )
+    assert summary.fetched_stories == 1
+    assert summary.apps_seen == 1
+    rows = conn.execute("SELECT source, by, text FROM hn_items WHERE source = 'app_store_reviews'").fetchall()
+    assert len(rows) == 1
+    assert rows[0]["by"] == "alice"
+    assert "spreadsheets" in rows[0]["text"]
+    conn.close()
+
+
+def test_run_app_store_reviews_collection_dedupes_across_runs(tmp_path):
+    conn = db.connect(tmp_path)
+    settings = {"search_terms": ["invoicing"], "apps_per_term": 2, "max_items_per_run": 100}
+    collection.run_app_store_reviews_collection(
+        conn,
+        settings,
+        FakeAppStoreSession({"results": [AS_SEARCH_HIT], "resultCount": 1}, {111: {"feed": {"entry": [AS_REVIEW_ENTRY]}}}),
+        fetched_at="t0",
+    )
+    summary2 = collection.run_app_store_reviews_collection(
+        conn,
+        settings,
+        FakeAppStoreSession({"results": [AS_SEARCH_HIT], "resultCount": 1}, {111: {"feed": {"entry": [AS_REVIEW_ENTRY]}}}),
+        fetched_at="t1",
+    )
+    assert summary2.fetched_stories == 0
+    conn.close()
     assert summary2.skipped_existing == 1
     conn.close()
 

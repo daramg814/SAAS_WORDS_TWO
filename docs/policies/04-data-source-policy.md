@@ -68,6 +68,39 @@
    없었다. 피드는 보통 최근 항목만 나열하므로 커서 없이 매 실행 전체를 다시
    가져오고, guid/id가 정수가 아니라 해시 기반 12자리 id(`8` 접두 — Stack Exchange의
    `9` 접두와 겹치지 않게)로 재매핑해 중복 방지에 사용한다(`rss_client.make_item_id`).
+10. App Store 고객 리뷰(Apple 공식 iTunes Search + 고객 리뷰 RSS)는 접근성 검사
+    (PASS, 실제 검색/리뷰 요청)를 거쳐 enabled: true로 전환됨(2026-08-11,
+    DEMAND-001 후속 - 설계 로드맵 3차 개선 "다른 종류의 데이터원 찾기").
+    HN/GH Archive/Stack Exchange가 전부 공유하는 실패 패턴(짧은 보일러플레이트/
+    템플릿 문구가 5명 이상 군집을 오염시킴, ACTIVE_ISSUES.md DEMAND-001 참고)을
+    깨보려고 개발자/소프트웨어 커뮤니티 텍스트가 아닌 완전히 다른 종류의 데이터를
+    찾다가 선택함 - 실제 최종 사용자가 각자 다른 사람으로서 기존 B2B/B2C SaaS
+    앱에 대해 자기 말로 쓴 리뷰. 이 배치에서 먼저 실측으로 배제한 후보:
+    - Reddit 공개 JSON(*.json 엔드포인트) - 2026-05-28 이후 Reddit이 전면
+      차단(TLS 지문/IP 평판 기반), 실측으로 403 확인. OAuth는 앱 등록(사용자
+      제공 자격증명 필요)이 있어야 해 이 세션이 자체 해결 불가.
+    - CFPB Consumer Complaint Database - 공식 검색 UI API는 Akamai 봇 차단으로
+      403(우회 시도 금지, CLAUDE.md 3항 정신), Socrata 오픈데이터 구 엔드포인트는
+      플랫폼 이전으로 폐기됨(실측으로 404/이전된 페이지 확인).
+    - Product Hunt GraphQL - 전부 OAuth 토큰 필수(실측으로 401 확인).
+    - GitHub Issue 전문 검색 API(api.github.com/search/issues) - 접근은
+      가능(200 OK)하지만 실제 검색 결과를 읽어보니 검색어 하나당 22건이 전부
+      서로 무관한 저장소의 서로 다른 기능 요청이었다(GH Archive와 동일한
+      구조적 문제 - 특정 저장소에 대한 기술 요청이지, 여러 사람이 독립적으로
+      말하는 같은 시장 문제가 아님). 실측 결과 자체로 기각, 구현하지 않음.
+    App Store 리뷰는 iTunes Search API(itunes.apple.com/search, 카테고리별
+    검색어로 앱 동적 발견 - 특정 앱 id를 하드코딩하지 않음)로 앱을 찾고, 그
+    앱의 customerreviews RSS(JSON 포맷)에서 최근 리뷰를 가져온다. 리뷰 id는
+    7 접두 + 12자리 zero-pad(app_store_client.make_item_id)로 재매핑해
+    다른 소스 id 범위와 겹치지 않게 한다. config/sources.yaml의
+    app_store_reviews.search_terms에 인보이싱/CRM/일정관리/시간추적 등
+    12개 SMB SaaS 카테고리 검색어를 두었다(산업이 정해지면 교체할 대상,
+    RSS의 feed_urls와 같은 위치의 결정). 주의: 실제 리뷰 내용을 표본
+    확인한 결과 유명 앱(QuickBooks 등)의 리뷰는 "미해결 시장 문제"보다
+    "이 앱 자체의 버그/가격 불만"에 치우쳐 있었다 - 이는 수요 발굴보다는
+    기존 공급 후보의 supply_gap_unresolved_complaints 판정에 더 잘 맞을 수
+    있는 신호다. 실제로 수요 관문 통과 여부에 도움이 되는지는 실측 파이프라인
+    재실행으로 검증할 것(memory/ACTIVE_ISSUES.md DEMAND-001에 결과 기록).
 
 ## 원본 설계 세부 규칙
 
