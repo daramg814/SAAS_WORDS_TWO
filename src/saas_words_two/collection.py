@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import shutil
 import sqlite3
 import time
 from dataclasses import dataclass, field
@@ -9,10 +10,35 @@ from pathlib import Path
 from . import gh_archive_client, hn_client
 from .contracts import atomic_write_text
 
+# Below this much free disk space, collection should not proceed - not a
+# precise budget calculation (no such number is specified in the design),
+# just a floor low enough that "the disk is actually full" is caught rather
+# than silently attempted and failing mid-write.
+MIN_FREE_DISK_BYTES = 200 * 1024 * 1024
+
+
+def check_disk_usage(project_root: Path) -> dict:
+    """Design 3.3 access-test step 5 ('디스크 사용량 확인'). Reports free space on
+    the project's drive plus the size of the two things that actually grow
+    with collection (data/local.db and data/cache/) so a session can see disk
+    pressure before it becomes a write failure."""
+    usage = shutil.disk_usage(project_root)
+    db_path = project_root / "data" / "local.db"
+    cache_dir = project_root / "data" / "cache"
+    cache_bytes = sum(f.stat().st_size for f in cache_dir.glob("**/*") if f.is_file()) if cache_dir.exists() else 0
+    return {
+        "free_bytes": usage.free,
+        "total_bytes": usage.total,
+        "local_db_bytes": db_path.stat().st_size if db_path.exists() else 0,
+        "cache_bytes": cache_bytes,
+        "ok": usage.free >= MIN_FREE_DISK_BYTES,
+    }
+
 
 @dataclass
 class AccessTestReport:
     results: dict[str, dict]
+    disk_usage: dict
 
     def to_markdown(self, generated_at: str) -> str:
         lines = ["# Data Source Access Test Report", "", f"Generated: {generated_at}", ""]
@@ -21,6 +47,13 @@ class AccessTestReport:
             lines.append(f"- status: {info['status']}")
             lines.append(f"- detail: {info['detail']}")
             lines.append("")
+        lines.append("## disk_usage")
+        lines.append(f"- free_bytes: {self.disk_usage['free_bytes']}")
+        lines.append(f"- total_bytes: {self.disk_usage['total_bytes']}")
+        lines.append(f"- local_db_bytes: {self.disk_usage['local_db_bytes']}")
+        lines.append(f"- cache_bytes: {self.disk_usage['cache_bytes']}")
+        lines.append(f"- ok: {self.disk_usage['ok']}")
+        lines.append("")
         return "\n".join(lines) + "\n"
 
 
@@ -68,7 +101,7 @@ def run_access_test(
             "detail": "optional source, activation_gate not exercised in this batch",
         }
 
-    report = AccessTestReport(results=results)
+    report = AccessTestReport(results=results, disk_usage=check_disk_usage(project_root))
     report_path = project_root / "output" / "logs" / "access_test_report.md"
     atomic_write_text(report_path, report.to_markdown(generated_at))
     return report

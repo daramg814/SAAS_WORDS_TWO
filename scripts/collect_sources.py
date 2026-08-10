@@ -29,6 +29,13 @@ def main(argv: list[str] | None = None) -> int:
         for name, info in access_report.results.items():
             print(f"  {name}: {info['status']} ({info['detail']})")
         return 2
+    if not access_report.disk_usage["ok"]:
+        print(
+            "SOURCE ACCESS: FAIL - insufficient free disk space "
+            f"({access_report.disk_usage['free_bytes']} bytes free, "
+            f"minimum {collection.MIN_FREE_DISK_BYTES})"
+        )
+        return 3
 
     conn = db.connect(project_root)
     try:

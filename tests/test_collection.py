@@ -57,6 +57,25 @@ SOURCES_CONFIG = {
 HN_SETTINGS = {"stories_per_list": 500, "comments_per_story": 20, "max_items_per_run": 800}
 
 
+def test_check_disk_usage_reports_free_space_and_db_size(tmp_path):
+    usage = collection.check_disk_usage(tmp_path)
+    assert usage["free_bytes"] > 0
+    assert usage["total_bytes"] >= usage["free_bytes"]
+    assert usage["local_db_bytes"] == 0  # no data/local.db in a fresh tmp_path
+    assert usage["ok"] is True
+
+
+def test_check_disk_usage_sums_cache_dir_and_reports_db_size(tmp_path):
+    cache_dir = tmp_path / "data" / "cache"
+    cache_dir.mkdir(parents=True)
+    (cache_dir / "hacker_news_last_id.txt").write_text("123", encoding="utf-8")
+    db_dir = tmp_path / "data"
+    (db_dir / "local.db").write_bytes(b"x" * 50)
+    usage = collection.check_disk_usage(tmp_path)
+    assert usage["cache_bytes"] == 3
+    assert usage["local_db_bytes"] == 50
+
+
 def test_run_access_test_pass_writes_report(tmp_path):
     session = FakeSession(
         {"maxitem.json": 100, "item/100.json": {"id": 100, "type": "story"}, "search": {"hits": []}}
@@ -64,9 +83,11 @@ def test_run_access_test_pass_writes_report(tmp_path):
     report = collection.run_access_test(tmp_path, SOURCES_CONFIG, session, generated_at="2026-08-10T19:00:00+09:00")
     assert report.results["hacker_news"]["status"] == "PASS"
     assert report.results["stack_exchange_dump"]["status"] == "DISABLED"
+    assert report.disk_usage["ok"] is True
     report_path = tmp_path / "output" / "logs" / "access_test_report.md"
     assert report_path.exists()
     assert "hacker_news" in report_path.read_text(encoding="utf-8")
+    assert "disk_usage" in report_path.read_text(encoding="utf-8")
 
 
 class CombinedFakeSession:
