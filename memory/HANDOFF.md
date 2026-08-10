@@ -113,5 +113,10 @@ python -c로 호출하는 방식을 이번 세션 내내 사용했음(요청 파
   단계에서 매번 확인받을 필요 없음 — CLAUDE.md §10의 "commit → push origin main"
   순서를 훅이 자동 수행. 단, 훅은 `.git/hooks/`(로컬 전용, git 추적 안 됨)에만
   있으므로 새 clone/새 머신에서는 재설치 필요.
+- (2026-08-10 추가) 인증을 브라우저 OAuth 세션 대신 만료 없는 Classic PAT(`repo`
+  scope)로 전환함. 이 저장소에서만 `credential.https://github.com.gitHubAuthModes=pat`
+  로컬 설정을 켜서 GCM이 브라우저 대신 자격 증명 프롬프트를 쓰도록 강제했고,
+  사용자가 한 번 PAT로 로그인한 뒤 Windows Credential Manager에 저장됨. 이후로는
+  로그인 세션 만료와 무관하게 완전 무인으로 push된다(아래에서 실제 커밋으로 검증).
 - `data/local.db`, `output/runs/*/judgment/`는 `.gitignore` 대상(대용량 원문
   데이터) — 실수로 강제 추가(`git add -f`)하지 말 것.
