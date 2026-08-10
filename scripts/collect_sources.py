@@ -7,7 +7,7 @@ from pathlib import Path
 
 import requests
 
-from saas_words_two import collection, config, db, ids
+from saas_words_two import collection, config, db, ids, text_filter
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -33,18 +33,35 @@ def main(argv: list[str] | None = None) -> int:
     conn = db.connect(project_root)
     try:
         hn_settings = project_config["collection"]["hacker_news"]
-        summary = collection.run_incremental_collection(
+        recency_summary = collection.run_incremental_collection(
             project_root, conn, sources_config, hn_settings, session, fetched_at=now.isoformat()
+        )
+
+        months_back = project_config["collection"]["recent_months_required"]
+        cutoff_epoch = int(now.timestamp()) - months_back * 30 * 24 * 3600
+        search_summary = collection.run_keyword_search_collection(
+            conn,
+            list(text_filter.PAIN_PATTERNS),
+            session,
+            hits_per_pattern=hn_settings["search_hits_per_pattern"],
+            budget=hn_settings["search_max_items_per_run"],
+            created_after_epoch=cutoff_epoch,
+            fetched_at=now.isoformat(),
         )
     finally:
         conn.close()
 
     print(
-        f"COLLECTED stories={summary.fetched_stories} comments={summary.fetched_comments} "
-        f"skipped_existing={summary.skipped_existing} "
-        f"cursor={summary.cursor_before}->{summary.cursor_after}"
+        f"COLLECTED (recency lists) stories={recency_summary.fetched_stories} "
+        f"comments={recency_summary.fetched_comments} skipped_existing={recency_summary.skipped_existing} "
+        f"cursor={recency_summary.cursor_before}->{recency_summary.cursor_after}"
     )
-    for error in summary.errors:
+    print(
+        f"COLLECTED (keyword search, {months_back}mo window) "
+        f"stories={search_summary.fetched_stories} comments={search_summary.fetched_comments} "
+        f"skipped_existing={search_summary.skipped_existing}"
+    )
+    for error in recency_summary.errors + search_summary.errors:
         print(f"  WARN: {error}")
     return 0
 

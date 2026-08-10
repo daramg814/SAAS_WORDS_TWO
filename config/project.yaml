@@ -25,6 +25,8 @@ collection:
     stories_per_list: 500
     comments_per_story: 20
     max_items_per_run: 800
+    search_hits_per_pattern: 40
+    search_max_items_per_run: 1200
 
 thresholds:
   demand_score_min: 45

@@ -94,8 +94,7 @@ def _existing_ids(conn: sqlite3.Connection, candidate_ids: list[int]) -> set[int
     return {row[0] for row in rows}
 
 
-def _insert_item(conn: sqlite3.Connection, raw: dict, fetched_at: str) -> None:
-    normalized = hn_client.normalize_item(raw)
+def _insert_normalized(conn: sqlite3.Connection, normalized: dict, fetched_at: str) -> None:
     conn.execute(
         "INSERT OR IGNORE INTO hn_items "
         "(id, type, by, time, text, title, url, parent, score, descendants, dead, deleted, fetched_at) "
@@ -145,7 +144,7 @@ def run_incremental_collection(
         if not result.ok or not isinstance(result.data, dict):
             summary.errors.append(f"item {story_id}: {result.error or 'null item'}")
             continue
-        _insert_item(conn, result.data, fetched_at)
+        _insert_normalized(conn, hn_client.normalize_item(result.data), fetched_at)
         summary.fetched_stories += 1
         max_cursor = max(max_cursor, story_id)
 
@@ -162,7 +161,7 @@ def run_incremental_collection(
             if not kid_result.ok or not isinstance(kid_result.data, dict):
                 summary.errors.append(f"item {kid_id}: {kid_result.error or 'null item'}")
                 continue
-            _insert_item(conn, kid_result.data, fetched_at)
+            _insert_normalized(conn, hn_client.normalize_item(kid_result.data), fetched_at)
             summary.fetched_comments += 1
             max_cursor = max(max_cursor, kid_id)
 
@@ -170,4 +169,64 @@ def run_incremental_collection(
     summary.cursor_after = max_cursor
     if max_cursor > summary.cursor_before:
         write_cursor(project_root, sources_config, max_cursor)
+    return summary
+
+
+def run_keyword_search_collection(
+    conn: sqlite3.Connection,
+    patterns: list[str],
+    session,
+    *,
+    hits_per_pattern: int,
+    budget: int,
+    created_after_epoch: int,
+    fetched_at: str,
+) -> CollectionSummary:
+    """Search HN's full history (via Algolia) for each demand-pattern phrase.
+
+    This is the primary source of dated, independent-user evidence: the
+    Firebase list-based collector above only reaches recently active items
+    and cannot realistically satisfy the 24-month evidence window on its own.
+    """
+    summary = CollectionSummary()
+    remaining = budget
+
+    for pattern in patterns:
+        if remaining <= 0:
+            break
+        result = hn_client.search_items(
+            session,
+            pattern,
+            hits_per_page=min(hits_per_pattern, remaining),
+            created_after_epoch=created_after_epoch,
+        )
+        if not result.ok:
+            summary.errors.append(f"search '{pattern}': {result.error}")
+            continue
+
+        hits = result.data.get("hits", []) if isinstance(result.data, dict) else []
+        hit_by_id: dict[int, dict] = {}
+        for hit in hits:
+            try:
+                hit_by_id[int(hit["objectID"])] = hit
+            except (KeyError, TypeError, ValueError):
+                summary.errors.append(f"search '{pattern}': hit missing valid objectID")
+
+        existing = _existing_ids(conn, list(hit_by_id.keys()))
+        for item_id, hit in hit_by_id.items():
+            if remaining <= 0:
+                break
+            if item_id in existing:
+                summary.skipped_existing += 1
+                continue
+            normalized = hn_client.normalize_algolia_hit(hit)
+            _insert_normalized(conn, normalized, fetched_at)
+            if normalized["type"] == "story":
+                summary.fetched_stories += 1
+            else:
+                summary.fetched_comments += 1
+            remaining -= 1
+            summary.cursor_after = max(summary.cursor_after, item_id)
+
+    conn.commit()
     return summary

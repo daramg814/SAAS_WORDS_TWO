@@ -1,4 +1,4 @@
-from saas_words_two import collection, db
+from saas_words_two import collection, db, hn_client
 
 
 class FakeResponse:
@@ -19,7 +19,14 @@ class FakeSession:
 
     def get(self, url, timeout):
         self.calls.append(url)
-        path = url.split("/v0/", 1)[1]
+        for base in (hn_client.BASE_URL, hn_client.SEARCH_BASE_URL):
+            if url.startswith(base + "/"):
+                path = url[len(base) + 1 :]
+                break
+        else:
+            raise AssertionError(f"unrecognized base url: {url}")
+        if path.startswith("search?") and path not in self.routes:
+            path = "search"
         return FakeResponse(self.routes[path])
 
 
@@ -45,7 +52,9 @@ HN_SETTINGS = {"stories_per_list": 500, "comments_per_story": 20, "max_items_per
 
 
 def test_run_access_test_pass_writes_report(tmp_path):
-    session = FakeSession({"maxitem.json": 100, "item/100.json": {"id": 100, "type": "story"}})
+    session = FakeSession(
+        {"maxitem.json": 100, "item/100.json": {"id": 100, "type": "story"}, "search": {"hits": []}}
+    )
     report = collection.run_access_test(tmp_path, SOURCES_CONFIG, session, generated_at="2026-08-10T19:00:00+09:00")
     assert report.results["hacker_news"]["status"] == "PASS"
     assert report.results["stack_exchange_dump"]["status"] == "DISABLED"
@@ -100,6 +109,78 @@ def test_incremental_collection_respects_max_items_budget(tmp_path):
         tmp_path, conn, SOURCES_CONFIG, limited_settings, FakeSession(build_routes()), fetched_at="t0"
     )
     assert summary.fetched_stories + summary.fetched_comments == 1
+    conn.close()
+
+
+def test_keyword_search_collection_inserts_story_and_comment_hits(tmp_path):
+    conn = db.connect(tmp_path)
+    routes = {
+        "search": {
+            "hits": [
+                {
+                    "objectID": "1",
+                    "_tags": ["story"],
+                    "author": "a",
+                    "created_at_i": 10,
+                    "title": "Ask HN: manual process pain",
+                },
+                {
+                    "objectID": "2",
+                    "_tags": ["comment"],
+                    "author": "b",
+                    "created_at_i": 11,
+                    "comment_text": "still use spreadsheets here",
+                    "parent_id": 1,
+                },
+            ]
+        }
+    }
+    session = FakeSession(routes)
+    summary = collection.run_keyword_search_collection(
+        conn,
+        ["manual process"],
+        session,
+        hits_per_pattern=40,
+        budget=100,
+        created_after_epoch=0,
+        fetched_at="2026-08-10T20:00:00+09:00",
+    )
+    assert summary.fetched_stories == 1
+    assert summary.fetched_comments == 1
+    rows = conn.execute("SELECT id FROM hn_items ORDER BY id").fetchall()
+    assert [row[0] for row in rows] == [1, 2]
+    conn.close()
+
+
+def test_keyword_search_collection_dedupes_across_patterns_and_existing_rows(tmp_path):
+    conn = db.connect(tmp_path)
+    hit = {"objectID": "1", "_tags": ["story"], "author": "a", "created_at_i": 10, "title": "x"}
+    routes = {"search": {"hits": [hit]}}
+    session = FakeSession(routes)
+    summary = collection.run_keyword_search_collection(
+        conn, ["manual process", "takes hours"], session,
+        hits_per_pattern=10, budget=100, created_after_epoch=0, fetched_at="t0",
+    )
+    assert summary.fetched_stories == 1
+    assert summary.skipped_existing == 1
+    conn.close()
+
+
+def test_keyword_search_collection_respects_budget(tmp_path):
+    conn = db.connect(tmp_path)
+    routes = {
+        "search": {
+            "hits": [
+                {"objectID": "1", "_tags": ["story"], "author": "a", "created_at_i": 10, "title": "x"},
+                {"objectID": "2", "_tags": ["story"], "author": "b", "created_at_i": 11, "title": "y"},
+            ]
+        }
+    }
+    summary = collection.run_keyword_search_collection(
+        conn, ["manual process"], FakeSession(routes),
+        hits_per_pattern=10, budget=1, created_after_epoch=0, fetched_at="t0",
+    )
+    assert summary.fetched_stories == 1
     conn.close()
 
 

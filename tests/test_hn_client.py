@@ -24,7 +24,14 @@ class FakeSession:
 
     def get(self, url, timeout):
         self.calls.append(url)
-        path = url.split("/v0/", 1)[1]
+        for base in (hn_client.BASE_URL, hn_client.SEARCH_BASE_URL):
+            if url.startswith(base + "/"):
+                path = url[len(base) + 1 :]
+                break
+        else:
+            raise AssertionError(f"unrecognized base url: {url}")
+        if path.startswith("search?") and path not in self._responses:
+            path = "search"
         entry = self._responses[path]
         if isinstance(entry, list):
             entry = entry.pop(0)
@@ -76,12 +83,14 @@ def test_access_test_pass():
         {
             "maxitem.json": FakeResponse(100),
             "item/100.json": FakeResponse({"id": 100, "type": "story", "title": "hi"}),
+            "search": FakeResponse({"hits": [{"objectID": "1"}]}),
         }
     )
     result = hn_client.access_test(session, sleep_fn=no_sleep)
     assert result.ok
     assert result.data["max_item"] == 100
     assert result.data["sample_item"]["id"] == 100
+    assert result.data["search_hits"] == 1
 
 
 def test_access_test_fails_when_maxitem_not_int():
@@ -94,6 +103,61 @@ def test_access_test_fails_when_sample_item_is_null():
     session = FakeSession({"maxitem.json": FakeResponse(100), "item/100.json": FakeResponse(None)})
     result = hn_client.access_test(session, sleep_fn=no_sleep)
     assert not result.ok
+
+
+def test_access_test_fails_when_search_unavailable():
+    session = FakeSession(
+        {
+            "maxitem.json": FakeResponse(100),
+            "item/100.json": FakeResponse({"id": 100, "type": "story"}),
+            "search": FakeResponse({"no_hits_key": True}),
+        }
+    )
+    result = hn_client.access_test(session, sleep_fn=no_sleep)
+    assert not result.ok
+
+
+def test_search_items_builds_or_group_tags_and_parses_hits():
+    session = FakeSession({"search": FakeResponse({"hits": [{"objectID": "42"}, {"objectID": "43"}]})})
+    result = hn_client.search_items(session, "manual process", hits_per_page=2, sleep_fn=no_sleep)
+    assert result.ok
+    assert len(result.data["hits"]) == 2
+    assert "tags=%28story%2Ccomment%29" in session.calls[0]
+
+
+def test_normalize_algolia_hit_story():
+    hit = {
+        "objectID": "13337024",
+        "_tags": ["story", "author_x", "story_13337024", "ask_hn"],
+        "author": "anacleto",
+        "created_at_i": 1483716839,
+        "title": "Ask HN: What manual processes would you automate?",
+        "story_text": "E.g. onboarding, expenses.",
+        "points": 184,
+        "num_comments": 249,
+    }
+    normalized = hn_client.normalize_algolia_hit(hit)
+    assert normalized["id"] == 13337024
+    assert normalized["type"] == "story"
+    assert normalized["by"] == "anacleto"
+    assert normalized["text"] == "E.g. onboarding, expenses."
+    assert normalized["parent"] is None
+    assert normalized["descendants"] == 249
+
+
+def test_normalize_algolia_hit_comment():
+    hit = {
+        "objectID": "13337056",
+        "_tags": ["comment", "author_y", "story_13337024"],
+        "author": "someone",
+        "created_at_i": 1483716900,
+        "comment_text": "We still use spreadsheets for this.",
+        "parent_id": 13337024,
+    }
+    normalized = hn_client.normalize_algolia_hit(hit)
+    assert normalized["type"] == "comment"
+    assert normalized["text"] == "We still use spreadsheets for this."
+    assert normalized["parent"] == 13337024
 
 
 def test_fetch_story_list_rejects_unknown_list():
