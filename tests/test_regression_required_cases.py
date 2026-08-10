@@ -250,7 +250,7 @@ def test_google_input_partial_duplicate_malformed_and_redated_rows(tmp_path):
             "user_checked_at": "2026-08-04T20:15:00+09:00", "country": "", "language": "",
             "search_context": "", "top_results_relevant": "", "user_notes": "",
         },
-        {  # partially filled -> missing user_checked_at -> invalid
+        {  # partially filled -> missing user_checked_at -> PARTIALLY_FILLED (4.11), not invalid
             "validation_id": "GVQ-2", "query_type": "MARKET_QUERY", "problem_id": "", "title": "",
             "google_query": "", "predicted_effective_supply": "", "predicted_scarcity_score": "",
             "predicted_result_band": "", "priority_reason": "", "user_result_count": "50",
@@ -279,7 +279,8 @@ def test_google_input_partial_duplicate_malformed_and_redated_rows(tmp_path):
         import_run_id="RUN-1", id_conn=conn, now=ids.now_kst(),
     )
     assert summary["imported"] == 1
-    assert summary["invalid"] == 2  # missing checked_at + malformed count
+    assert summary["invalid"] == 1  # malformed count (GVQ-3)
+    assert summary["partially_filled"] == 1  # missing checked_at (GVQ-2), design 4.11 - not the same as invalid
 
     # re-checking the SAME query on a different date is a new, valid observation
     rows_redated = [dict(rows[0])]

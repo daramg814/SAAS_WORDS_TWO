@@ -87,6 +87,32 @@ def test_import_observations_treats_different_checked_at_as_new(tmp_path):
 
 
 def test_import_observations_skips_invalid_rows(tmp_path):
+    """4.11: a row with both required fields filled but malformed (here, a
+    non-integer count) is INVALID, distinct from PARTIALLY_FILLED below."""
+    conn = db.connect(tmp_path)
+    now = ids.now_kst()
+    input_path = tmp_path / "human_google_checks.csv"
+    input_path.write_text(
+        "validation_id,user_result_count,user_checked_at\nGVQ-1,not-a-number,2026-08-04T20:15:00+09:00\n",
+        encoding="utf-8",
+    )
+    summary = script.import_observations(
+        input_path,
+        tmp_path / "missing_queue.csv",
+        tmp_path / "ledger.jsonl",
+        import_run_id="RUN-1",
+        id_conn=conn,
+        now=now,
+    )
+    assert summary["invalid"] == 1
+    assert summary["imported"] == 0
+    conn.close()
+
+
+def test_import_observations_counts_partially_filled_rows_separately(tmp_path):
+    """4.11 PARTIALLY_FILLED: the user filled in one of the two required
+    fields but not the other - not the same as a format error (INVALID) or
+    an untouched row (QUEUED)."""
     conn = db.connect(tmp_path)
     now = ids.now_kst()
     input_path = tmp_path / "human_google_checks.csv"
@@ -102,8 +128,33 @@ def test_import_observations_skips_invalid_rows(tmp_path):
         id_conn=conn,
         now=now,
     )
-    assert summary["invalid"] == 1
+    assert summary["partially_filled"] == 1
+    assert summary["invalid"] == 0
     assert summary["imported"] == 0
+    conn.close()
+
+
+def test_import_observations_counts_untouched_rows_as_queued(tmp_path):
+    """4.11 QUEUED: a row still waiting on the user (neither field filled)
+    is not an error at all - it just keeps waiting."""
+    conn = db.connect(tmp_path)
+    now = ids.now_kst()
+    input_path = tmp_path / "human_google_checks.csv"
+    input_path.write_text(
+        "validation_id,user_result_count,user_checked_at\nGVQ-1,,\n",
+        encoding="utf-8",
+    )
+    summary = script.import_observations(
+        input_path,
+        tmp_path / "missing_queue.csv",
+        tmp_path / "ledger.jsonl",
+        import_run_id="RUN-1",
+        id_conn=conn,
+        now=now,
+    )
+    assert summary["queued"] == 1
+    assert summary["invalid"] == 0
+    assert summary["partially_filled"] == 0
     conn.close()
 
 

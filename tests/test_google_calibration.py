@@ -206,3 +206,50 @@ def test_compute_title_calibration_brand_conflict_gets_large_negative_adjustment
     )
     assert result["google_title_collision_class"] == "BRAND_CONFLICT"
     assert result["title_collision_adjustment"] < -50
+
+
+# ---------------------------------------------------------------------------
+# 4.11 processing states
+# ---------------------------------------------------------------------------
+
+
+def test_market_query_needs_research_true_on_large_band_gap():
+    observations = [
+        {"user_result_count": 200_000, "top_results_relevant": 5, "predicted_result_band_at_time": "VERY_LOW"}
+    ]
+    assert gc.market_query_needs_research(observations)
+
+
+def test_market_query_needs_research_false_when_prediction_close():
+    observations = [
+        {"user_result_count": 50, "top_results_relevant": None, "predicted_result_band_at_time": "LOW"}
+    ]
+    assert not gc.market_query_needs_research(observations)
+
+
+def test_market_query_needs_research_false_without_recorded_prediction():
+    assert not gc.market_query_needs_research([{"user_result_count": 200_000, "top_results_relevant": 5}])
+
+
+def test_classify_import_row_status_queued_when_untouched():
+    assert gc.classify_import_row_status({"validation_id": "GVQ-1", "user_result_count": "", "user_checked_at": ""}) == "QUEUED"
+
+
+def test_classify_import_row_status_partially_filled_when_one_side_missing():
+    row = {"validation_id": "GVQ-1", "user_result_count": "", "user_checked_at": "2026-08-04T20:15:00+09:00"}
+    assert gc.classify_import_row_status(row) == "PARTIALLY_FILLED"
+
+
+def test_classify_import_row_status_invalid_when_malformed():
+    row = {"validation_id": "GVQ-1", "user_result_count": "not-a-number", "user_checked_at": "2026-08-04T20:15:00+09:00"}
+    assert gc.classify_import_row_status(row) == "INVALID"
+
+
+def test_classify_import_row_status_invalid_when_no_validation_id():
+    row = {"validation_id": "", "user_result_count": "100", "user_checked_at": "2026-08-04T20:15:00+09:00"}
+    assert gc.classify_import_row_status(row) == "INVALID"
+
+
+def test_classify_import_row_status_ready_when_fully_filled_and_well_formed():
+    row = {"validation_id": "GVQ-1", "user_result_count": "100", "user_checked_at": "2026-08-04T20:15:00+09:00"}
+    assert gc.classify_import_row_status(row) == "READY"

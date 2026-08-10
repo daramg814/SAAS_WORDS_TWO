@@ -169,6 +169,25 @@ def compute_title_calibration(observations_for_title: list[dict]) -> dict:
     }
 
 
+def market_query_needs_research(observations_for_problem: list[dict]) -> bool:
+    """4.11 RESEARCH_REQUIRED: 'AI 예측과 사람 관측 차이가 커서 공급 재조사 필요'.
+    True if any observation's actual result band is >=2 steps away from what
+    was predicted at queue-build time (classify_market_query_error's
+    SUPPLY_UNDERESTIMATED/SUPPLY_OVERESTIMATED) - a large enough surprise to
+    warrant re-investigating supply regardless of how many samples exist."""
+    for observation in observations_for_problem:
+        predicted_band = observation.get("predicted_result_band_at_time")
+        if not predicted_band:
+            continue
+        actual_band = result_band(observation["user_result_count"])
+        error = classify_market_query_error(
+            predicted_band, actual_band, top_results_relevant=observation.get("top_results_relevant")
+        )
+        if error in ("SUPPLY_UNDERESTIMATED", "SUPPLY_OVERESTIMATED"):
+            return True
+    return False
+
+
 def compute_supply_adjustment(observations_for_problem: list[dict], base_score: float) -> dict:
     """4.7: adjusted_supply_scarcity = base x (1-w) + human_google_scarcity x w.
     Shared by apply_human_calibration.py (recalibrates existing opportunities
@@ -189,12 +208,17 @@ def compute_supply_adjustment(observations_for_problem: list[dict], base_score: 
     bands = [result_band(o["user_result_count"]) for o in observations_for_problem]
     human_scarcity = sum(human_google_scarcity_score(band) for band in bands) / len(bands)
     adjusted = adjusted_supply_scarcity(base_score, human_scarcity, weight)
+    status = (
+        "RESEARCH_REQUIRED"
+        if market_query_needs_research(observations_for_problem)
+        else calibration_status(count)
+    )
 
     return {
         "observation_count": count,
         "human_weight": weight,
         "adjusted_supply_scarcity_score": adjusted,
-        "status": calibration_status(count),
+        "status": status,
     }
 
 
@@ -222,6 +246,23 @@ def validate_import_row(row: dict) -> RowValidation:
     if "T" not in raw_checked_at:
         errors.append("user_checked_at_not_iso8601")
     return RowValidation(not errors, tuple(errors))
+
+
+def classify_import_row_status(row: dict) -> str:
+    """4.11's per-row import lifecycle, checked before validate_import_row's
+    field-format validation: a completely untouched queue row (QUEUED - the
+    user hasn't filled anything in) is distinct from one the user started but
+    didn't finish (PARTIALLY_FILLED), which is distinct again from one that's
+    fully filled but malformed (INVALID, decided by validate_import_row)."""
+    result_count = (row.get("user_result_count") or "").strip()
+    checked_at = (row.get("user_checked_at") or "").strip()
+    if not (row.get("validation_id") or "").strip():
+        return "INVALID"
+    if not result_count and not checked_at:
+        return "QUEUED"
+    if not result_count or not checked_at:
+        return "PARTIALLY_FILLED"
+    return "INVALID" if not validate_import_row(row).valid else "READY"
 
 
 def is_duplicate_observation(

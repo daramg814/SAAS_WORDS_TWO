@@ -34,6 +34,23 @@ def test_compute_adjustment_blends_toward_human_observation():
     assert 0 < result["human_weight"] <= 0.25
 
 
+def test_compute_adjustment_status_is_research_required_when_ai_prediction_way_off(tmp_path):
+    """4.11 RESEARCH_REQUIRED: predicted VERY_LOW but actual VERY_HIGH is a
+    >=2-band surprise (google_calibration.classify_market_query_error), which
+    overrides PROVISIONAL/CALIBRATED regardless of sample count."""
+    observations = [
+        {"user_result_count": 200_000, "top_results_relevant": 5, "predicted_result_band_at_time": "VERY_LOW"}
+    ]
+    result = script.compute_adjustment(observations, base_score=80.0)
+    assert result["status"] == "RESEARCH_REQUIRED"
+
+
+def test_compute_adjustment_status_ignores_observations_without_a_recorded_prediction():
+    observations = [{"user_result_count": 200_000, "top_results_relevant": 5}]  # no predicted_result_band_at_time
+    result = script.compute_adjustment(observations, base_score=80.0)
+    assert result["status"] == "PROVISIONAL"
+
+
 def test_apply_calibration_updates_opportunities_with_matching_observations(tmp_path):
     conn = db.connect(tmp_path)
     conn.execute(

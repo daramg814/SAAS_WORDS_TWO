@@ -91,10 +91,23 @@ def import_observations(
     imported: list[dict] = []
     duplicate_rejected = 0
     invalid = 0
+    partially_filled = 0
+    queued = 0
 
     for row in rows:
-        validation = google_calibration.validate_import_row(row)
-        if not validation.valid:
+        # 4.11 per-row states: an untouched queue row (QUEUED) just keeps
+        # waiting - it is not an error and is not counted as invalid. A row
+        # the user started but didn't finish (PARTIALLY_FILLED) is reported
+        # separately so it's visible without being conflated with a real
+        # format error.
+        row_status = google_calibration.classify_import_row_status(row)
+        if row_status == "QUEUED":
+            queued += 1
+            continue
+        if row_status == "PARTIALLY_FILLED":
+            partially_filled += 1
+            continue
+        if row_status == "INVALID":
             invalid += 1
             continue
         if google_calibration.is_duplicate_observation(row, existing) or google_calibration.is_duplicate_observation(
@@ -120,6 +133,8 @@ def import_observations(
         "imported": len(imported),
         "duplicate_rejected": duplicate_rejected,
         "invalid": invalid,
+        "partially_filled": partially_filled,
+        "queued": queued,
         "imported_records": imported,
     }
 
@@ -132,6 +147,8 @@ def report_to_markdown(summary: dict, generated_at: str) -> str:
         f"- imported: {summary['imported']}\n"
         f"- duplicate rejected: {summary['duplicate_rejected']}\n"
         f"- invalid: {summary['invalid']}\n"
+        f"- partially filled (waiting on user): {summary['partially_filled']}\n"
+        f"- queued (untouched): {summary['queued']}\n"
     )
 
 
@@ -178,7 +195,8 @@ def main(argv: list[str] | None = None) -> int:
     atomic_write_text(report_path, report_to_markdown(summary, now.isoformat()))
     print(
         f"GOOGLE FEEDBACK IMPORT: total={summary['total_rows']} imported={summary['imported']} "
-        f"duplicate_rejected={summary['duplicate_rejected']} invalid={summary['invalid']}"
+        f"duplicate_rejected={summary['duplicate_rejected']} invalid={summary['invalid']} "
+        f"partially_filled={summary['partially_filled']} queued={summary['queued']}"
     )
     return 0
 
