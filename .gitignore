@@ -25,6 +25,8 @@ data/local.db
 # Runtime temporary files
 output/logs/*
 !output/logs/.gitkeep
+output/intermediate/*
+!output/intermediate/.gitkeep
 *.tmp
 .DS_Store
 Thumbs.db

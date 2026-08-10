@@ -106,6 +106,9 @@ CREATE TABLE IF NOT EXISTS opportunities (
     decision TEXT NOT NULL,
     evidence_ids TEXT NOT NULL,
     product_ids TEXT NOT NULL,
+    human_observation_count INTEGER NOT NULL DEFAULT 0,
+    human_adjusted_supply_scarcity_score REAL,
+    human_calibration_status TEXT NOT NULL DEFAULT 'NO_DATA',
     updated_at TEXT NOT NULL
 );
 
@@ -122,6 +125,26 @@ CREATE TABLE IF NOT EXISTS titles (
 """
 
 
+# CREATE TABLE IF NOT EXISTS only creates a table the first time local.db is
+# built; it does not retroactively add columns to a table that already exists
+# from an earlier schema revision. Each column added to an existing table
+# after its initial release must be listed here too, or scripts touching a
+# pre-existing local.db will hit "no such column" at runtime.
+COLUMN_MIGRATIONS: tuple[tuple[str, str, str], ...] = (
+    ("problems", "risk_severity", "TEXT NOT NULL DEFAULT 'none'"),
+    ("problems", "purchase_intent", "TEXT NOT NULL DEFAULT 'none'"),
+    ("problems", "has_manual_or_complaint_evidence", "INTEGER NOT NULL DEFAULT 0"),
+    ("problems", "supply_gap_user_specific", "INTEGER NOT NULL DEFAULT 0"),
+    ("problems", "supply_gap_no_strong_incumbent", "INTEGER NOT NULL DEFAULT 0"),
+    ("problems", "supply_gap_no_recent_entrants", "INTEGER NOT NULL DEFAULT 0"),
+    ("problems", "supply_gap_unresolved_complaints", "INTEGER NOT NULL DEFAULT 0"),
+    ("demand_scores", "risk_score", "INTEGER NOT NULL DEFAULT 0"),
+    ("opportunities", "human_observation_count", "INTEGER NOT NULL DEFAULT 0"),
+    ("opportunities", "human_adjusted_supply_scarcity_score", "REAL"),
+    ("opportunities", "human_calibration_status", "TEXT NOT NULL DEFAULT 'NO_DATA'"),
+)
+
+
 def connect(project_root: Path) -> sqlite3.Connection:
     db_path = project_root / "data" / "local.db"
     db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -134,4 +157,12 @@ def connect(project_root: Path) -> sqlite3.Connection:
 
 def init_schema(conn: sqlite3.Connection) -> None:
     conn.executescript(SCHEMA)
+    _apply_column_migrations(conn)
     conn.commit()
+
+
+def _apply_column_migrations(conn: sqlite3.Connection) -> None:
+    for table, column, ddl in COLUMN_MIGRATIONS:
+        existing_columns = {row[1] for row in conn.execute(f"PRAGMA table_info({table})").fetchall()}
+        if column not in existing_columns:
+            conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {ddl}")
