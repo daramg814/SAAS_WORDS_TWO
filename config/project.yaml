@@ -21,6 +21,10 @@ collection:
   recent_months_required: 24
   retry_attempts: 3
   incremental: true
+  hacker_news:
+    stories_per_list: 500
+    comments_per_story: 20
+    max_items_per_run: 800
 
 thresholds:
   demand_score_min: 45
