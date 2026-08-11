@@ -5,7 +5,7 @@ import argparse
 from pathlib import Path
 
 from .judgment import JudgmentRequired
-from .pipeline import ImplementationPendingError, RecoveryRequired, RetryRequired, RunOptions, run_pipeline
+from .word_pipeline import ImplementationPendingError, RecoveryRequired, RetryRequired, RunOptions, run_pipeline
 
 
 def build_parser() -> argparse.ArgumentParser:
