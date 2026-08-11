@@ -28,6 +28,8 @@ collection:
     search_hits_per_pattern: 1000
     search_max_items_per_run: 8000
     supply_hits_per_problem: 20
+    industry_term_hits_per_pattern: 50
+    industry_term_search_max_items_per_run: 2000
   gh_archive:
     max_hours_per_run: 12
   stack_exchange_dump:

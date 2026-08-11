@@ -56,6 +56,23 @@ def main(argv: list[str] | None = None) -> int:
             fetched_at=now.isoformat(),
         )
 
+        # DEMAND-001 follow-up (2026-08-11): a second, smaller keyword-search
+        # pass using cross-industry process jargon (text_filter.INDUSTRY_TERMS)
+        # instead of generic pain-framing phrases - quoted for exact-phrase
+        # matching (real probes showed unquoted multi-common-word terms get
+        # diluted by Algolia's fuzzy ranking). Reuses the same collection
+        # function/dedup path as the PAIN_PATTERNS search above; only the
+        # query list and budget differ.
+        industry_term_summary = collection.run_keyword_search_collection(
+            conn,
+            [f'"{term}"' for term in text_filter.INDUSTRY_TERMS],
+            session,
+            hits_per_pattern=hn_settings["industry_term_hits_per_pattern"],
+            budget=hn_settings["industry_term_search_max_items_per_run"],
+            created_after_epoch=cutoff_epoch,
+            fetched_at=now.isoformat(),
+        )
+
         gh_summary = None
         if access_report.results.get("gh_archive", {}).get("status") == "PASS" and sources_config["sources"].get(
             "gh_archive", {}
@@ -105,7 +122,12 @@ def main(argv: list[str] | None = None) -> int:
         f"stories={search_summary.fetched_stories} comments={search_summary.fetched_comments} "
         f"skipped_existing={search_summary.skipped_existing}"
     )
-    errors = list(recency_summary.errors) + list(search_summary.errors)
+    print(
+        f"COLLECTED (industry term search, {months_back}mo window) "
+        f"stories={industry_term_summary.fetched_stories} comments={industry_term_summary.fetched_comments} "
+        f"skipped_existing={industry_term_summary.skipped_existing}"
+    )
+    errors = list(recency_summary.errors) + list(search_summary.errors) + list(industry_term_summary.errors)
     if gh_summary is not None:
         print(
             f"COLLECTED (gh_archive) stories={gh_summary.fetched_stories} "

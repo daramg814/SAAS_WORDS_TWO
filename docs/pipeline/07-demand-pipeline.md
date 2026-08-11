@@ -7,6 +7,23 @@
 2. 같은 작성자의 반복 표현을 독립 사용자 수로 중복 계산하지 않는다.
 3. 문자열 유사도로 1차 군집 후 애매한 군집만 현재 세션이 의미 판정한다.
 4. 수요 통과 기준 45점, 독립 사용자 5명, 최근 24개월, 수작업/불만, 구매 의도 또는 경제 손실을 모두 적용한다.
+5. **`text_filter.INDUSTRY_TERMS`(2026-08-11, DEMAND-001 후속 — "대량의 전문용어
+   확보" 라운드)는 `PAIN_PATTERNS`와 별도의 후보 확장 목록이다.** 의료행정·법무·
+   물류·재무회계·부동산관리·보험·인사급여·건설·소매운영·현장서비스·비영리 등
+   업계별 프로세스/워크플로 전문용어(예: "prior authorization", "chargeback
+   dispute", "lien waiver")로, 실제 HN Algolia 검색(따옴표로 정확 문구 매칭)을
+   통해 관련성이 확인된 것만 채택했다 — "change order"/"rent roll"처럼 흔한
+   단어 조합은 모호한 결과만 나와 제외됨. `text_filter.matched_patterns`가
+   `PAIN_PATTERNS` 또는 `INDUSTRY_TERMS` 둘 중 하나만 일치해도 후보로 채택하도록
+   확장했지만(재현율 개선), **`clustering.strip_trigger_phrases`는 여전히
+   `PAIN_PATTERNS`만 제거한다** — 업계 전문용어는 일반적 인사말(courtesy)이
+   아니라 그 자체로 특정 문제를 가리키는 희소하고 구체적인 신호이므로, 군집화
+   유사도 계산에서 지우지 않고 그대로 남겨 "같은 전문용어를 쓰는 문장은 진짜
+   같은 문제일 가능성이 높다"는 근거로 활용한다. `collect_sources.py`는 이
+   목록을 정확 문구(따옴표) HN 검색의 두 번째, 더 작은 예산(`industry_term_
+   hits_per_pattern`/`industry_term_search_max_items_per_run`, `config/
+   project.yaml`)으로 추가 수집한다 — 기존 `PAIN_PATTERNS` 검색 경로·예산은
+   그대로 유지.
 
 ## 원본 설계 세부 규칙
 

@@ -6,6 +6,25 @@ def test_matched_patterns_case_insensitive():
     assert text_filter.matched_patterns("everything is fine") == []
 
 
+def test_matched_patterns_also_matches_industry_terms():
+    """DEMAND-001 follow-up (2026-08-11): INDUSTRY_TERMS is a separate,
+    additive list of cross-industry process jargon - a sentence containing
+    one becomes a candidate even without a PAIN_PATTERNS phrase, broadening
+    recall for genuine industry-specific complaints."""
+    sentence = "Our team still tracks prior authorization status in a shared spreadsheet."
+    matched = text_filter.matched_patterns(sentence)
+    assert "prior authorization" in matched
+    assert "still use spreadsheets" not in matched  # PAIN_PATTERNS phrase not literally present
+
+
+def test_extract_candidate_sentences_keeps_industry_term_sentence_without_pain_pattern():
+    candidates = text_filter.extract_candidate_sentences(
+        1, "Our team still tracks prior authorization status in a shared spreadsheet."
+    )
+    assert len(candidates) == 1
+    assert "prior authorization" in candidates[0].matched_patterns
+
+
 def test_split_sentences_strips_html_and_code_blocks():
     raw = "<p>We still use spreadsheets.</p><pre><code>def f(): pass</code></pre><p>It takes hours.</p>"
     sentences = text_filter.split_sentences(raw)

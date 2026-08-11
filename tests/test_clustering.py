@@ -84,6 +84,29 @@ def test_cluster_candidates_does_not_merge_isolated_intensifier_complaints():
     assert len(clusters) == 4
 
 
+def test_strip_trigger_phrases_preserves_industry_terms():
+    """DEMAND-001 follow-up (2026-08-11): INDUSTRY_TERMS (text_filter.py) is
+    deliberately NOT part of the trigger-phrase regex clustering.py strips -
+    an industry-specific term is exactly the kind of rare, specific content
+    that should survive into the similarity/blocking computation, unlike
+    PAIN_PATTERNS' generic pain-framing phrases."""
+    from saas_words_two.clustering import strip_trigger_phrases
+
+    residual = strip_trigger_phrases("Our team still tracks prior authorization status in a shared spreadsheet")
+    assert "prior authorization" in residual.lower()
+
+
+def test_cluster_candidates_groups_by_shared_industry_term():
+    candidates = [
+        Candidate(1, 101, "We track prior authorization status in a shared spreadsheet", author="alice"),
+        Candidate(2, 102, "I manually track prior authorization status for every patient", author="bob"),
+        Candidate(3, 103, "This build tool is way too complicated for beginners", author="carl"),
+    ]
+    clusters = cluster_candidates(candidates)
+    sizes = sorted(len(c.members) for c in clusters)
+    assert sizes == [1, 2]
+
+
 def test_strip_trigger_phrases_removes_matched_pattern():
     from saas_words_two.clustering import strip_trigger_phrases
 

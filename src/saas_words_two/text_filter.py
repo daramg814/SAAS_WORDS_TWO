@@ -22,6 +22,42 @@ PAIN_PATTERNS = (
     "workaround",
 )
 
+# DEMAND-001 follow-up (2026-08-11, "대량의 전문용어 확보" round): a RECALL
+# improvement, distinct from PAIN_PATTERNS - curated cross-industry process/
+# workflow jargon (healthcare admin, legal, logistics, finance, property
+# management, insurance, HR, construction, retail ops, field services,
+# nonprofit) rather than generic pain-framing phrases. Real HN Algolia
+# probes (quoted exact-phrase search) confirmed specific low-ambiguity
+# compound terms surface genuinely on-topic content ("prior authorization",
+# "chargeback dispute", "lien waiver" all returned real complaint/purchase-
+# intent threads); generic two-common-word combos ("change order", "rent
+# roll", "punch list") were too ambiguous even quoted and were dropped.
+#
+# Deliberately a SEPARATE list from PAIN_PATTERNS, not merged into it:
+# matched_patterns() below treats either list as sufficient to select a
+# candidate sentence (broadening intake), but clustering.strip_trigger_
+# phrases only strips PAIN_PATTERNS - an industry term is exactly the
+# specific, rare content that should survive into clustering as a strong
+# same-problem signal, not framing noise to discard.
+INDUSTRY_TERMS = (
+    "prior authorization", "credentialing", "eligibility verification",
+    "claims adjudication", "explanation of benefits", "referral tracking",
+    "conflict check", "redlining", "e-discovery", "docket tracking",
+    "engagement letter", "bill of lading", "customs clearance",
+    "freight reconciliation", "demurrage", "vendor onboarding",
+    "returns processing", "accounts payable reconciliation",
+    "expense reimbursement", "month-end close", "chargeback dispute",
+    "invoice factoring", "bank reconciliation", "1099 filing",
+    "lease abstraction", "tenant screening", "maintenance request",
+    "cam reconciliation", "underwriting", "subrogation", "policy renewal",
+    "loss run", "onboarding checklist", "pto accrual", "benefits enrollment",
+    "payroll reconciliation", "timesheet approval", "offboarding",
+    "lien waiver", "submittal review", "subcontractor invoicing",
+    "sku reconciliation", "return merchandise authorization",
+    "vendor compliance", "work order dispatch", "warranty claim tracking",
+    "grant reporting", "donor reconciliation",
+)
+
 PROMO_MARKERS = (
     "check out my",
     "check out our",
@@ -144,7 +180,7 @@ def is_url_only(sentence: str) -> bool:
 
 def matched_patterns(sentence: str) -> list[str]:
     lowered = sentence.lower()
-    return [pattern for pattern in PAIN_PATTERNS if pattern in lowered]
+    return [pattern for pattern in PAIN_PATTERNS + INDUSTRY_TERMS if pattern in lowered]
 
 
 @dataclass(frozen=True)
