@@ -1,15 +1,17 @@
 # HANDOFF
 
 - 상태: `PAUSED`
-- 요약 한 줄: **감사 배치(#8~#26) → 데이터원 탐색(App Store 리뷰) →
-  알고리즘 정밀 튜닝(스톱워드/템플릿 어휘 확장), 세 라운드 모두 완료.**
-  마지막 라운드는 "소량으로 다방면으로" 지시에 따라 합성 문장으로 저비용
-  검증하는 방식으로 진짜 결함 2개(`clustering.STOPWORDS`에 "your"/"way"
-  누락)를 찾아 고쳤고, 실측으로 고득점 오탐 군집이 34→20개(41% 감소)로
-  줄었다 — 하지만 `DEMAND-001`(수요 관문 통과 0건)은 여전히 미해결.
-  상세는 `ACTIVE_ISSUES.md` `DEMAND-001` "여섯 번째 확인"(가장 최신).
-  이 세션은 사용자가 "자리를 비운다"며 확인 없이 계속 진행하라고 명시적으로
-  승인한 상태에서 자율적으로 여기까지 진행했다.
+- 요약 한 줄: **감사 배치(#8~#26) → 데이터원 탐색(App Store 리뷰) → 알고리즘
+  정밀도 튜닝(스톱워드/템플릿 어휘) → 알고리즘 재현율 튜닝(업계 전문용어),
+  네 라운드 모두 완료.** 마지막 라운드(`INDUSTRY_TERMS`)는 정밀도가 아니라
+  재현율 개선 시도로, 실제 수집+재클러스터링까지 마쳤지만 이번 1회 수집으로는
+  아직 새 군집을 만들지 못했다(재현율은 늘었으나 아직 5명이 겹치는 표현까지는
+  못 감; 증분 수집 누적으로 시간이 지나면 달라질 수 있다는 가설만 남김).
+  `DEMAND-001`(수요 관문 통과 0건)은 여전히 미해결. 상세는 `ACTIVE_ISSUES.md`
+  `DEMAND-001` "일곱 번째 확인"(가장 최신). 이 세션은 사용자가 "자리를
+  비운다"며 확인 없이 계속 진행하라고 명시적으로 승인한 상태에서 자율적으로
+  여기까지 진행했다. pytest 430 passed, `verify_design_coverage.py` PASS,
+  최신 커밋 `3752ea2`.
 
 ## 1. 지금 이 세션을 새로 열면 가장 먼저 할 일
 
@@ -23,7 +25,7 @@
 2. 환경 확인:
    ```bash
    cd "C:\Share\Claude_project\SAAS_WORDS_TWO_claude_code_project_v2.4"
-   ./.venv/Scripts/python -m pytest -q          # 426 passed 나와야 정상
+   ./.venv/Scripts/python -m pytest -q          # 430 passed 나와야 정상
    ./.venv/Scripts/python tools/verify_design_coverage.py   # PASS 나와야 정상
    ```
 3. `git log --oneline`으로 로컬 커밋 확인. **push는 PC에서 사용자가 요청할 때만**
