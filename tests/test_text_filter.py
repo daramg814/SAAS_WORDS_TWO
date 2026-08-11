@@ -137,6 +137,54 @@ def test_is_generic_courtesy_sentence_false_for_empty_content():
     assert not text_filter.is_generic_courtesy_sentence("a an the is")
 
 
+def test_is_generic_courtesy_sentence_true_for_github_issue_template_headers():
+    """Regression (DEMAND-001, 2026-08-11): GitHub's default issue-template
+    section headers repeat verbatim across thousands of unrelated repos and
+    formed a false-positive cluster (independent_user_count=17) despite
+    having zero real descriptive content - the line IS the template label."""
+    assert text_filter.is_generic_courtesy_sentence("## Current Workaround")
+    assert text_filter.is_generic_courtesy_sentence("### Current Workaround Limitations")
+    assert text_filter.is_generic_courtesy_sentence("## Workaround (current)")
+    assert text_filter.is_generic_courtesy_sentence("Is your feature request related to a problem?")
+    assert text_filter.is_generic_courtesy_sentence("## Workaround for affected users today")
+
+
+def test_is_generic_courtesy_sentence_false_for_specific_workaround_description():
+    # "workaround" alone must not blanket-suppress a genuinely descriptive
+    # sentence - only template-label-only lines should be caught
+    assert not text_filter.is_generic_courtesy_sentence(
+        "Local workaround: we manually reconcile spreadsheets every Friday because there is no sync feature"
+    )
+
+
+def test_is_generic_courtesy_sentence_true_for_github_checkbox_and_pay_meme():
+    """Regression (DEMAND-001, 2026-08-11): GitHub PR/issue template checkbox
+    fields ("- [x] I have searched for existing feature requests") and the
+    recurring HN agreement meme ("I would pay for this service!" with no
+    specifics) both formed false-positive clusters despite zero real content."""
+    assert text_filter.is_generic_courtesy_sentence("- [x] I have searched for existing feature requests")
+    assert text_filter.is_generic_courtesy_sentence("OK, I would pay for this service.")
+    assert text_filter.is_generic_courtesy_sentence("I agree and I would pay for this service!")
+
+
+def test_is_generic_courtesy_sentence_true_for_local_workaround_verification_headers():
+    """Regression (DEMAND-001, 2026-08-11): "## Local workaround verified" /
+    "## Local workaround result" style GitHub issue-template sub-headers
+    formed a false-positive cluster (independent_user_count=10)."""
+    assert text_filter.is_generic_courtesy_sentence("## Local workaround verified")
+    assert text_filter.is_generic_courtesy_sentence("## Local workaround result")
+    assert text_filter.is_generic_courtesy_sentence("## Concrete local patch/workaround")
+
+
+def test_is_generic_courtesy_sentence_false_for_specific_purchase_intent():
+    # genuine, specific purchase-intent content must survive even though it
+    # uses some of the same words ("pay") as the filtered meme phrase
+    assert not text_filter.is_generic_courtesy_sentence(
+        "I would pay 50 dollars a month for a tool that automatically reconciles "
+        "vendor invoices against purchase orders"
+    )
+
+
 def test_extract_candidate_sentences_excludes_generic_courtesy_text():
     candidates = text_filter.extract_candidate_sentences(
         1, "I'd love to hear your feedback and feature requests! Also, we still use spreadsheets for tracking."

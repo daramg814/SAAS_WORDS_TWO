@@ -8,13 +8,32 @@ from difflib import SequenceMatcher
 
 from .text_filter import PAIN_PATTERNS
 
-STOPWORDS = {
-    "the", "a", "an", "is", "are", "was", "were", "to", "of", "for", "and", "or",
-    "in", "on", "at", "it", "its", "this", "that", "we", "i", "you", "our", "my",
-    "with", "do", "does", "did", "be", "been", "has", "have", "had", "not", "no",
-    "but", "so", "if", "as", "by", "from", "still", "use", "used", "using", "just",
-    "hn", "ask", "show", "will", "can", "could", "would", "should", "get", "got",
-}
+# DEMAND-001 follow-up (2026-08-11, "다른 알고리즘 연구" round): real cluster
+# content review found this list was missing common English function words -
+# "your", "way", "how", "what", "there", "know" among them - letting them
+# count as shared "content" between otherwise-unrelated sentences. E.g.
+# "Ask HN: How do you manage your dotfiles?" vs "...your prompts in ChatGPT?"
+# scored 0.45+ similarity purely from the shared "your" token plus the
+# "Ask HN:"/"?" boilerplate structure inflating the character-level
+# sequence-ratio term - both topics are completely unrelated. Verified via
+# small synthetic probes mirroring real false-positive cluster pairs (not a
+# full re-cluster each iteration - see PROJECT_PLAYBOOK.md for the method)
+# that expanding to a standard-sized English stopword list eliminates these
+# specific false positives while leaving genuine near-duplicates (which share
+# actual content words, not just function words) unaffected.
+STOPWORDS = frozenset(
+    """
+    the a an is are was were to of for and or in on at it its this that these those
+    we i you your yours our ours my mine his her hers their theirs
+    with do does did doing be been being have has had having not no nor but so if as by from
+    still use used using just hn ask show will would could should shall can cannot
+    get got getting how what why where when who whom which there here way
+    know knowing think thinking want wanting anyone anybody something someone
+    then than also very really quite about above after again all am any
+    because before being below between both down during each few further
+    into more most other over own same some such too under until up
+    """.split()
+)
 
 _TOKEN_RE = re.compile(r"[a-zA-Z]+")
 _TRIGGER_PHRASE_RE = re.compile(

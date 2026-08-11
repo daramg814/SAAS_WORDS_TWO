@@ -56,6 +56,25 @@ GENERIC_COURTESY_TOKENS = frozenset(
         "thought", "thoughts", "think", "hear", "love", "anyone", "anytime", "anything",
         "everyone", "open", "issue", "issues", "github", "thanks", "thank", "question", "questions",
         "creative", "cases", "case", "kinds", "kind", "honest", "amazing", "trying", "try",
+        # DEMAND-001 follow-up (2026-08-11): GitHub's default issue-template
+        # section headers ("## Current Workaround", "## Workaround (current)",
+        # "Is your feature request related to a problem?") repeat verbatim
+        # across thousands of unrelated repos/issues and were forming large
+        # false-positive clusters (independent_user_count up to 17) despite
+        # having zero actual descriptive content - the line IS the template
+        # label, not a real answer filled into it.
+        "current", "currently", "temporary", "attempted", "tried", "documented",
+        "affected", "problem", "challenge", "related", "today", "downstream",
+        "consumer", "operator", "place", "applied", "verified", "limitations",
+        "users", "hitting", "available", "locally",
+        # GitHub PR/issue template checkbox fields ("- [x] I have searched
+        # for existing feature requests") and the recurring HN comment-
+        # section agreement meme ("I would pay for this service!" with no
+        # specifics) - both zero-content boilerplate once the trigger
+        # phrase itself is stripped.
+        "searched", "existing", "duplicates", "similar", "checked", "found",
+        "submitting", "pay", "service", "agree", "needed", "possible", "solutions",
+        "local", "evidence", "concrete", "patch", "result",
     }
 )
 _GENERIC_COURTESY_STOPWORDS = frozenset(

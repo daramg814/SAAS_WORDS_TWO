@@ -49,6 +49,41 @@ def test_cluster_candidates_does_not_merge_on_shared_trigger_phrase_alone():
     assert len(clusters) == 2
 
 
+def test_cluster_candidates_does_not_merge_ask_hn_prefixed_unrelated_topics():
+    """Regression (DEMAND-001, 2026-08-11): a real cluster (independent_
+    user_count=12) merged "Ask HN: How do you manage your prompts in
+    ChatGPT?" with "...your dotfiles?", "...your paper receipts?", etc. -
+    the shared "Ask HN:" prefix/"?" suffix boilerplate inflated character-
+    level sequence similarity, and the bare pronoun "your" (missing from
+    STOPWORDS at the time) counted as shared content. Fixed by expanding
+    STOPWORDS to a standard-sized English function-word list."""
+    candidates = [
+        Candidate(1, 101, "Ask HN: How do you manage your prompts in ChatGPT?", author="alice"),
+        Candidate(2, 102, "Ask HN: How do you manage your dotfiles?", author="bob"),
+        Candidate(3, 103, "Ask HN: How do you manage your paper receipts?", author="carl"),
+        Candidate(4, 104, "Ask HN: How do you manage your health data?", author="dave"),
+    ]
+    clusters = cluster_candidates(candidates)
+    assert len(clusters) == 4  # four unrelated topics, all singletons
+
+
+def test_cluster_candidates_does_not_merge_isolated_intensifier_complaints():
+    """Regression (DEMAND-001, 2026-08-11): a real cluster (independent_
+    user_count=22) merged unrelated "way too complicated"/"way too
+    expensive" complaints (about Discord, WASM, hospital bills, Twitter's
+    API...) because "too complicated"/"too expensive" (PAIN_PATTERNS) get
+    stripped as the trigger phrase, leaving only the intensifier "way" as
+    a shared token - "way" is now a stopword."""
+    candidates = [
+        Candidate(1, 101, "This is way too complicated.", author="alice"),
+        Candidate(2, 102, "Discord seems way too complicated to me.", author="bob"),
+        Candidate(3, 103, "$36/user/month is way too expensive.", author="carl"),
+        Candidate(4, 104, "Hospital visits are just way too expensive.", author="dave"),
+    ]
+    clusters = cluster_candidates(candidates)
+    assert len(clusters) == 4
+
+
 def test_strip_trigger_phrases_removes_matched_pattern():
     from saas_words_two.clustering import strip_trigger_phrases
 
