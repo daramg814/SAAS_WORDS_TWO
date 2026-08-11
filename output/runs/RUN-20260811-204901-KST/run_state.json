@@ -5275,8 +5275,8 @@
   "created_at": "2026-08-11T20:49:01.749123+09:00",
   "mode": "production",
   "run_id": "RUN-20260811-204901-KST",
-  "stage": "publish_mode_outputs",
-  "status": "RUNNING",
+  "stage": "update_memory_and_git_checkpoint",
+  "status": "DONE",
   "target_title_count": 500,
-  "updated_at": "2026-08-11T20:50:19.481626+09:00"
+  "updated_at": "2026-08-11T20:50:20.763251+09:00"
 }
