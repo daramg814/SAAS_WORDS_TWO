@@ -1,0 +1,5750 @@
+{
+  "awaiting_judgment": null,
+  "context": {
+    "approved": [
+      {
+        "industry": "events",
+        "title": "Ticketing Center"
+      },
+      {
+        "industry": "automotive",
+        "title": "Recall Zone"
+      },
+      {
+        "industry": "food_service",
+        "title": "Waste Portal"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Insurance Console"
+      },
+      {
+        "industry": "finance",
+        "title": "Audit Panel"
+      },
+      {
+        "industry": "legal",
+        "title": "Deposition Dial"
+      },
+      {
+        "industry": "logistics",
+        "title": "Route Meter"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Deposit Scale"
+      },
+      {
+        "industry": "insurance",
+        "title": "Subrogation Route"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Payroll Dock"
+      },
+      {
+        "industry": "construction",
+        "title": "Material Rail"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Storefront Trail"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Booking Chain"
+      },
+      {
+        "industry": "education",
+        "title": "Syllabus Ring"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Batch Node"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Grazing Gate"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Demand Nexus"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Impact Atlas"
+      },
+      {
+        "industry": "government",
+        "title": "Licensing Sentry"
+      },
+      {
+        "industry": "marketing",
+        "title": "Referral Keeper"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Licensing Manager"
+      },
+      {
+        "industry": "telecom",
+        "title": "Coverage Tracker"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Endpoint Sync"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Monitoring Flow"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Feedback Hub"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Requisition Pilot"
+      },
+      {
+        "industry": "events",
+        "title": "Exhibitor Desk"
+      },
+      {
+        "industry": "automotive",
+        "title": "Maintenance Radar"
+      },
+      {
+        "industry": "food_service",
+        "title": "Menu Relay"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Diagnosis Vault"
+      },
+      {
+        "industry": "finance",
+        "title": "Accrual Compass"
+      },
+      {
+        "industry": "legal",
+        "title": "Waiver Beacon"
+      },
+      {
+        "industry": "logistics",
+        "title": "Fleet Forge"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Rent Cascade"
+      },
+      {
+        "industry": "insurance",
+        "title": "Renewal Bridge"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Offboarding Anchor"
+      },
+      {
+        "industry": "construction",
+        "title": "Crew Signal"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Loyalty Watch"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Banquet Scope"
+      },
+      {
+        "industry": "education",
+        "title": "Advisor Loop"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Yield Grid"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Greenhouse Pulse"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Efficiency Wave"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Membership Path"
+      },
+      {
+        "industry": "government",
+        "title": "Compliance Point"
+      },
+      {
+        "industry": "marketing",
+        "title": "Conversion Lock"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Distribution Map"
+      },
+      {
+        "industry": "transportation",
+        "title": "Terminal Lens"
+      },
+      {
+        "industry": "telecom",
+        "title": "Latency Frame"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Breach Base"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Capacity Core"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Resolution Ledger"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Onboarding Board"
+      },
+      {
+        "industry": "events",
+        "title": "Session Deck"
+      },
+      {
+        "industry": "automotive",
+        "title": "Dealer Studio"
+      },
+      {
+        "industry": "food_service",
+        "title": "Catering Lab"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Discharge Station"
+      },
+      {
+        "industry": "legal",
+        "title": "Retainer Center"
+      },
+      {
+        "industry": "logistics",
+        "title": "Dispatch Zone"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Title Portal"
+      },
+      {
+        "industry": "insurance",
+        "title": "Actuary Console"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Compliance Panel"
+      },
+      {
+        "industry": "construction",
+        "title": "Jobsite Dial"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Markdown Meter"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Itinerary Scale"
+      },
+      {
+        "industry": "education",
+        "title": "Scholarship Route"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Supplier Dock"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Fertilizer Rail"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Compliance Trail"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Outreach Chain"
+      },
+      {
+        "industry": "marketing",
+        "title": "Segment Node"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Rights Gate"
+      },
+      {
+        "industry": "transportation",
+        "title": "Cargo Nexus"
+      },
+      {
+        "industry": "telecom",
+        "title": "Churn Atlas"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Firewall Sentry"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Migration Keeper"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Knowledge Manager"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Assessment Guard"
+      },
+      {
+        "industry": "events",
+        "title": "Catering Tracker"
+      },
+      {
+        "industry": "automotive",
+        "title": "Fleet Sync"
+      },
+      {
+        "industry": "food_service",
+        "title": "Staffing Flow"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Intake Hub"
+      },
+      {
+        "industry": "finance",
+        "title": "Chargeback Pilot"
+      },
+      {
+        "industry": "legal",
+        "title": "Discovery Desk"
+      },
+      {
+        "industry": "logistics",
+        "title": "Inventory Radar"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Zoning Relay"
+      },
+      {
+        "industry": "insurance",
+        "title": "Rider Vault"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Candidate Compass"
+      },
+      {
+        "industry": "construction",
+        "title": "Warranty Beacon"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Restock Forge"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Shuttle Cascade"
+      },
+      {
+        "industry": "education",
+        "title": "Classroom Bridge"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Calibration Anchor"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Rotation Signal"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Inspection Watch"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Stewardship Scope"
+      },
+      {
+        "industry": "government",
+        "title": "Franchise Loop"
+      },
+      {
+        "industry": "marketing",
+        "title": "Content Grid"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Circulation Pulse"
+      },
+      {
+        "industry": "transportation",
+        "title": "Schedule Wave"
+      },
+      {
+        "industry": "telecom",
+        "title": "Activation Path"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Patch Point"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Configuration Lock"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Chat Map"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Placement Lens"
+      },
+      {
+        "industry": "events",
+        "title": "Logistics Frame"
+      },
+      {
+        "industry": "automotive",
+        "title": "Mileage Base"
+      },
+      {
+        "industry": "food_service",
+        "title": "Allergen Core"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Consent Ledger"
+      },
+      {
+        "industry": "finance",
+        "title": "Escrow Board"
+      },
+      {
+        "industry": "legal",
+        "title": "Statute Deck"
+      },
+      {
+        "industry": "logistics",
+        "title": "Backorder Studio"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Appraisal Lab"
+      },
+      {
+        "industry": "insurance",
+        "title": "Binder Station"
+      },
+      {
+        "industry": "construction",
+        "title": "Lien Center"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Bundle Zone"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Feedback Portal"
+      },
+      {
+        "industry": "education",
+        "title": "Alumni Console"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Throughput Panel"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Silo Dial"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Ledger Scale"
+      },
+      {
+        "industry": "government",
+        "title": "Ballot Route"
+      },
+      {
+        "industry": "marketing",
+        "title": "Placement Dock"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Feed Rail"
+      },
+      {
+        "industry": "transportation",
+        "title": "Permit Trail"
+      },
+      {
+        "industry": "telecom",
+        "title": "Network Chain"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Perimeter Ring"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Runbook Node"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Callback Gate"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Referral Nexus"
+      },
+      {
+        "industry": "events",
+        "title": "Feedback Atlas"
+      },
+      {
+        "industry": "automotive",
+        "title": "Appraisal Sentry"
+      },
+      {
+        "industry": "food_service",
+        "title": "Franchise Keeper"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Patient Manager"
+      },
+      {
+        "industry": "finance",
+        "title": "Ledger Guard"
+      },
+      {
+        "industry": "legal",
+        "title": "Contract Tracker"
+      },
+      {
+        "industry": "logistics",
+        "title": "Freight Sync"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Lease Flow"
+      },
+      {
+        "industry": "insurance",
+        "title": "Policy Hub"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Onboarding Pilot"
+      },
+      {
+        "industry": "construction",
+        "title": "Permit Desk"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Reservation Relay"
+      },
+      {
+        "industry": "education",
+        "title": "Enrollment Vault"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Production Compass"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Harvest Beacon"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Meter Forge"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Donor Cascade"
+      },
+      {
+        "industry": "government",
+        "title": "Permit Bridge"
+      },
+      {
+        "industry": "marketing",
+        "title": "Campaign Anchor"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Editorial Signal"
+      },
+      {
+        "industry": "transportation",
+        "title": "Route Watch"
+      },
+      {
+        "industry": "telecom",
+        "title": "Subscriber Scope"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Incident Loop"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Deployment Grid"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Ticket Pulse"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Candidate Wave"
+      },
+      {
+        "industry": "events",
+        "title": "Registration Path"
+      },
+      {
+        "industry": "automotive",
+        "title": "Warranty Point"
+      },
+      {
+        "industry": "food_service",
+        "title": "Inventory Lock"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Referral Map"
+      },
+      {
+        "industry": "finance",
+        "title": "Invoice Lens"
+      },
+      {
+        "industry": "legal",
+        "title": "Docket Frame"
+      },
+      {
+        "industry": "logistics",
+        "title": "Shipment Base"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Tenant Core"
+      },
+      {
+        "industry": "insurance",
+        "title": "Premium Ledger"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Timesheet Board"
+      },
+      {
+        "industry": "construction",
+        "title": "Blueprint Deck"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Variant Studio"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Guest Lab"
+      },
+      {
+        "industry": "education",
+        "title": "Curriculum Station"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Livestock Center"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Outage Zone"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Grant Portal"
+      },
+      {
+        "industry": "government",
+        "title": "Citation Console"
+      },
+      {
+        "industry": "marketing",
+        "title": "Audience Panel"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Subscriber Dial"
+      },
+      {
+        "industry": "transportation",
+        "title": "Fleet Meter"
+      },
+      {
+        "industry": "telecom",
+        "title": "Provisioning Scale"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Vulnerability Route"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Incident Dock"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Escalation Rail"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Pipeline Trail"
+      },
+      {
+        "industry": "events",
+        "title": "Attendee Chain"
+      },
+      {
+        "industry": "automotive",
+        "title": "Service Ring"
+      },
+      {
+        "industry": "food_service",
+        "title": "Recipe Node"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Prior Gate"
+      },
+      {
+        "industry": "finance",
+        "title": "Payroll Nexus"
+      },
+      {
+        "industry": "legal",
+        "title": "Filing Atlas"
+      },
+      {
+        "industry": "logistics",
+        "title": "Manifest Sentry"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Property Keeper"
+      },
+      {
+        "industry": "insurance",
+        "title": "Underwriting Manager"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Benefits Guard"
+      },
+      {
+        "industry": "construction",
+        "title": "Punchlist Tracker"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Checkout Sync"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Housekeeping Flow"
+      },
+      {
+        "industry": "education",
+        "title": "Attendance Hub"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Quality Pilot"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Irrigation Desk"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Grid Radar"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Volunteer Relay"
+      },
+      {
+        "industry": "government",
+        "title": "Ordinance Vault"
+      },
+      {
+        "industry": "marketing",
+        "title": "Funnel Compass"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Royalty Beacon"
+      },
+      {
+        "industry": "transportation",
+        "title": "Fuel Forge"
+      },
+      {
+        "industry": "telecom",
+        "title": "Outage Cascade"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Access Bridge"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Uptime Anchor"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Response Signal"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Interview Watch"
+      },
+      {
+        "industry": "events",
+        "title": "Venue Scope"
+      },
+      {
+        "industry": "automotive",
+        "title": "Inspection Loop"
+      },
+      {
+        "industry": "food_service",
+        "title": "Supplier Grid"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Claim Pulse"
+      },
+      {
+        "industry": "finance",
+        "title": "Expense Wave"
+      },
+      {
+        "industry": "legal",
+        "title": "Clause Path"
+      },
+      {
+        "industry": "logistics",
+        "title": "Customs Point"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Listing Lock"
+      },
+      {
+        "industry": "insurance",
+        "title": "Claim Map"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Roster Lens"
+      },
+      {
+        "industry": "construction",
+        "title": "Subcontractor Frame"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Return Base"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Checkin Core"
+      },
+      {
+        "industry": "education",
+        "title": "Transcript Ledger"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Defect Board"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Yield Deck"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Consumption Studio"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Campaign Lab"
+      },
+      {
+        "industry": "government",
+        "title": "Zoning Station"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Syndication Center"
+      },
+      {
+        "industry": "transportation",
+        "title": "Maintenance Zone"
+      },
+      {
+        "industry": "telecom",
+        "title": "Bandwidth Portal"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Credential Console"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Backup Panel"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Satisfaction Dial"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Offer Meter"
+      },
+      {
+        "industry": "events",
+        "title": "Sponsor Scale"
+      },
+      {
+        "industry": "automotive",
+        "title": "Inventory Route"
+      },
+      {
+        "industry": "food_service",
+        "title": "Reservation Dock"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Provider Rail"
+      },
+      {
+        "industry": "finance",
+        "title": "Budget Trail"
+      },
+      {
+        "industry": "legal",
+        "title": "Compliance Chain"
+      },
+      {
+        "industry": "logistics",
+        "title": "Warehouse Ring"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Escrow Node"
+      },
+      {
+        "industry": "insurance",
+        "title": "Adjuster Gate"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Shift Nexus"
+      },
+      {
+        "industry": "construction",
+        "title": "Bid Atlas"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Fulfillment Sentry"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Amenity Keeper"
+      },
+      {
+        "industry": "education",
+        "title": "Tuition Manager"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Downtime Guard"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Crop Tracker"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Billing Sync"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Fundraising Flow"
+      },
+      {
+        "industry": "government",
+        "title": "Constituent Hub"
+      },
+      {
+        "industry": "marketing",
+        "title": "Brand Pilot"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Manuscript Desk"
+      },
+      {
+        "industry": "transportation",
+        "title": "Dispatch Radar"
+      },
+      {
+        "industry": "telecom",
+        "title": "Billing Relay"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Threat Vault"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Provisioning Compass"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Queue Beacon"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Sourcing Forge"
+      },
+      {
+        "industry": "events",
+        "title": "Badge Cascade"
+      },
+      {
+        "industry": "automotive",
+        "title": "Trade Bridge"
+      },
+      {
+        "industry": "food_service",
+        "title": "Delivery Anchor"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Appointment Signal"
+      },
+      {
+        "industry": "finance",
+        "title": "Payment Watch"
+      },
+      {
+        "industry": "legal",
+        "title": "Redline Scope"
+      },
+      {
+        "industry": "logistics",
+        "title": "Pallet Loop"
+      },
+      {
+        "industry": "insurance",
+        "title": "Coverage Pulse"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Leave Wave"
+      },
+      {
+        "industry": "construction",
+        "title": "Change Path"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Vendor Point"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Concierge Lock"
+      },
+      {
+        "industry": "education",
+        "title": "Grading Map"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Maintenance Lens"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Soil Frame"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Maintenance Base"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Pledge Core"
+      },
+      {
+        "industry": "government",
+        "title": "Hearing Ledger"
+      },
+      {
+        "industry": "marketing",
+        "title": "Creative Board"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Archive Deck"
+      },
+      {
+        "industry": "transportation",
+        "title": "Driver Studio"
+      },
+      {
+        "industry": "telecom",
+        "title": "Roaming Lab"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Audit Station"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Refund Center"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Reference Zone"
+      },
+      {
+        "industry": "events",
+        "title": "Agenda Portal"
+      },
+      {
+        "industry": "automotive",
+        "title": "Financing Console"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Prescription Dial"
+      },
+      {
+        "industry": "finance",
+        "title": "Reconciliation Meter"
+      },
+      {
+        "industry": "legal",
+        "title": "Matter Scale"
+      },
+      {
+        "industry": "logistics",
+        "title": "Container Route"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Maintenance Dock"
+      },
+      {
+        "industry": "insurance",
+        "title": "Deductible Rail"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Recruiting Trail"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Catalog Ring"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Occupancy Node"
+      },
+      {
+        "industry": "education",
+        "title": "Cohort Gate"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Scheduling Nexus"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Pesticide Atlas"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Substation Sentry"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Beneficiary Keeper"
+      },
+      {
+        "industry": "government",
+        "title": "Records Manager"
+      },
+      {
+        "industry": "marketing",
+        "title": "Engagement Guard"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Broadcast Tracker"
+      },
+      {
+        "industry": "transportation",
+        "title": "Compliance Sync"
+      },
+      {
+        "industry": "telecom",
+        "title": "Ticket Flow"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Compliance Hub"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Rollback Pilot"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Warranty Desk"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Screening Radar"
+      },
+      {
+        "industry": "events",
+        "title": "Ticketing Relay"
+      },
+      {
+        "industry": "automotive",
+        "title": "Recall Vault"
+      },
+      {
+        "industry": "food_service",
+        "title": "Waste Compass"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Insurance Beacon"
+      },
+      {
+        "industry": "finance",
+        "title": "Audit Forge"
+      },
+      {
+        "industry": "legal",
+        "title": "Deposition Cascade"
+      },
+      {
+        "industry": "logistics",
+        "title": "Route Bridge"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Deposit Anchor"
+      },
+      {
+        "industry": "insurance",
+        "title": "Subrogation Signal"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Payroll Watch"
+      },
+      {
+        "industry": "construction",
+        "title": "Material Scope"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Storefront Loop"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Booking Grid"
+      },
+      {
+        "industry": "education",
+        "title": "Syllabus Pulse"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Batch Wave"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Grazing Path"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Demand Point"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Impact Lock"
+      },
+      {
+        "industry": "government",
+        "title": "Licensing Map"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Licensing Frame"
+      },
+      {
+        "industry": "telecom",
+        "title": "Coverage Core"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Endpoint Ledger"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Monitoring Board"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Feedback Deck"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Requisition Studio"
+      },
+      {
+        "industry": "events",
+        "title": "Exhibitor Lab"
+      },
+      {
+        "industry": "automotive",
+        "title": "Maintenance Station"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Diagnosis Center"
+      },
+      {
+        "industry": "finance",
+        "title": "Accrual Zone"
+      },
+      {
+        "industry": "legal",
+        "title": "Waiver Portal"
+      },
+      {
+        "industry": "logistics",
+        "title": "Fleet Console"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Rent Panel"
+      },
+      {
+        "industry": "insurance",
+        "title": "Renewal Dial"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Offboarding Meter"
+      },
+      {
+        "industry": "construction",
+        "title": "Crew Scale"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Loyalty Route"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Banquet Dock"
+      },
+      {
+        "industry": "education",
+        "title": "Advisor Rail"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Yield Trail"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Greenhouse Chain"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Efficiency Ring"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Membership Node"
+      },
+      {
+        "industry": "government",
+        "title": "Compliance Gate"
+      },
+      {
+        "industry": "marketing",
+        "title": "Conversion Nexus"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Distribution Atlas"
+      },
+      {
+        "industry": "transportation",
+        "title": "Terminal Sentry"
+      },
+      {
+        "industry": "telecom",
+        "title": "Latency Keeper"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Breach Manager"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Capacity Guard"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Resolution Tracker"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Onboarding Sync"
+      },
+      {
+        "industry": "events",
+        "title": "Session Flow"
+      },
+      {
+        "industry": "automotive",
+        "title": "Dealer Hub"
+      },
+      {
+        "industry": "food_service",
+        "title": "Catering Pilot"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Discharge Desk"
+      },
+      {
+        "industry": "finance",
+        "title": "Refund Radar"
+      },
+      {
+        "industry": "legal",
+        "title": "Retainer Relay"
+      },
+      {
+        "industry": "logistics",
+        "title": "Dispatch Vault"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Title Compass"
+      },
+      {
+        "industry": "insurance",
+        "title": "Actuary Beacon"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Compliance Forge"
+      },
+      {
+        "industry": "construction",
+        "title": "Jobsite Cascade"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Markdown Bridge"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Itinerary Anchor"
+      },
+      {
+        "industry": "education",
+        "title": "Scholarship Signal"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Supplier Watch"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Fertilizer Scope"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Compliance Loop"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Outreach Grid"
+      },
+      {
+        "industry": "marketing",
+        "title": "Segment Wave"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Rights Path"
+      },
+      {
+        "industry": "transportation",
+        "title": "Cargo Point"
+      },
+      {
+        "industry": "telecom",
+        "title": "Churn Lock"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Firewall Map"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Migration Lens"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Knowledge Frame"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Assessment Base"
+      },
+      {
+        "industry": "events",
+        "title": "Catering Core"
+      },
+      {
+        "industry": "automotive",
+        "title": "Fleet Ledger"
+      },
+      {
+        "industry": "food_service",
+        "title": "Staffing Board"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Intake Deck"
+      },
+      {
+        "industry": "finance",
+        "title": "Chargeback Studio"
+      },
+      {
+        "industry": "legal",
+        "title": "Discovery Lab"
+      },
+      {
+        "industry": "logistics",
+        "title": "Inventory Station"
+      },
+      {
+        "industry": "insurance",
+        "title": "Rider Center"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Candidate Zone"
+      },
+      {
+        "industry": "construction",
+        "title": "Warranty Portal"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Restock Console"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Shuttle Panel"
+      },
+      {
+        "industry": "education",
+        "title": "Classroom Dial"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Calibration Meter"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Rotation Scale"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Inspection Route"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Stewardship Dock"
+      },
+      {
+        "industry": "government",
+        "title": "Franchise Rail"
+      },
+      {
+        "industry": "marketing",
+        "title": "Content Trail"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Circulation Chain"
+      },
+      {
+        "industry": "transportation",
+        "title": "Schedule Ring"
+      },
+      {
+        "industry": "telecom",
+        "title": "Activation Node"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Patch Gate"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Configuration Nexus"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Chat Atlas"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Placement Sentry"
+      },
+      {
+        "industry": "events",
+        "title": "Logistics Keeper"
+      },
+      {
+        "industry": "automotive",
+        "title": "Mileage Manager"
+      },
+      {
+        "industry": "food_service",
+        "title": "Allergen Guard"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Consent Tracker"
+      },
+      {
+        "industry": "finance",
+        "title": "Escrow Sync"
+      },
+      {
+        "industry": "legal",
+        "title": "Statute Flow"
+      },
+      {
+        "industry": "logistics",
+        "title": "Backorder Hub"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Appraisal Pilot"
+      },
+      {
+        "industry": "insurance",
+        "title": "Binder Desk"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Review Radar"
+      },
+      {
+        "industry": "construction",
+        "title": "Lien Relay"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Bundle Vault"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Feedback Compass"
+      },
+      {
+        "industry": "education",
+        "title": "Alumni Beacon"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Throughput Forge"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Silo Cascade"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Ledger Anchor"
+      },
+      {
+        "industry": "government",
+        "title": "Ballot Signal"
+      },
+      {
+        "industry": "marketing",
+        "title": "Placement Watch"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Feed Scope"
+      },
+      {
+        "industry": "transportation",
+        "title": "Permit Loop"
+      },
+      {
+        "industry": "telecom",
+        "title": "Network Grid"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Perimeter Pulse"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Runbook Wave"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Callback Path"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Referral Point"
+      },
+      {
+        "industry": "events",
+        "title": "Feedback Lock"
+      },
+      {
+        "industry": "automotive",
+        "title": "Appraisal Map"
+      },
+      {
+        "industry": "food_service",
+        "title": "Franchise Lens"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Patient Frame"
+      },
+      {
+        "industry": "finance",
+        "title": "Ledger Base"
+      },
+      {
+        "industry": "legal",
+        "title": "Contract Core"
+      },
+      {
+        "industry": "logistics",
+        "title": "Freight Ledger"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Lease Board"
+      },
+      {
+        "industry": "insurance",
+        "title": "Policy Deck"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Onboarding Studio"
+      },
+      {
+        "industry": "construction",
+        "title": "Permit Lab"
+      },
+      {
+        "industry": "education",
+        "title": "Enrollment Center"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Production Zone"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Harvest Portal"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Meter Console"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Donor Panel"
+      },
+      {
+        "industry": "government",
+        "title": "Permit Dial"
+      },
+      {
+        "industry": "marketing",
+        "title": "Campaign Meter"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Editorial Scale"
+      },
+      {
+        "industry": "telecom",
+        "title": "Subscriber Dock"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Deployment Trail"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Ticket Chain"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Candidate Ring"
+      },
+      {
+        "industry": "events",
+        "title": "Registration Node"
+      },
+      {
+        "industry": "automotive",
+        "title": "Warranty Gate"
+      },
+      {
+        "industry": "food_service",
+        "title": "Inventory Nexus"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Referral Atlas"
+      },
+      {
+        "industry": "finance",
+        "title": "Invoice Sentry"
+      },
+      {
+        "industry": "legal",
+        "title": "Docket Keeper"
+      },
+      {
+        "industry": "logistics",
+        "title": "Shipment Manager"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Tenant Guard"
+      },
+      {
+        "industry": "insurance",
+        "title": "Premium Tracker"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Timesheet Sync"
+      },
+      {
+        "industry": "construction",
+        "title": "Blueprint Flow"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Variant Hub"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Guest Pilot"
+      },
+      {
+        "industry": "education",
+        "title": "Curriculum Desk"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Assembly Radar"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Livestock Relay"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Outage Vault"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Grant Compass"
+      },
+      {
+        "industry": "government",
+        "title": "Citation Beacon"
+      },
+      {
+        "industry": "marketing",
+        "title": "Audience Forge"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Subscriber Cascade"
+      },
+      {
+        "industry": "transportation",
+        "title": "Fleet Bridge"
+      },
+      {
+        "industry": "telecom",
+        "title": "Provisioning Anchor"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Vulnerability Signal"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Incident Watch"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Escalation Scope"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Pipeline Loop"
+      },
+      {
+        "industry": "events",
+        "title": "Attendee Grid"
+      },
+      {
+        "industry": "automotive",
+        "title": "Service Pulse"
+      },
+      {
+        "industry": "food_service",
+        "title": "Recipe Wave"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Prior Path"
+      },
+      {
+        "industry": "finance",
+        "title": "Payroll Point"
+      },
+      {
+        "industry": "legal",
+        "title": "Filing Lock"
+      },
+      {
+        "industry": "logistics",
+        "title": "Manifest Map"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Property Lens"
+      },
+      {
+        "industry": "insurance",
+        "title": "Underwriting Frame"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Benefits Base"
+      },
+      {
+        "industry": "construction",
+        "title": "Punchlist Core"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Checkout Ledger"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Housekeeping Board"
+      },
+      {
+        "industry": "education",
+        "title": "Attendance Deck"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Quality Studio"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Irrigation Lab"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Grid Station"
+      },
+      {
+        "industry": "government",
+        "title": "Ordinance Center"
+      },
+      {
+        "industry": "marketing",
+        "title": "Funnel Zone"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Royalty Portal"
+      },
+      {
+        "industry": "transportation",
+        "title": "Fuel Console"
+      },
+      {
+        "industry": "telecom",
+        "title": "Outage Panel"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Access Dial"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Uptime Meter"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Response Scale"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Interview Route"
+      },
+      {
+        "industry": "events",
+        "title": "Venue Dock"
+      },
+      {
+        "industry": "automotive",
+        "title": "Inspection Rail"
+      },
+      {
+        "industry": "food_service",
+        "title": "Supplier Trail"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Claim Chain"
+      },
+      {
+        "industry": "finance",
+        "title": "Expense Ring"
+      },
+      {
+        "industry": "legal",
+        "title": "Clause Node"
+      },
+      {
+        "industry": "logistics",
+        "title": "Customs Gate"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Listing Nexus"
+      },
+      {
+        "industry": "insurance",
+        "title": "Claim Atlas"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Roster Sentry"
+      },
+      {
+        "industry": "construction",
+        "title": "Subcontractor Keeper"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Return Manager"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Checkin Guard"
+      },
+      {
+        "industry": "education",
+        "title": "Transcript Tracker"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Defect Sync"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Yield Flow"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Consumption Hub"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Campaign Pilot"
+      },
+      {
+        "industry": "government",
+        "title": "Zoning Desk"
+      },
+      {
+        "industry": "marketing",
+        "title": "Attribution Radar"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Syndication Relay"
+      },
+      {
+        "industry": "transportation",
+        "title": "Maintenance Vault"
+      },
+      {
+        "industry": "telecom",
+        "title": "Bandwidth Compass"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Credential Beacon"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Backup Forge"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Satisfaction Cascade"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Offer Bridge"
+      },
+      {
+        "industry": "events",
+        "title": "Sponsor Anchor"
+      },
+      {
+        "industry": "automotive",
+        "title": "Inventory Signal"
+      },
+      {
+        "industry": "food_service",
+        "title": "Reservation Watch"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Provider Scope"
+      },
+      {
+        "industry": "finance",
+        "title": "Budget Loop"
+      },
+      {
+        "industry": "logistics",
+        "title": "Warehouse Pulse"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Escrow Wave"
+      },
+      {
+        "industry": "insurance",
+        "title": "Adjuster Path"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Shift Point"
+      },
+      {
+        "industry": "construction",
+        "title": "Bid Lock"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Fulfillment Map"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Amenity Lens"
+      },
+      {
+        "industry": "education",
+        "title": "Tuition Frame"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Downtime Base"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Crop Core"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Billing Ledger"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Fundraising Board"
+      },
+      {
+        "industry": "government",
+        "title": "Constituent Deck"
+      },
+      {
+        "industry": "marketing",
+        "title": "Brand Studio"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Manuscript Lab"
+      },
+      {
+        "industry": "transportation",
+        "title": "Dispatch Station"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Threat Center"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Provisioning Zone"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Queue Portal"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Sourcing Console"
+      },
+      {
+        "industry": "events",
+        "title": "Badge Panel"
+      },
+      {
+        "industry": "automotive",
+        "title": "Trade Dial"
+      },
+      {
+        "industry": "food_service",
+        "title": "Delivery Meter"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Appointment Scale"
+      },
+      {
+        "industry": "finance",
+        "title": "Payment Route"
+      },
+      {
+        "industry": "legal",
+        "title": "Redline Dock"
+      },
+      {
+        "industry": "logistics",
+        "title": "Pallet Rail"
+      },
+      {
+        "industry": "insurance",
+        "title": "Coverage Chain"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Leave Ring"
+      },
+      {
+        "industry": "construction",
+        "title": "Change Node"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Vendor Gate"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Concierge Nexus"
+      },
+      {
+        "industry": "education",
+        "title": "Grading Atlas"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Maintenance Sentry"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Soil Keeper"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Maintenance Manager"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Pledge Guard"
+      },
+      {
+        "industry": "government",
+        "title": "Hearing Tracker"
+      },
+      {
+        "industry": "marketing",
+        "title": "Creative Sync"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Archive Flow"
+      },
+      {
+        "industry": "transportation",
+        "title": "Driver Hub"
+      },
+      {
+        "industry": "telecom",
+        "title": "Roaming Pilot"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Audit Desk"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Pipeline Radar"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Reference Vault"
+      },
+      {
+        "industry": "events",
+        "title": "Agenda Compass"
+      },
+      {
+        "industry": "automotive",
+        "title": "Financing Beacon"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Prescription Cascade"
+      },
+      {
+        "industry": "finance",
+        "title": "Reconciliation Bridge"
+      },
+      {
+        "industry": "legal",
+        "title": "Matter Anchor"
+      },
+      {
+        "industry": "logistics",
+        "title": "Container Signal"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Maintenance Watch"
+      },
+      {
+        "industry": "insurance",
+        "title": "Deductible Scope"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Recruiting Loop"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Catalog Pulse"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Occupancy Wave"
+      },
+      {
+        "industry": "education",
+        "title": "Cohort Path"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Scheduling Point"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Pesticide Lock"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Substation Map"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Beneficiary Lens"
+      },
+      {
+        "industry": "government",
+        "title": "Records Frame"
+      },
+      {
+        "industry": "marketing",
+        "title": "Engagement Base"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Broadcast Core"
+      },
+      {
+        "industry": "transportation",
+        "title": "Compliance Ledger"
+      },
+      {
+        "industry": "telecom",
+        "title": "Ticket Board"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Compliance Deck"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Rollback Studio"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Warranty Lab"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Screening Station"
+      },
+      {
+        "industry": "automotive",
+        "title": "Recall Center"
+      },
+      {
+        "industry": "food_service",
+        "title": "Waste Zone"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Insurance Portal"
+      },
+      {
+        "industry": "finance",
+        "title": "Audit Console"
+      },
+      {
+        "industry": "legal",
+        "title": "Deposition Panel"
+      },
+      {
+        "industry": "logistics",
+        "title": "Route Dial"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Deposit Meter"
+      },
+      {
+        "industry": "insurance",
+        "title": "Subrogation Scale"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Payroll Route"
+      },
+      {
+        "industry": "construction",
+        "title": "Material Dock"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Storefront Rail"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Booking Trail"
+      },
+      {
+        "industry": "education",
+        "title": "Syllabus Chain"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Batch Ring"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Grazing Node"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Demand Gate"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Impact Nexus"
+      },
+      {
+        "industry": "government",
+        "title": "Licensing Atlas"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Licensing Keeper"
+      },
+      {
+        "industry": "telecom",
+        "title": "Coverage Guard"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Endpoint Tracker"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Monitoring Sync"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Feedback Flow"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Requisition Hub"
+      },
+      {
+        "industry": "events",
+        "title": "Exhibitor Pilot"
+      },
+      {
+        "industry": "automotive",
+        "title": "Maintenance Desk"
+      },
+      {
+        "industry": "food_service",
+        "title": "Menu Radar"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Diagnosis Relay"
+      },
+      {
+        "industry": "finance",
+        "title": "Accrual Vault"
+      },
+      {
+        "industry": "legal",
+        "title": "Waiver Compass"
+      },
+      {
+        "industry": "logistics",
+        "title": "Fleet Beacon"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Rent Forge"
+      },
+      {
+        "industry": "insurance",
+        "title": "Renewal Cascade"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Offboarding Bridge"
+      },
+      {
+        "industry": "construction",
+        "title": "Crew Anchor"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Loyalty Signal"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Banquet Watch"
+      },
+      {
+        "industry": "education",
+        "title": "Advisor Scope"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Yield Loop"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Greenhouse Grid"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Efficiency Pulse"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Membership Wave"
+      },
+      {
+        "industry": "government",
+        "title": "Compliance Path"
+      },
+      {
+        "industry": "marketing",
+        "title": "Conversion Point"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Distribution Lock"
+      },
+      {
+        "industry": "transportation",
+        "title": "Terminal Map"
+      },
+      {
+        "industry": "telecom",
+        "title": "Latency Lens"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Breach Frame"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Capacity Base"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Resolution Core"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Onboarding Ledger"
+      },
+      {
+        "industry": "events",
+        "title": "Session Board"
+      },
+      {
+        "industry": "automotive",
+        "title": "Dealer Deck"
+      },
+      {
+        "industry": "food_service",
+        "title": "Catering Studio"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Discharge Lab"
+      },
+      {
+        "industry": "finance",
+        "title": "Refund Station"
+      },
+      {
+        "industry": "logistics",
+        "title": "Dispatch Center"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Title Zone"
+      },
+      {
+        "industry": "insurance",
+        "title": "Actuary Portal"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Compliance Console"
+      },
+      {
+        "industry": "construction",
+        "title": "Jobsite Panel"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Markdown Dial"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Itinerary Meter"
+      },
+      {
+        "industry": "education",
+        "title": "Scholarship Scale"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Supplier Route"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Fertilizer Dock"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Compliance Rail"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Outreach Trail"
+      },
+      {
+        "industry": "marketing",
+        "title": "Segment Ring"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Rights Node"
+      },
+      {
+        "industry": "transportation",
+        "title": "Cargo Gate"
+      },
+      {
+        "industry": "telecom",
+        "title": "Churn Nexus"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Firewall Atlas"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Migration Sentry"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Knowledge Keeper"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Assessment Manager"
+      },
+      {
+        "industry": "events",
+        "title": "Catering Guard"
+      },
+      {
+        "industry": "automotive",
+        "title": "Fleet Tracker"
+      },
+      {
+        "industry": "food_service",
+        "title": "Staffing Sync"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Intake Flow"
+      },
+      {
+        "industry": "finance",
+        "title": "Chargeback Hub"
+      },
+      {
+        "industry": "legal",
+        "title": "Discovery Pilot"
+      },
+      {
+        "industry": "logistics",
+        "title": "Inventory Desk"
+      },
+      {
+        "industry": "insurance",
+        "title": "Rider Relay"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Candidate Vault"
+      },
+      {
+        "industry": "construction",
+        "title": "Warranty Compass"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Restock Beacon"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Shuttle Forge"
+      },
+      {
+        "industry": "education",
+        "title": "Classroom Cascade"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Calibration Bridge"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Rotation Anchor"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Inspection Signal"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Stewardship Watch"
+      },
+      {
+        "industry": "government",
+        "title": "Franchise Scope"
+      },
+      {
+        "industry": "marketing",
+        "title": "Content Loop"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Circulation Grid"
+      },
+      {
+        "industry": "transportation",
+        "title": "Schedule Pulse"
+      },
+      {
+        "industry": "telecom",
+        "title": "Activation Wave"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Patch Path"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Configuration Point"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Chat Lock"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Placement Map"
+      },
+      {
+        "industry": "events",
+        "title": "Logistics Lens"
+      },
+      {
+        "industry": "automotive",
+        "title": "Mileage Frame"
+      },
+      {
+        "industry": "food_service",
+        "title": "Allergen Base"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Consent Core"
+      },
+      {
+        "industry": "finance",
+        "title": "Escrow Ledger"
+      },
+      {
+        "industry": "legal",
+        "title": "Statute Board"
+      },
+      {
+        "industry": "logistics",
+        "title": "Backorder Deck"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Appraisal Studio"
+      },
+      {
+        "industry": "insurance",
+        "title": "Binder Lab"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Review Station"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Bundle Center"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Feedback Zone"
+      },
+      {
+        "industry": "education",
+        "title": "Alumni Portal"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Throughput Console"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Silo Panel"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Ledger Meter"
+      },
+      {
+        "industry": "government",
+        "title": "Ballot Scale"
+      },
+      {
+        "industry": "marketing",
+        "title": "Placement Route"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Feed Dock"
+      },
+      {
+        "industry": "transportation",
+        "title": "Permit Rail"
+      },
+      {
+        "industry": "telecom",
+        "title": "Network Trail"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Perimeter Chain"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Runbook Ring"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Callback Node"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Referral Gate"
+      },
+      {
+        "industry": "events",
+        "title": "Feedback Nexus"
+      },
+      {
+        "industry": "automotive",
+        "title": "Appraisal Atlas"
+      },
+      {
+        "industry": "food_service",
+        "title": "Franchise Sentry"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Patient Keeper"
+      },
+      {
+        "industry": "finance",
+        "title": "Ledger Manager"
+      },
+      {
+        "industry": "legal",
+        "title": "Contract Guard"
+      },
+      {
+        "industry": "logistics",
+        "title": "Freight Tracker"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Lease Sync"
+      },
+      {
+        "industry": "insurance",
+        "title": "Policy Flow"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Onboarding Hub"
+      },
+      {
+        "industry": "construction",
+        "title": "Permit Pilot"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Reservation Radar"
+      },
+      {
+        "industry": "education",
+        "title": "Enrollment Relay"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Production Vault"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Harvest Compass"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Meter Beacon"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Donor Forge"
+      },
+      {
+        "industry": "government",
+        "title": "Permit Cascade"
+      },
+      {
+        "industry": "marketing",
+        "title": "Campaign Bridge"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Editorial Anchor"
+      },
+      {
+        "industry": "transportation",
+        "title": "Route Signal"
+      },
+      {
+        "industry": "telecom",
+        "title": "Subscriber Watch"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Deployment Loop"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Ticket Grid"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Candidate Pulse"
+      },
+      {
+        "industry": "events",
+        "title": "Registration Wave"
+      },
+      {
+        "industry": "automotive",
+        "title": "Warranty Path"
+      },
+      {
+        "industry": "food_service",
+        "title": "Inventory Point"
+      },
+      {
+        "industry": "finance",
+        "title": "Invoice Map"
+      },
+      {
+        "industry": "legal",
+        "title": "Docket Lens"
+      },
+      {
+        "industry": "logistics",
+        "title": "Shipment Frame"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Tenant Base"
+      },
+      {
+        "industry": "insurance",
+        "title": "Premium Core"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Timesheet Ledger"
+      },
+      {
+        "industry": "construction",
+        "title": "Blueprint Board"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Variant Deck"
+      }
+    ],
+    "candidate_industry": {
+      "Access Bridge": "cybersecurity",
+      "Access Dial": "cybersecurity",
+      "Accrual Compass": "finance",
+      "Accrual Vault": "finance",
+      "Accrual Zone": "finance",
+      "Activation Node": "telecom",
+      "Activation Path": "telecom",
+      "Activation Wave": "telecom",
+      "Actuary Beacon": "insurance",
+      "Actuary Console": "insurance",
+      "Actuary Portal": "insurance",
+      "Adjuster Gate": "insurance",
+      "Adjuster Path": "insurance",
+      "Advisor Loop": "education",
+      "Advisor Rail": "education",
+      "Advisor Scope": "education",
+      "Agenda Compass": "events",
+      "Agenda Portal": "events",
+      "Allergen Base": "food_service",
+      "Allergen Core": "food_service",
+      "Allergen Guard": "food_service",
+      "Alumni Beacon": "education",
+      "Alumni Console": "education",
+      "Alumni Portal": "education",
+      "Amenity Keeper": "hospitality",
+      "Amenity Lens": "hospitality",
+      "Appointment Scale": "healthcare",
+      "Appointment Signal": "healthcare",
+      "Appraisal Atlas": "automotive",
+      "Appraisal Lab": "real_estate",
+      "Appraisal Map": "automotive",
+      "Appraisal Pilot": "real_estate",
+      "Appraisal Sentry": "automotive",
+      "Appraisal Studio": "real_estate",
+      "Archive Deck": "media_publishing",
+      "Archive Flow": "media_publishing",
+      "Assembly Radar": "manufacturing",
+      "Assembly Terminal": "manufacturing",
+      "Assessment Base": "recruiting",
+      "Assessment Guard": "recruiting",
+      "Assessment Manager": "recruiting",
+      "Attendance Deck": "education",
+      "Attendance Hub": "education",
+      "Attendee Chain": "events",
+      "Attendee Grid": "events",
+      "Attribution Radar": "marketing",
+      "Attribution Terminal": "marketing",
+      "Audience Forge": "marketing",
+      "Audience Panel": "marketing",
+      "Audit Console": "finance",
+      "Audit Desk": "cybersecurity",
+      "Audit Forge": "finance",
+      "Audit Panel": "finance",
+      "Audit Station": "cybersecurity",
+      "Audit Terminal": "cybersecurity",
+      "Backorder Deck": "logistics",
+      "Backorder Hub": "logistics",
+      "Backorder Studio": "logistics",
+      "Backup Forge": "it_devops",
+      "Backup Panel": "it_devops",
+      "Badge Cascade": "events",
+      "Badge Panel": "events",
+      "Ballot Route": "government",
+      "Ballot Scale": "government",
+      "Ballot Signal": "government",
+      "Bandwidth Compass": "telecom",
+      "Bandwidth Portal": "telecom",
+      "Banquet Dock": "hospitality",
+      "Banquet Scope": "hospitality",
+      "Banquet Watch": "hospitality",
+      "Batch Node": "manufacturing",
+      "Batch Ring": "manufacturing",
+      "Batch Wave": "manufacturing",
+      "Beneficiary Keeper": "nonprofit",
+      "Beneficiary Lens": "nonprofit",
+      "Benefits Base": "hr_payroll",
+      "Benefits Guard": "hr_payroll",
+      "Bid Atlas": "construction",
+      "Bid Lock": "construction",
+      "Billing Ledger": "energy_utilities",
+      "Billing Relay": "telecom",
+      "Billing Sync": "energy_utilities",
+      "Billing Terminal": "telecom",
+      "Binder Desk": "insurance",
+      "Binder Lab": "insurance",
+      "Binder Station": "insurance",
+      "Blueprint Board": "construction",
+      "Blueprint Deck": "construction",
+      "Blueprint Flow": "construction",
+      "Booking Chain": "hospitality",
+      "Booking Grid": "hospitality",
+      "Booking Trail": "hospitality",
+      "Brand Pilot": "marketing",
+      "Brand Studio": "marketing",
+      "Breach Base": "cybersecurity",
+      "Breach Frame": "cybersecurity",
+      "Breach Manager": "cybersecurity",
+      "Broadcast Core": "media_publishing",
+      "Broadcast Tracker": "media_publishing",
+      "Budget Loop": "finance",
+      "Budget Trail": "finance",
+      "Bundle Center": "retail_ecommerce",
+      "Bundle Vault": "retail_ecommerce",
+      "Bundle Zone": "retail_ecommerce",
+      "Calibration Anchor": "manufacturing",
+      "Calibration Bridge": "manufacturing",
+      "Calibration Meter": "manufacturing",
+      "Callback Gate": "customer_support",
+      "Callback Node": "customer_support",
+      "Callback Path": "customer_support",
+      "Campaign Anchor": "marketing",
+      "Campaign Bridge": "marketing",
+      "Campaign Lab": "nonprofit",
+      "Campaign Meter": "marketing",
+      "Campaign Pilot": "nonprofit",
+      "Candidate Compass": "hr_payroll",
+      "Candidate Pulse": "recruiting",
+      "Candidate Ring": "recruiting",
+      "Candidate Vault": "hr_payroll",
+      "Candidate Wave": "recruiting",
+      "Candidate Zone": "hr_payroll",
+      "Capacity Base": "it_devops",
+      "Capacity Core": "it_devops",
+      "Capacity Guard": "it_devops",
+      "Cargo Gate": "transportation",
+      "Cargo Nexus": "transportation",
+      "Cargo Point": "transportation",
+      "Catalog Pulse": "retail_ecommerce",
+      "Catalog Ring": "retail_ecommerce",
+      "Catering Core": "events",
+      "Catering Guard": "events",
+      "Catering Lab": "food_service",
+      "Catering Pilot": "food_service",
+      "Catering Studio": "food_service",
+      "Catering Tracker": "events",
+      "Change Node": "construction",
+      "Change Path": "construction",
+      "Chargeback Hub": "finance",
+      "Chargeback Pilot": "finance",
+      "Chargeback Studio": "finance",
+      "Chat Atlas": "customer_support",
+      "Chat Lock": "customer_support",
+      "Chat Map": "customer_support",
+      "Checkin Core": "hospitality",
+      "Checkin Guard": "hospitality",
+      "Checkout Ledger": "retail_ecommerce",
+      "Checkout Sync": "retail_ecommerce",
+      "Churn Atlas": "telecom",
+      "Churn Lock": "telecom",
+      "Churn Nexus": "telecom",
+      "Circulation Chain": "media_publishing",
+      "Circulation Grid": "media_publishing",
+      "Circulation Pulse": "media_publishing",
+      "Citation Beacon": "government",
+      "Citation Console": "government",
+      "Claim Atlas": "insurance",
+      "Claim Chain": "healthcare",
+      "Claim Map": "insurance",
+      "Claim Pulse": "healthcare",
+      "Classroom Bridge": "education",
+      "Classroom Cascade": "education",
+      "Classroom Dial": "education",
+      "Clause Node": "legal",
+      "Clause Path": "legal",
+      "Cohort Gate": "education",
+      "Cohort Path": "education",
+      "Compliance Chain": "legal",
+      "Compliance Console": "hr_payroll",
+      "Compliance Deck": "cybersecurity",
+      "Compliance Forge": "hr_payroll",
+      "Compliance Gate": "government",
+      "Compliance Hub": "cybersecurity",
+      "Compliance Ledger": "transportation",
+      "Compliance Loop": "energy_utilities",
+      "Compliance Panel": "hr_payroll",
+      "Compliance Path": "government",
+      "Compliance Point": "government",
+      "Compliance Rail": "energy_utilities",
+      "Compliance Sync": "transportation",
+      "Compliance Trail": "energy_utilities",
+      "Concierge Lock": "hospitality",
+      "Concierge Nexus": "hospitality",
+      "Configuration Lock": "it_devops",
+      "Configuration Nexus": "it_devops",
+      "Configuration Point": "it_devops",
+      "Consent Core": "healthcare",
+      "Consent Ledger": "healthcare",
+      "Consent Tracker": "healthcare",
+      "Constituent Deck": "government",
+      "Constituent Hub": "government",
+      "Consumption Hub": "energy_utilities",
+      "Consumption Studio": "energy_utilities",
+      "Container Route": "logistics",
+      "Container Signal": "logistics",
+      "Content Grid": "marketing",
+      "Content Loop": "marketing",
+      "Content Trail": "marketing",
+      "Contract Core": "legal",
+      "Contract Guard": "legal",
+      "Contract Tracker": "legal",
+      "Conversion Lock": "marketing",
+      "Conversion Nexus": "marketing",
+      "Conversion Point": "marketing",
+      "Coverage Chain": "insurance",
+      "Coverage Core": "telecom",
+      "Coverage Guard": "telecom",
+      "Coverage Pulse": "insurance",
+      "Coverage Tracker": "telecom",
+      "Creative Board": "marketing",
+      "Creative Sync": "marketing",
+      "Credential Beacon": "cybersecurity",
+      "Credential Console": "cybersecurity",
+      "Crew Anchor": "construction",
+      "Crew Scale": "construction",
+      "Crew Signal": "construction",
+      "Crop Core": "agriculture",
+      "Crop Tracker": "agriculture",
+      "Curriculum Desk": "education",
+      "Curriculum Station": "education",
+      "Curriculum Terminal": "education",
+      "Customs Gate": "logistics",
+      "Customs Point": "logistics",
+      "Dealer Deck": "automotive",
+      "Dealer Hub": "automotive",
+      "Dealer Studio": "automotive",
+      "Deductible Rail": "insurance",
+      "Deductible Scope": "insurance",
+      "Defect Board": "manufacturing",
+      "Defect Sync": "manufacturing",
+      "Delivery Anchor": "food_service",
+      "Delivery Meter": "food_service",
+      "Demand Gate": "energy_utilities",
+      "Demand Nexus": "energy_utilities",
+      "Demand Point": "energy_utilities",
+      "Deployment Grid": "it_devops",
+      "Deployment Loop": "it_devops",
+      "Deployment Trail": "it_devops",
+      "Deposit Anchor": "real_estate",
+      "Deposit Meter": "real_estate",
+      "Deposit Scale": "real_estate",
+      "Deposition Cascade": "legal",
+      "Deposition Dial": "legal",
+      "Deposition Panel": "legal",
+      "Diagnosis Center": "healthcare",
+      "Diagnosis Relay": "healthcare",
+      "Diagnosis Vault": "healthcare",
+      "Discharge Desk": "healthcare",
+      "Discharge Lab": "healthcare",
+      "Discharge Station": "healthcare",
+      "Discovery Desk": "legal",
+      "Discovery Lab": "legal",
+      "Discovery Pilot": "legal",
+      "Dispatch Center": "logistics",
+      "Dispatch Radar": "transportation",
+      "Dispatch Station": "transportation",
+      "Dispatch Vault": "logistics",
+      "Dispatch Zone": "logistics",
+      "Distribution Atlas": "media_publishing",
+      "Distribution Lock": "media_publishing",
+      "Distribution Map": "media_publishing",
+      "Docket Frame": "legal",
+      "Docket Keeper": "legal",
+      "Docket Lens": "legal",
+      "Donor Cascade": "nonprofit",
+      "Donor Forge": "nonprofit",
+      "Donor Panel": "nonprofit",
+      "Downtime Base": "manufacturing",
+      "Downtime Guard": "manufacturing",
+      "Driver Hub": "transportation",
+      "Driver Studio": "transportation",
+      "Editorial Anchor": "media_publishing",
+      "Editorial Scale": "media_publishing",
+      "Editorial Signal": "media_publishing",
+      "Efficiency Pulse": "energy_utilities",
+      "Efficiency Ring": "energy_utilities",
+      "Efficiency Wave": "energy_utilities",
+      "Endpoint Ledger": "cybersecurity",
+      "Endpoint Sync": "cybersecurity",
+      "Endpoint Tracker": "cybersecurity",
+      "Engagement Base": "marketing",
+      "Engagement Guard": "marketing",
+      "Enrollment Center": "education",
+      "Enrollment Relay": "education",
+      "Enrollment Vault": "education",
+      "Escalation Rail": "customer_support",
+      "Escalation Scope": "customer_support",
+      "Escrow Board": "finance",
+      "Escrow Ledger": "finance",
+      "Escrow Node": "real_estate",
+      "Escrow Sync": "finance",
+      "Escrow Wave": "real_estate",
+      "Exhibitor Desk": "events",
+      "Exhibitor Lab": "events",
+      "Exhibitor Pilot": "events",
+      "Expense Ring": "finance",
+      "Expense Wave": "finance",
+      "Feed Dock": "media_publishing",
+      "Feed Rail": "media_publishing",
+      "Feed Scope": "media_publishing",
+      "Feedback Atlas": "events",
+      "Feedback Compass": "hospitality",
+      "Feedback Deck": "customer_support",
+      "Feedback Flow": "customer_support",
+      "Feedback Hub": "customer_support",
+      "Feedback Lock": "events",
+      "Feedback Nexus": "events",
+      "Feedback Portal": "hospitality",
+      "Feedback Zone": "hospitality",
+      "Fertilizer Dock": "agriculture",
+      "Fertilizer Rail": "agriculture",
+      "Fertilizer Scope": "agriculture",
+      "Filing Atlas": "legal",
+      "Filing Lock": "legal",
+      "Financing Beacon": "automotive",
+      "Financing Console": "automotive",
+      "Firewall Atlas": "cybersecurity",
+      "Firewall Map": "cybersecurity",
+      "Firewall Sentry": "cybersecurity",
+      "Fleet Beacon": "logistics",
+      "Fleet Bridge": "transportation",
+      "Fleet Console": "logistics",
+      "Fleet Forge": "logistics",
+      "Fleet Ledger": "automotive",
+      "Fleet Meter": "transportation",
+      "Fleet Sync": "automotive",
+      "Fleet Tracker": "automotive",
+      "Franchise Keeper": "food_service",
+      "Franchise Lens": "food_service",
+      "Franchise Loop": "government",
+      "Franchise Rail": "government",
+      "Franchise Scope": "government",
+      "Franchise Sentry": "food_service",
+      "Freight Ledger": "logistics",
+      "Freight Sync": "logistics",
+      "Freight Tracker": "logistics",
+      "Fuel Console": "transportation",
+      "Fuel Forge": "transportation",
+      "Fulfillment Map": "retail_ecommerce",
+      "Fulfillment Sentry": "retail_ecommerce",
+      "Fundraising Board": "nonprofit",
+      "Fundraising Flow": "nonprofit",
+      "Funnel Compass": "marketing",
+      "Funnel Zone": "marketing",
+      "Grading Atlas": "education",
+      "Grading Map": "education",
+      "Grant Compass": "nonprofit",
+      "Grant Portal": "nonprofit",
+      "Grazing Gate": "agriculture",
+      "Grazing Node": "agriculture",
+      "Grazing Path": "agriculture",
+      "Greenhouse Chain": "agriculture",
+      "Greenhouse Grid": "agriculture",
+      "Greenhouse Pulse": "agriculture",
+      "Grid Radar": "energy_utilities",
+      "Grid Station": "energy_utilities",
+      "Grid Terminal": "energy_utilities",
+      "Guest Lab": "hospitality",
+      "Guest Pilot": "hospitality",
+      "Harvest Beacon": "agriculture",
+      "Harvest Compass": "agriculture",
+      "Harvest Portal": "agriculture",
+      "Hearing Ledger": "government",
+      "Hearing Tracker": "government",
+      "Housekeeping Board": "hospitality",
+      "Housekeeping Flow": "hospitality",
+      "Impact Atlas": "nonprofit",
+      "Impact Lock": "nonprofit",
+      "Impact Nexus": "nonprofit",
+      "Incident Dock": "it_devops",
+      "Incident Loop": "cybersecurity",
+      "Incident Watch": "it_devops",
+      "Inspection Loop": "automotive",
+      "Inspection Rail": "automotive",
+      "Inspection Route": "energy_utilities",
+      "Inspection Signal": "energy_utilities",
+      "Inspection Watch": "energy_utilities",
+      "Insurance Beacon": "healthcare",
+      "Insurance Console": "healthcare",
+      "Insurance Portal": "healthcare",
+      "Intake Deck": "healthcare",
+      "Intake Flow": "healthcare",
+      "Intake Hub": "healthcare",
+      "Interview Route": "recruiting",
+      "Interview Watch": "recruiting",
+      "Inventory Desk": "logistics",
+      "Inventory Lock": "food_service",
+      "Inventory Nexus": "food_service",
+      "Inventory Point": "food_service",
+      "Inventory Radar": "logistics",
+      "Inventory Route": "automotive",
+      "Inventory Signal": "automotive",
+      "Inventory Station": "logistics",
+      "Invoice Lens": "finance",
+      "Invoice Map": "finance",
+      "Invoice Sentry": "finance",
+      "Irrigation Desk": "agriculture",
+      "Irrigation Lab": "agriculture",
+      "Itinerary Anchor": "hospitality",
+      "Itinerary Meter": "hospitality",
+      "Itinerary Scale": "hospitality",
+      "Jobsite Cascade": "construction",
+      "Jobsite Dial": "construction",
+      "Jobsite Panel": "construction",
+      "Knowledge Frame": "customer_support",
+      "Knowledge Keeper": "customer_support",
+      "Knowledge Manager": "customer_support",
+      "Latency Frame": "telecom",
+      "Latency Keeper": "telecom",
+      "Latency Lens": "telecom",
+      "Lease Board": "real_estate",
+      "Lease Flow": "real_estate",
+      "Lease Sync": "real_estate",
+      "Leave Ring": "hr_payroll",
+      "Leave Wave": "hr_payroll",
+      "Ledger Anchor": "nonprofit",
+      "Ledger Base": "finance",
+      "Ledger Guard": "finance",
+      "Ledger Manager": "finance",
+      "Ledger Meter": "nonprofit",
+      "Ledger Scale": "nonprofit",
+      "Licensing Atlas": "government",
+      "Licensing Frame": "media_publishing",
+      "Licensing Keeper": "media_publishing",
+      "Licensing Manager": "media_publishing",
+      "Licensing Map": "government",
+      "Licensing Sentry": "government",
+      "Lien Center": "construction",
+      "Lien Relay": "construction",
+      "Lien Terminal": "construction",
+      "Listing Lock": "real_estate",
+      "Listing Nexus": "real_estate",
+      "Livestock Center": "agriculture",
+      "Livestock Relay": "agriculture",
+      "Logistics Frame": "events",
+      "Logistics Keeper": "events",
+      "Logistics Lens": "events",
+      "Loyalty Route": "retail_ecommerce",
+      "Loyalty Signal": "retail_ecommerce",
+      "Loyalty Watch": "retail_ecommerce",
+      "Maintenance Base": "energy_utilities",
+      "Maintenance Desk": "automotive",
+      "Maintenance Dock": "real_estate",
+      "Maintenance Lens": "manufacturing",
+      "Maintenance Manager": "energy_utilities",
+      "Maintenance Radar": "automotive",
+      "Maintenance Sentry": "manufacturing",
+      "Maintenance Station": "automotive",
+      "Maintenance Terminal": "automotive",
+      "Maintenance Vault": "transportation",
+      "Maintenance Watch": "real_estate",
+      "Maintenance Zone": "transportation",
+      "Manifest Map": "logistics",
+      "Manifest Sentry": "logistics",
+      "Manuscript Desk": "media_publishing",
+      "Manuscript Lab": "media_publishing",
+      "Markdown Bridge": "retail_ecommerce",
+      "Markdown Dial": "retail_ecommerce",
+      "Markdown Meter": "retail_ecommerce",
+      "Material Dock": "construction",
+      "Material Rail": "construction",
+      "Material Scope": "construction",
+      "Matter Anchor": "legal",
+      "Matter Scale": "legal",
+      "Membership Node": "nonprofit",
+      "Membership Path": "nonprofit",
+      "Membership Wave": "nonprofit",
+      "Menu Radar": "food_service",
+      "Menu Relay": "food_service",
+      "Menu Terminal": "food_service",
+      "Meter Beacon": "energy_utilities",
+      "Meter Console": "energy_utilities",
+      "Meter Forge": "energy_utilities",
+      "Migration Keeper": "it_devops",
+      "Migration Lens": "it_devops",
+      "Migration Sentry": "it_devops",
+      "Mileage Base": "automotive",
+      "Mileage Frame": "automotive",
+      "Mileage Manager": "automotive",
+      "Monitoring Board": "it_devops",
+      "Monitoring Flow": "it_devops",
+      "Monitoring Sync": "it_devops",
+      "Network Chain": "telecom",
+      "Network Grid": "telecom",
+      "Network Trail": "telecom",
+      "Occupancy Node": "hospitality",
+      "Occupancy Wave": "hospitality",
+      "Offboarding Anchor": "hr_payroll",
+      "Offboarding Bridge": "hr_payroll",
+      "Offboarding Meter": "hr_payroll",
+      "Offer Bridge": "recruiting",
+      "Offer Meter": "recruiting",
+      "Onboarding Board": "recruiting",
+      "Onboarding Hub": "hr_payroll",
+      "Onboarding Ledger": "recruiting",
+      "Onboarding Pilot": "hr_payroll",
+      "Onboarding Studio": "hr_payroll",
+      "Onboarding Sync": "recruiting",
+      "Ordinance Center": "government",
+      "Ordinance Vault": "government",
+      "Outage Cascade": "telecom",
+      "Outage Panel": "telecom",
+      "Outage Vault": "energy_utilities",
+      "Outage Zone": "energy_utilities",
+      "Outreach Chain": "nonprofit",
+      "Outreach Grid": "nonprofit",
+      "Outreach Trail": "nonprofit",
+      "Pallet Loop": "logistics",
+      "Pallet Rail": "logistics",
+      "Patch Gate": "cybersecurity",
+      "Patch Path": "cybersecurity",
+      "Patch Point": "cybersecurity",
+      "Patient Frame": "healthcare",
+      "Patient Keeper": "healthcare",
+      "Patient Manager": "healthcare",
+      "Payment Route": "finance",
+      "Payment Watch": "finance",
+      "Payroll Dock": "hr_payroll",
+      "Payroll Nexus": "finance",
+      "Payroll Point": "finance",
+      "Payroll Route": "hr_payroll",
+      "Payroll Watch": "hr_payroll",
+      "Perimeter Chain": "cybersecurity",
+      "Perimeter Pulse": "cybersecurity",
+      "Perimeter Ring": "cybersecurity",
+      "Permit Bridge": "government",
+      "Permit Cascade": "government",
+      "Permit Desk": "construction",
+      "Permit Dial": "government",
+      "Permit Lab": "construction",
+      "Permit Loop": "transportation",
+      "Permit Pilot": "construction",
+      "Permit Rail": "transportation",
+      "Permit Trail": "transportation",
+      "Pesticide Atlas": "agriculture",
+      "Pesticide Lock": "agriculture",
+      "Pipeline Loop": "recruiting",
+      "Pipeline Radar": "it_devops",
+      "Pipeline Terminal": "it_devops",
+      "Pipeline Trail": "recruiting",
+      "Placement Dock": "marketing",
+      "Placement Lens": "recruiting",
+      "Placement Map": "recruiting",
+      "Placement Route": "marketing",
+      "Placement Sentry": "recruiting",
+      "Placement Watch": "marketing",
+      "Pledge Core": "nonprofit",
+      "Pledge Guard": "nonprofit",
+      "Policy Deck": "insurance",
+      "Policy Flow": "insurance",
+      "Policy Hub": "insurance",
+      "Premium Core": "insurance",
+      "Premium Ledger": "insurance",
+      "Premium Tracker": "insurance",
+      "Prescription Cascade": "healthcare",
+      "Prescription Dial": "healthcare",
+      "Prior Gate": "healthcare",
+      "Prior Path": "healthcare",
+      "Production Compass": "manufacturing",
+      "Production Vault": "manufacturing",
+      "Production Zone": "manufacturing",
+      "Property Keeper": "real_estate",
+      "Property Lens": "real_estate",
+      "Provider Rail": "healthcare",
+      "Provider Scope": "healthcare",
+      "Provisioning Anchor": "telecom",
+      "Provisioning Compass": "it_devops",
+      "Provisioning Scale": "telecom",
+      "Provisioning Zone": "it_devops",
+      "Punchlist Core": "construction",
+      "Punchlist Tracker": "construction",
+      "Quality Pilot": "manufacturing",
+      "Quality Studio": "manufacturing",
+      "Queue Beacon": "customer_support",
+      "Queue Portal": "customer_support",
+      "Recall Center": "automotive",
+      "Recall Vault": "automotive",
+      "Recall Zone": "automotive",
+      "Recipe Node": "food_service",
+      "Recipe Wave": "food_service",
+      "Reconciliation Bridge": "finance",
+      "Reconciliation Meter": "finance",
+      "Records Frame": "government",
+      "Records Manager": "government",
+      "Recruiting Loop": "hr_payroll",
+      "Recruiting Trail": "hr_payroll",
+      "Redline Dock": "legal",
+      "Redline Scope": "legal",
+      "Reference Vault": "recruiting",
+      "Reference Zone": "recruiting",
+      "Referral Atlas": "healthcare",
+      "Referral Gate": "recruiting",
+      "Referral Keeper": "marketing",
+      "Referral Map": "healthcare",
+      "Referral Nexus": "recruiting",
+      "Referral Point": "recruiting",
+      "Refund Center": "customer_support",
+      "Refund Radar": "finance",
+      "Refund Station": "finance",
+      "Refund Terminal": "finance",
+      "Registration Node": "events",
+      "Registration Path": "events",
+      "Registration Wave": "events",
+      "Renewal Bridge": "insurance",
+      "Renewal Cascade": "insurance",
+      "Renewal Dial": "insurance",
+      "Rent Cascade": "real_estate",
+      "Rent Forge": "real_estate",
+      "Rent Panel": "real_estate",
+      "Requisition Hub": "recruiting",
+      "Requisition Pilot": "recruiting",
+      "Requisition Studio": "recruiting",
+      "Reservation Dock": "food_service",
+      "Reservation Radar": "hospitality",
+      "Reservation Relay": "hospitality",
+      "Reservation Terminal": "hospitality",
+      "Reservation Watch": "food_service",
+      "Resolution Core": "customer_support",
+      "Resolution Ledger": "customer_support",
+      "Resolution Tracker": "customer_support",
+      "Response Scale": "customer_support",
+      "Response Signal": "customer_support",
+      "Restock Beacon": "retail_ecommerce",
+      "Restock Console": "retail_ecommerce",
+      "Restock Forge": "retail_ecommerce",
+      "Retainer Center": "legal",
+      "Retainer Relay": "legal",
+      "Retainer Terminal": "legal",
+      "Return Base": "retail_ecommerce",
+      "Return Manager": "retail_ecommerce",
+      "Review Radar": "hr_payroll",
+      "Review Station": "hr_payroll",
+      "Review Terminal": "hr_payroll",
+      "Rider Center": "insurance",
+      "Rider Relay": "insurance",
+      "Rider Vault": "insurance",
+      "Rights Gate": "media_publishing",
+      "Rights Node": "media_publishing",
+      "Rights Path": "media_publishing",
+      "Roaming Lab": "telecom",
+      "Roaming Pilot": "telecom",
+      "Rollback Pilot": "it_devops",
+      "Rollback Studio": "it_devops",
+      "Roster Lens": "hr_payroll",
+      "Roster Sentry": "hr_payroll",
+      "Rotation Anchor": "agriculture",
+      "Rotation Scale": "agriculture",
+      "Rotation Signal": "agriculture",
+      "Route Bridge": "logistics",
+      "Route Dial": "logistics",
+      "Route Meter": "logistics",
+      "Route Signal": "transportation",
+      "Route Watch": "transportation",
+      "Royalty Beacon": "media_publishing",
+      "Royalty Portal": "media_publishing",
+      "Runbook Node": "it_devops",
+      "Runbook Ring": "it_devops",
+      "Runbook Wave": "it_devops",
+      "Satisfaction Cascade": "customer_support",
+      "Satisfaction Dial": "customer_support",
+      "Schedule Pulse": "transportation",
+      "Schedule Ring": "transportation",
+      "Schedule Wave": "transportation",
+      "Scheduling Nexus": "manufacturing",
+      "Scheduling Point": "manufacturing",
+      "Scholarship Route": "education",
+      "Scholarship Scale": "education",
+      "Scholarship Signal": "education",
+      "Screening Radar": "recruiting",
+      "Screening Station": "recruiting",
+      "Screening Terminal": "recruiting",
+      "Segment Node": "marketing",
+      "Segment Ring": "marketing",
+      "Segment Wave": "marketing",
+      "Service Pulse": "automotive",
+      "Service Ring": "automotive",
+      "Session Board": "events",
+      "Session Deck": "events",
+      "Session Flow": "events",
+      "Shift Nexus": "hr_payroll",
+      "Shift Point": "hr_payroll",
+      "Shipment Base": "logistics",
+      "Shipment Frame": "logistics",
+      "Shipment Manager": "logistics",
+      "Shuttle Cascade": "hospitality",
+      "Shuttle Forge": "hospitality",
+      "Shuttle Panel": "hospitality",
+      "Silo Cascade": "agriculture",
+      "Silo Dial": "agriculture",
+      "Silo Panel": "agriculture",
+      "Soil Frame": "agriculture",
+      "Soil Keeper": "agriculture",
+      "Sourcing Console": "recruiting",
+      "Sourcing Forge": "recruiting",
+      "Sponsor Anchor": "events",
+      "Sponsor Scale": "events",
+      "Staffing Board": "food_service",
+      "Staffing Flow": "food_service",
+      "Staffing Sync": "food_service",
+      "Statute Board": "legal",
+      "Statute Deck": "legal",
+      "Statute Flow": "legal",
+      "Stewardship Dock": "nonprofit",
+      "Stewardship Scope": "nonprofit",
+      "Stewardship Watch": "nonprofit",
+      "Storefront Loop": "retail_ecommerce",
+      "Storefront Rail": "retail_ecommerce",
+      "Storefront Trail": "retail_ecommerce",
+      "Subcontractor Frame": "construction",
+      "Subcontractor Keeper": "construction",
+      "Subrogation Route": "insurance",
+      "Subrogation Scale": "insurance",
+      "Subrogation Signal": "insurance",
+      "Subscriber Cascade": "media_publishing",
+      "Subscriber Dial": "media_publishing",
+      "Subscriber Dock": "telecom",
+      "Subscriber Scope": "telecom",
+      "Subscriber Watch": "telecom",
+      "Substation Map": "energy_utilities",
+      "Substation Sentry": "energy_utilities",
+      "Supplier Dock": "manufacturing",
+      "Supplier Grid": "food_service",
+      "Supplier Route": "manufacturing",
+      "Supplier Trail": "food_service",
+      "Supplier Watch": "manufacturing",
+      "Syllabus Chain": "education",
+      "Syllabus Pulse": "education",
+      "Syllabus Ring": "education",
+      "Syndication Center": "media_publishing",
+      "Syndication Relay": "media_publishing",
+      "Tenant Base": "real_estate",
+      "Tenant Core": "real_estate",
+      "Tenant Guard": "real_estate",
+      "Terminal Lens": "transportation",
+      "Terminal Map": "transportation",
+      "Terminal Sentry": "transportation",
+      "Threat Center": "cybersecurity",
+      "Threat Vault": "cybersecurity",
+      "Throughput Console": "manufacturing",
+      "Throughput Forge": "manufacturing",
+      "Throughput Panel": "manufacturing",
+      "Ticket Board": "telecom",
+      "Ticket Chain": "customer_support",
+      "Ticket Flow": "telecom",
+      "Ticket Grid": "customer_support",
+      "Ticket Pulse": "customer_support",
+      "Ticketing Center": "events",
+      "Ticketing Relay": "events",
+      "Ticketing Terminal": "events",
+      "Timesheet Board": "hr_payroll",
+      "Timesheet Ledger": "hr_payroll",
+      "Timesheet Sync": "hr_payroll",
+      "Title Compass": "real_estate",
+      "Title Portal": "real_estate",
+      "Title Zone": "real_estate",
+      "Trade Bridge": "automotive",
+      "Trade Dial": "automotive",
+      "Transcript Ledger": "education",
+      "Transcript Tracker": "education",
+      "Tuition Frame": "education",
+      "Tuition Manager": "education",
+      "Underwriting Frame": "insurance",
+      "Underwriting Manager": "insurance",
+      "Uptime Anchor": "it_devops",
+      "Uptime Meter": "it_devops",
+      "Variant Deck": "retail_ecommerce",
+      "Variant Hub": "retail_ecommerce",
+      "Variant Studio": "retail_ecommerce",
+      "Vendor Gate": "retail_ecommerce",
+      "Vendor Point": "retail_ecommerce",
+      "Venue Dock": "events",
+      "Venue Scope": "events",
+      "Volunteer Relay": "nonprofit",
+      "Volunteer Terminal": "nonprofit",
+      "Vulnerability Route": "cybersecurity",
+      "Vulnerability Signal": "cybersecurity",
+      "Waiver Beacon": "legal",
+      "Waiver Compass": "legal",
+      "Waiver Portal": "legal",
+      "Warehouse Pulse": "logistics",
+      "Warehouse Ring": "logistics",
+      "Warranty Beacon": "construction",
+      "Warranty Compass": "construction",
+      "Warranty Desk": "customer_support",
+      "Warranty Gate": "automotive",
+      "Warranty Lab": "customer_support",
+      "Warranty Path": "automotive",
+      "Warranty Point": "automotive",
+      "Warranty Portal": "construction",
+      "Waste Compass": "food_service",
+      "Waste Portal": "food_service",
+      "Waste Zone": "food_service",
+      "Yield Deck": "agriculture",
+      "Yield Flow": "agriculture",
+      "Yield Grid": "manufacturing",
+      "Yield Loop": "manufacturing",
+      "Yield Trail": "manufacturing",
+      "Zoning Desk": "government",
+      "Zoning Relay": "real_estate",
+      "Zoning Station": "government",
+      "Zoning Terminal": "government"
+    },
+    "excluded_normalized": [
+      "access anchor",
+      "access bridge",
+      "access dial",
+      "access meter",
+      "accrual compass",
+      "accrual portal",
+      "accrual vault",
+      "accrual zone",
+      "activation gate",
+      "activation node",
+      "activation path",
+      "activation wave",
+      "actuary beacon",
+      "actuary console",
+      "actuary forge",
+      "actuary portal",
+      "adjuster gate",
+      "adjuster nexus",
+      "adjuster path",
+      "adjuster point",
+      "advisor loop",
+      "advisor rail",
+      "advisor scope",
+      "advisor trail",
+      "agenda beacon",
+      "agenda compass",
+      "agenda console",
+      "agenda portal",
+      "allergen base",
+      "allergen core",
+      "allergen guard",
+      "allergen tracker",
+      "alumni beacon",
+      "alumni console",
+      "alumni forge",
+      "alumni portal",
+      "amenity frame",
+      "amenity keeper",
+      "amenity lens",
+      "amenity manager",
+      "appointment route",
+      "appointment scale",
+      "appointment signal",
+      "appointment watch",
+      "appraisal atlas",
+      "appraisal desk",
+      "appraisal lab",
+      "appraisal lens",
+      "appraisal map",
+      "appraisal pilot",
+      "appraisal sentry",
+      "appraisal studio",
+      "archive deck",
+      "archive flow",
+      "archive hub",
+      "archive studio",
+      "assembly center",
+      "assembly radar",
+      "assembly relay",
+      "assembly terminal",
+      "assessment base",
+      "assessment core",
+      "assessment guard",
+      "assessment manager",
+      "attendance deck",
+      "attendance hub",
+      "attendance pilot",
+      "attendance studio",
+      "attendee chain",
+      "attendee grid",
+      "attendee pulse",
+      "attendee ring",
+      "attribution center",
+      "attribution radar",
+      "attribution relay",
+      "attribution terminal",
+      "audience cascade",
+      "audience dial",
+      "audience forge",
+      "audience panel",
+      "audit cascade",
+      "audit console",
+      "audit desk",
+      "audit forge",
+      "audit panel",
+      "audit radar",
+      "audit station",
+      "audit terminal",
+      "backorder deck",
+      "backorder hub",
+      "backorder pilot",
+      "backorder studio",
+      "backup cascade",
+      "backup dial",
+      "backup forge",
+      "backup panel",
+      "badge bridge",
+      "badge cascade",
+      "badge dial",
+      "badge panel",
+      "ballot route",
+      "ballot scale",
+      "ballot signal",
+      "ballot watch",
+      "bandwidth beacon",
+      "bandwidth compass",
+      "bandwidth console",
+      "bandwidth portal",
+      "banquet dock",
+      "banquet rail",
+      "banquet scope",
+      "banquet watch",
+      "batch node",
+      "batch path",
+      "batch ring",
+      "batch wave",
+      "beneficiary frame",
+      "beneficiary keeper",
+      "beneficiary lens",
+      "beneficiary manager",
+      "benefits base",
+      "benefits core",
+      "benefits guard",
+      "benefits tracker",
+      "bid atlas",
+      "bid lock",
+      "bid map",
+      "bid sentry",
+      "billing board",
+      "billing center",
+      "billing flow",
+      "billing ledger",
+      "billing relay",
+      "billing sync",
+      "billing terminal",
+      "billing vault",
+      "binder desk",
+      "binder lab",
+      "binder radar",
+      "binder station",
+      "blueprint board",
+      "blueprint deck",
+      "blueprint flow",
+      "blueprint hub",
+      "blueprint studio",
+      "booking chain",
+      "booking grid",
+      "booking pulse",
+      "booking trail",
+      "brand desk",
+      "brand lab",
+      "brand pilot",
+      "brand studio",
+      "breach base",
+      "breach frame",
+      "breach guard",
+      "breach manager",
+      "broadcast core",
+      "broadcast ledger",
+      "broadcast sync",
+      "broadcast tracker",
+      "budget chain",
+      "budget grid",
+      "budget loop",
+      "budget trail",
+      "bundle center",
+      "bundle compass",
+      "bundle vault",
+      "bundle zone",
+      "calibration anchor",
+      "calibration bridge",
+      "calibration meter",
+      "calibration scale",
+      "callback gate",
+      "callback node",
+      "callback path",
+      "callback point",
+      "campaign anchor",
+      "campaign bridge",
+      "campaign desk",
+      "campaign lab",
+      "campaign meter",
+      "campaign pilot",
+      "campaign scale",
+      "campaign signal",
+      "campaign station",
+      "candidate compass",
+      "candidate node",
+      "candidate path",
+      "candidate portal",
+      "candidate pulse",
+      "candidate ring",
+      "candidate vault",
+      "candidate wave",
+      "candidate zone",
+      "capacity base",
+      "capacity core",
+      "capacity guard",
+      "capacity tracker",
+      "cargo gate",
+      "cargo lock",
+      "cargo nexus",
+      "cargo point",
+      "catalog node",
+      "catalog pulse",
+      "catalog ring",
+      "catalog wave",
+      "catering core",
+      "catering desk",
+      "catering guard",
+      "catering lab",
+      "catering ledger",
+      "catering pilot",
+      "catering studio",
+      "catering tracker",
+      "change gate",
+      "change node",
+      "change path",
+      "change point",
+      "chargeback hub",
+      "chargeback lab",
+      "chargeback pilot",
+      "chargeback studio",
+      "chat atlas",
+      "chat lock",
+      "chat map",
+      "chat sentry",
+      "checkin core",
+      "checkin guard",
+      "checkin ledger",
+      "checkin tracker",
+      "checkout board",
+      "checkout flow",
+      "checkout ledger",
+      "checkout sync",
+      "churn atlas",
+      "churn lock",
+      "churn map",
+      "churn nexus",
+      "circulation chain",
+      "circulation grid",
+      "circulation pulse",
+      "circulation ring",
+      "citation beacon",
+      "citation console",
+      "citation forge",
+      "citation panel",
+      "claim atlas",
+      "claim chain",
+      "claim lens",
+      "claim map",
+      "claim pulse",
+      "claim ring",
+      "claim sentry",
+      "claim wave",
+      "classroom bridge",
+      "classroom cascade",
+      "classroom dial",
+      "classroom meter",
+      "clause gate",
+      "clause node",
+      "clause path",
+      "clause point",
+      "cohort gate",
+      "cohort nexus",
+      "cohort path",
+      "cohort point",
+      "compliance board",
+      "compliance cascade",
+      "compliance chain",
+      "compliance console",
+      "compliance deck",
+      "compliance dial",
+      "compliance flow",
+      "compliance forge",
+      "compliance gate",
+      "compliance grid",
+      "compliance hub",
+      "compliance ledger",
+      "compliance loop",
+      "compliance nexus",
+      "compliance panel",
+      "compliance path",
+      "compliance pilot",
+      "compliance point",
+      "compliance pulse",
+      "compliance rail",
+      "compliance ring",
+      "compliance studio",
+      "compliance sync",
+      "compliance trail",
+      "concierge atlas",
+      "concierge lock",
+      "concierge map",
+      "concierge nexus",
+      "configuration atlas",
+      "configuration lock",
+      "configuration nexus",
+      "configuration point",
+      "consent core",
+      "consent ledger",
+      "consent sync",
+      "consent tracker",
+      "constituent deck",
+      "constituent hub",
+      "constituent pilot",
+      "constituent studio",
+      "consumption hub",
+      "consumption lab",
+      "consumption pilot",
+      "consumption studio",
+      "container dock",
+      "container route",
+      "container signal",
+      "container watch",
+      "content chain",
+      "content grid",
+      "content loop",
+      "content trail",
+      "contract core",
+      "contract guard",
+      "contract ledger",
+      "contract sync",
+      "contract tracker",
+      "conversion atlas",
+      "conversion lock",
+      "conversion nexus",
+      "conversion point",
+      "coverage chain",
+      "coverage core",
+      "coverage guard",
+      "coverage ledger",
+      "coverage pulse",
+      "coverage ring",
+      "coverage tracker",
+      "coverage wave",
+      "creative board",
+      "creative deck",
+      "creative flow",
+      "creative sync",
+      "credential beacon",
+      "credential console",
+      "credential forge",
+      "credential panel",
+      "crew anchor",
+      "crew route",
+      "crew scale",
+      "crew signal",
+      "crop core",
+      "crop ledger",
+      "crop sync",
+      "crop tracker",
+      "curriculum desk",
+      "curriculum radar",
+      "curriculum station",
+      "curriculum terminal",
+      "customs gate",
+      "customs lock",
+      "customs nexus",
+      "customs point",
+      "dealer deck",
+      "dealer hub",
+      "dealer pilot",
+      "dealer studio",
+      "deductible loop",
+      "deductible rail",
+      "deductible scope",
+      "deductible trail",
+      "defect board",
+      "defect deck",
+      "defect flow",
+      "defect sync",
+      "delivery anchor",
+      "delivery meter",
+      "delivery scale",
+      "delivery signal",
+      "demand gate",
+      "demand lock",
+      "demand nexus",
+      "demand point",
+      "deployment chain",
+      "deployment grid",
+      "deployment loop",
+      "deployment pulse",
+      "deployment trail",
+      "deposit anchor",
+      "deposit meter",
+      "deposit scale",
+      "deposit signal",
+      "deposition bridge",
+      "deposition cascade",
+      "deposition dial",
+      "deposition panel",
+      "diagnosis center",
+      "diagnosis relay",
+      "diagnosis vault",
+      "diagnosis zone",
+      "discharge desk",
+      "discharge lab",
+      "discharge radar",
+      "discharge station",
+      "discovery desk",
+      "discovery lab",
+      "discovery pilot",
+      "discovery station",
+      "dispatch center",
+      "dispatch compass",
+      "dispatch radar",
+      "dispatch relay",
+      "dispatch station",
+      "dispatch terminal",
+      "dispatch vault",
+      "dispatch zone",
+      "distribution atlas",
+      "distribution lock",
+      "distribution map",
+      "distribution sentry",
+      "docket base",
+      "docket frame",
+      "docket keeper",
+      "docket lens",
+      "docket manager",
+      "donor bridge",
+      "donor cascade",
+      "donor dial",
+      "donor forge",
+      "donor panel",
+      "downtime base",
+      "downtime core",
+      "downtime guard",
+      "downtime tracker",
+      "driver hub",
+      "driver lab",
+      "driver pilot",
+      "driver studio",
+      "editorial anchor",
+      "editorial route",
+      "editorial scale",
+      "editorial signal",
+      "editorial watch",
+      "efficiency node",
+      "efficiency pulse",
+      "efficiency ring",
+      "efficiency wave",
+      "endpoint board",
+      "endpoint ledger",
+      "endpoint sync",
+      "endpoint tracker",
+      "engagement base",
+      "engagement core",
+      "engagement guard",
+      "engagement tracker",
+      "enrollment center",
+      "enrollment compass",
+      "enrollment relay",
+      "enrollment vault",
+      "enrollment zone",
+      "escalation loop",
+      "escalation rail",
+      "escalation scope",
+      "escalation trail",
+      "escrow board",
+      "escrow flow",
+      "escrow gate",
+      "escrow ledger",
+      "escrow node",
+      "escrow path",
+      "escrow sync",
+      "escrow wave",
+      "exhibitor desk",
+      "exhibitor lab",
+      "exhibitor pilot",
+      "exhibitor station",
+      "expense node",
+      "expense path",
+      "expense ring",
+      "expense wave",
+      "feed dock",
+      "feed loop",
+      "feed rail",
+      "feed scope",
+      "feedback atlas",
+      "feedback beacon",
+      "feedback compass",
+      "feedback deck",
+      "feedback flow",
+      "feedback hub",
+      "feedback lock",
+      "feedback map",
+      "feedback nexus",
+      "feedback portal",
+      "feedback studio",
+      "feedback zone",
+      "fertilizer dock",
+      "fertilizer loop",
+      "fertilizer rail",
+      "fertilizer scope",
+      "filing atlas",
+      "filing lock",
+      "filing map",
+      "filing sentry",
+      "financing beacon",
+      "financing console",
+      "financing forge",
+      "financing panel",
+      "firewall atlas",
+      "firewall lens",
+      "firewall map",
+      "firewall sentry",
+      "fleet anchor",
+      "fleet beacon",
+      "fleet board",
+      "fleet bridge",
+      "fleet console",
+      "fleet forge",
+      "fleet ledger",
+      "fleet meter",
+      "fleet panel",
+      "fleet scale",
+      "fleet sync",
+      "fleet tracker",
+      "franchise frame",
+      "franchise keeper",
+      "franchise lens",
+      "franchise loop",
+      "franchise rail",
+      "franchise scope",
+      "franchise sentry",
+      "franchise trail",
+      "freight board",
+      "freight flow",
+      "freight ledger",
+      "freight sync",
+      "freight tracker",
+      "fuel cascade",
+      "fuel console",
+      "fuel forge",
+      "fuel panel",
+      "fulfillment keeper",
+      "fulfillment lens",
+      "fulfillment map",
+      "fulfillment sentry",
+      "fundraising board",
+      "fundraising deck",
+      "fundraising flow",
+      "fundraising hub",
+      "funnel beacon",
+      "funnel compass",
+      "funnel portal",
+      "funnel zone",
+      "grading atlas",
+      "grading lens",
+      "grading map",
+      "grading sentry",
+      "grant beacon",
+      "grant compass",
+      "grant console",
+      "grant portal",
+      "grazing gate",
+      "grazing node",
+      "grazing path",
+      "grazing point",
+      "greenhouse chain",
+      "greenhouse grid",
+      "greenhouse pulse",
+      "greenhouse ring",
+      "grid radar",
+      "grid relay",
+      "grid station",
+      "grid terminal",
+      "guest desk",
+      "guest lab",
+      "guest pilot",
+      "guest station",
+      "harvest beacon",
+      "harvest compass",
+      "harvest console",
+      "harvest forge",
+      "harvest portal",
+      "hearing board",
+      "hearing ledger",
+      "hearing sync",
+      "hearing tracker",
+      "housekeeping board",
+      "housekeeping deck",
+      "housekeeping flow",
+      "housekeeping hub",
+      "impact atlas",
+      "impact lock",
+      "impact map",
+      "impact nexus",
+      "incident dock",
+      "incident grid",
+      "incident loop",
+      "incident rail",
+      "incident scope",
+      "incident trail",
+      "incident watch",
+      "inspection chain",
+      "inspection dock",
+      "inspection grid",
+      "inspection loop",
+      "inspection pulse",
+      "inspection rail",
+      "inspection ring",
+      "inspection route",
+      "inspection signal",
+      "inspection trail",
+      "inspection watch",
+      "inspection wave",
+      "insurance beacon",
+      "insurance console",
+      "insurance forge",
+      "insurance portal",
+      "intake deck",
+      "intake flow",
+      "intake hub",
+      "intake studio",
+      "interview dock",
+      "interview route",
+      "interview scope",
+      "interview watch",
+      "inventory atlas",
+      "inventory desk",
+      "inventory dock",
+      "inventory lock",
+      "inventory map",
+      "inventory nexus",
+      "inventory point",
+      "inventory radar",
+      "inventory relay",
+      "inventory route",
+      "inventory signal",
+      "inventory station",
+      "inventory terminal",
+      "inventory watch",
+      "invoice frame",
+      "invoice keeper",
+      "invoice lens",
+      "invoice map",
+      "invoice sentry",
+      "irrigation desk",
+      "irrigation lab",
+      "irrigation radar",
+      "irrigation station",
+      "itinerary anchor",
+      "itinerary meter",
+      "itinerary scale",
+      "itinerary signal",
+      "jobsite bridge",
+      "jobsite cascade",
+      "jobsite dial",
+      "jobsite panel",
+      "knowledge base",
+      "knowledge frame",
+      "knowledge keeper",
+      "knowledge manager",
+      "latency frame",
+      "latency keeper",
+      "latency lens",
+      "latency manager",
+      "lease board",
+      "lease deck",
+      "lease flow",
+      "lease hub",
+      "lease sync",
+      "leave node",
+      "leave path",
+      "leave ring",
+      "leave wave",
+      "ledger anchor",
+      "ledger base",
+      "ledger core",
+      "ledger guard",
+      "ledger manager",
+      "ledger meter",
+      "ledger scale",
+      "ledger signal",
+      "ledger tracker",
+      "licensing atlas",
+      "licensing base",
+      "licensing frame",
+      "licensing keeper",
+      "licensing lens",
+      "licensing manager",
+      "licensing map",
+      "licensing sentry",
+      "lien center",
+      "lien relay",
+      "lien terminal",
+      "lien vault",
+      "listing atlas",
+      "listing lock",
+      "listing map",
+      "listing nexus",
+      "livestock center",
+      "livestock relay",
+      "livestock vault",
+      "livestock zone",
+      "logistics frame",
+      "logistics keeper",
+      "logistics lens",
+      "logistics manager",
+      "loyalty dock",
+      "loyalty route",
+      "loyalty signal",
+      "loyalty watch",
+      "maintenance base",
+      "maintenance compass",
+      "maintenance core",
+      "maintenance desk",
+      "maintenance dock",
+      "maintenance frame",
+      "maintenance guard",
+      "maintenance keeper",
+      "maintenance lens",
+      "maintenance manager",
+      "maintenance portal",
+      "maintenance radar",
+      "maintenance rail",
+      "maintenance scope",
+      "maintenance sentry",
+      "maintenance station",
+      "maintenance terminal",
+      "maintenance vault",
+      "maintenance watch",
+      "maintenance zone",
+      "manifest keeper",
+      "manifest lens",
+      "manifest map",
+      "manifest sentry",
+      "manuscript desk",
+      "manuscript lab",
+      "manuscript radar",
+      "manuscript station",
+      "markdown anchor",
+      "markdown bridge",
+      "markdown dial",
+      "markdown meter",
+      "material dock",
+      "material loop",
+      "material rail",
+      "material scope",
+      "matter anchor",
+      "matter route",
+      "matter scale",
+      "matter signal",
+      "membership gate",
+      "membership node",
+      "membership path",
+      "membership wave",
+      "menu center",
+      "menu radar",
+      "menu relay",
+      "menu terminal",
+      "meter beacon",
+      "meter cascade",
+      "meter console",
+      "meter forge",
+      "meter panel",
+      "migration frame",
+      "migration keeper",
+      "migration lens",
+      "migration sentry",
+      "mileage base",
+      "mileage core",
+      "mileage frame",
+      "mileage guard",
+      "mileage manager",
+      "monitoring board",
+      "monitoring deck",
+      "monitoring flow",
+      "monitoring sync",
+      "network chain",
+      "network grid",
+      "network pulse",
+      "network trail",
+      "occupancy gate",
+      "occupancy node",
+      "occupancy path",
+      "occupancy wave",
+      "offboarding anchor",
+      "offboarding bridge",
+      "offboarding meter",
+      "offboarding scale",
+      "offer anchor",
+      "offer bridge",
+      "offer meter",
+      "offer scale",
+      "onboarding board",
+      "onboarding desk",
+      "onboarding flow",
+      "onboarding hub",
+      "onboarding lab",
+      "onboarding ledger",
+      "onboarding pilot",
+      "onboarding studio",
+      "onboarding sync",
+      "ordinance center",
+      "ordinance compass",
+      "ordinance vault",
+      "ordinance zone",
+      "outage bridge",
+      "outage cascade",
+      "outage compass",
+      "outage dial",
+      "outage panel",
+      "outage portal",
+      "outage vault",
+      "outage zone",
+      "outreach chain",
+      "outreach grid",
+      "outreach pulse",
+      "outreach trail",
+      "pallet grid",
+      "pallet loop",
+      "pallet rail",
+      "pallet trail",
+      "patch gate",
+      "patch nexus",
+      "patch path",
+      "patch point",
+      "patient base",
+      "patient frame",
+      "patient guard",
+      "patient keeper",
+      "patient manager",
+      "payment dock",
+      "payment route",
+      "payment scope",
+      "payment watch",
+      "payroll atlas",
+      "payroll dock",
+      "payroll lock",
+      "payroll nexus",
+      "payroll point",
+      "payroll route",
+      "payroll scope",
+      "payroll watch",
+      "perimeter chain",
+      "perimeter pulse",
+      "perimeter ring",
+      "perimeter wave",
+      "permit anchor",
+      "permit bridge",
+      "permit cascade",
+      "permit desk",
+      "permit dial",
+      "permit grid",
+      "permit lab",
+      "permit loop",
+      "permit meter",
+      "permit pilot",
+      "permit radar",
+      "permit rail",
+      "permit station",
+      "permit trail",
+      "pesticide atlas",
+      "pesticide lock",
+      "pesticide map",
+      "pesticide sentry",
+      "pipeline center",
+      "pipeline chain",
+      "pipeline grid",
+      "pipeline loop",
+      "pipeline radar",
+      "pipeline relay",
+      "pipeline terminal",
+      "pipeline trail",
+      "placement dock",
+      "placement keeper",
+      "placement lens",
+      "placement map",
+      "placement route",
+      "placement scope",
+      "placement sentry",
+      "placement watch",
+      "pledge core",
+      "pledge guard",
+      "pledge ledger",
+      "pledge tracker",
+      "policy deck",
+      "policy flow",
+      "policy hub",
+      "policy pilot",
+      "policy studio",
+      "premium board",
+      "premium core",
+      "premium ledger",
+      "premium sync",
+      "premium tracker",
+      "prescription bridge",
+      "prescription cascade",
+      "prescription dial",
+      "prescription meter",
+      "prior gate",
+      "prior nexus",
+      "prior path",
+      "prior point",
+      "production beacon",
+      "production compass",
+      "production portal",
+      "production vault",
+      "production zone",
+      "property frame",
+      "property keeper",
+      "property lens",
+      "property manager",
+      "provider loop",
+      "provider rail",
+      "provider scope",
+      "provider trail",
+      "provisioning anchor",
+      "provisioning beacon",
+      "provisioning compass",
+      "provisioning portal",
+      "provisioning route",
+      "provisioning scale",
+      "provisioning signal",
+      "provisioning zone",
+      "punchlist core",
+      "punchlist ledger",
+      "punchlist sync",
+      "punchlist tracker",
+      "quality desk",
+      "quality lab",
+      "quality pilot",
+      "quality studio",
+      "queue beacon",
+      "queue console",
+      "queue forge",
+      "queue portal",
+      "recall center",
+      "recall compass",
+      "recall vault",
+      "recall zone",
+      "recipe gate",
+      "recipe node",
+      "recipe path",
+      "recipe wave",
+      "reconciliation anchor",
+      "reconciliation bridge",
+      "reconciliation meter",
+      "reconciliation scale",
+      "records base",
+      "records frame",
+      "records guard",
+      "records manager",
+      "recruiting chain",
+      "recruiting grid",
+      "recruiting loop",
+      "recruiting trail",
+      "redline dock",
+      "redline loop",
+      "redline rail",
+      "redline scope",
+      "reference compass",
+      "reference portal",
+      "reference vault",
+      "reference zone",
+      "referral atlas",
+      "referral frame",
+      "referral gate",
+      "referral keeper",
+      "referral lens",
+      "referral lock",
+      "referral map",
+      "referral nexus",
+      "referral point",
+      "referral sentry",
+      "refund center",
+      "refund radar",
+      "refund relay",
+      "refund station",
+      "refund terminal",
+      "refund vault",
+      "refund zone",
+      "registration gate",
+      "registration node",
+      "registration path",
+      "registration point",
+      "registration wave",
+      "renewal bridge",
+      "renewal cascade",
+      "renewal dial",
+      "renewal meter",
+      "rent cascade",
+      "rent dial",
+      "rent forge",
+      "rent panel",
+      "requisition hub",
+      "requisition lab",
+      "requisition pilot",
+      "requisition studio",
+      "reservation center",
+      "reservation dock",
+      "reservation radar",
+      "reservation rail",
+      "reservation relay",
+      "reservation scope",
+      "reservation terminal",
+      "reservation vault",
+      "reservation watch",
+      "resolution core",
+      "resolution ledger",
+      "resolution sync",
+      "resolution tracker",
+      "response route",
+      "response scale",
+      "response signal",
+      "response watch",
+      "restock beacon",
+      "restock console",
+      "restock forge",
+      "restock panel",
+      "retainer center",
+      "retainer relay",
+      "retainer terminal",
+      "retainer vault",
+      "return base",
+      "return core",
+      "return guard",
+      "return manager",
+      "review radar",
+      "review relay",
+      "review station",
+      "review terminal",
+      "rider center",
+      "rider relay",
+      "rider vault",
+      "rider zone",
+      "rights gate",
+      "rights node",
+      "rights path",
+      "rights point",
+      "roaming desk",
+      "roaming lab",
+      "roaming pilot",
+      "roaming station",
+      "rollback desk",
+      "rollback lab",
+      "rollback pilot",
+      "rollback studio",
+      "roster frame",
+      "roster keeper",
+      "roster lens",
+      "roster sentry",
+      "rotation anchor",
+      "rotation route",
+      "rotation scale",
+      "rotation signal",
+      "route anchor",
+      "route bridge",
+      "route dial",
+      "route dock",
+      "route meter",
+      "route scope",
+      "route signal",
+      "route watch",
+      "royalty beacon",
+      "royalty console",
+      "royalty forge",
+      "royalty portal",
+      "runbook node",
+      "runbook path",
+      "runbook ring",
+      "runbook wave",
+      "satisfaction bridge",
+      "satisfaction cascade",
+      "satisfaction dial",
+      "satisfaction meter",
+      "schedule node",
+      "schedule pulse",
+      "schedule ring",
+      "schedule wave",
+      "scheduling atlas",
+      "scheduling lock",
+      "scheduling nexus",
+      "scheduling point",
+      "scholarship route",
+      "scholarship scale",
+      "scholarship signal",
+      "scholarship watch",
+      "screening radar",
+      "screening relay",
+      "screening station",
+      "screening terminal",
+      "segment node",
+      "segment path",
+      "segment ring",
+      "segment wave",
+      "service node",
+      "service pulse",
+      "service ring",
+      "service wave",
+      "session board",
+      "session deck",
+      "session flow",
+      "session hub",
+      "shift atlas",
+      "shift lock",
+      "shift nexus",
+      "shift point",
+      "shipment base",
+      "shipment core",
+      "shipment frame",
+      "shipment guard",
+      "shipment manager",
+      "shuttle cascade",
+      "shuttle dial",
+      "shuttle forge",
+      "shuttle panel",
+      "silo bridge",
+      "silo cascade",
+      "silo dial",
+      "silo panel",
+      "soil base",
+      "soil frame",
+      "soil keeper",
+      "soil manager",
+      "sourcing cascade",
+      "sourcing console",
+      "sourcing forge",
+      "sourcing panel",
+      "sponsor anchor",
+      "sponsor route",
+      "sponsor scale",
+      "sponsor signal",
+      "staffing board",
+      "staffing deck",
+      "staffing flow",
+      "staffing sync",
+      "statute board",
+      "statute deck",
+      "statute flow",
+      "statute hub",
+      "stewardship dock",
+      "stewardship rail",
+      "stewardship scope",
+      "stewardship watch",
+      "storefront grid",
+      "storefront loop",
+      "storefront rail",
+      "storefront trail",
+      "subcontractor base",
+      "subcontractor frame",
+      "subcontractor keeper",
+      "subcontractor manager",
+      "subrogation route",
+      "subrogation scale",
+      "subrogation signal",
+      "subrogation watch",
+      "subscriber bridge",
+      "subscriber cascade",
+      "subscriber dial",
+      "subscriber dock",
+      "subscriber loop",
+      "subscriber meter",
+      "subscriber rail",
+      "subscriber scope",
+      "subscriber watch",
+      "substation keeper",
+      "substation lens",
+      "substation map",
+      "substation sentry",
+      "supplier chain",
+      "supplier dock",
+      "supplier grid",
+      "supplier pulse",
+      "supplier route",
+      "supplier scope",
+      "supplier trail",
+      "supplier watch",
+      "syllabus chain",
+      "syllabus pulse",
+      "syllabus ring",
+      "syllabus wave",
+      "syndication center",
+      "syndication relay",
+      "syndication vault",
+      "syndication zone",
+      "tenant base",
+      "tenant core",
+      "tenant guard",
+      "tenant ledger",
+      "tenant tracker",
+      "terminal keeper",
+      "terminal lens",
+      "terminal map",
+      "terminal sentry",
+      "threat center",
+      "threat compass",
+      "threat vault",
+      "threat zone",
+      "throughput cascade",
+      "throughput console",
+      "throughput forge",
+      "throughput panel",
+      "ticket board",
+      "ticket chain",
+      "ticket deck",
+      "ticket flow",
+      "ticket grid",
+      "ticket hub",
+      "ticket pulse",
+      "ticket ring",
+      "ticket wave",
+      "ticketing center",
+      "ticketing relay",
+      "ticketing terminal",
+      "ticketing vault",
+      "timesheet board",
+      "timesheet deck",
+      "timesheet flow",
+      "timesheet ledger",
+      "timesheet sync",
+      "title beacon",
+      "title compass",
+      "title portal",
+      "title zone",
+      "trade anchor",
+      "trade bridge",
+      "trade dial",
+      "trade meter",
+      "transcript board",
+      "transcript ledger",
+      "transcript sync",
+      "transcript tracker",
+      "tuition base",
+      "tuition frame",
+      "tuition guard",
+      "tuition manager",
+      "underwriting base",
+      "underwriting frame",
+      "underwriting guard",
+      "underwriting manager",
+      "uptime anchor",
+      "uptime meter",
+      "uptime scale",
+      "uptime signal",
+      "variant deck",
+      "variant hub",
+      "variant lab",
+      "variant pilot",
+      "variant studio",
+      "vendor gate",
+      "vendor lock",
+      "vendor nexus",
+      "vendor point",
+      "venue dock",
+      "venue loop",
+      "venue rail",
+      "venue scope",
+      "volunteer center",
+      "volunteer relay",
+      "volunteer terminal",
+      "volunteer vault",
+      "vulnerability dock",
+      "vulnerability route",
+      "vulnerability signal",
+      "vulnerability watch",
+      "waiver beacon",
+      "waiver compass",
+      "waiver console",
+      "waiver portal",
+      "warehouse node",
+      "warehouse pulse",
+      "warehouse ring",
+      "warehouse wave",
+      "warranty beacon",
+      "warranty compass",
+      "warranty console",
+      "warranty desk",
+      "warranty gate",
+      "warranty lab",
+      "warranty lock",
+      "warranty nexus",
+      "warranty path",
+      "warranty point",
+      "warranty portal",
+      "warranty radar",
+      "warranty station",
+      "waste beacon",
+      "waste compass",
+      "waste portal",
+      "waste zone",
+      "yield chain",
+      "yield deck",
+      "yield flow",
+      "yield grid",
+      "yield hub",
+      "yield loop",
+      "yield studio",
+      "yield trail",
+      "zoning center",
+      "zoning desk",
+      "zoning radar",
+      "zoning relay",
+      "zoning station",
+      "zoning terminal"
+    ],
+    "final_titles": [
+      "Ticketing Center",
+      "Recall Zone",
+      "Waste Portal",
+      "Insurance Console",
+      "Audit Panel",
+      "Deposition Dial",
+      "Route Meter",
+      "Deposit Scale",
+      "Subrogation Route",
+      "Payroll Dock",
+      "Material Rail",
+      "Storefront Trail",
+      "Booking Chain",
+      "Syllabus Ring",
+      "Batch Node",
+      "Grazing Gate",
+      "Demand Nexus",
+      "Impact Atlas",
+      "Licensing Sentry",
+      "Referral Keeper",
+      "Licensing Manager",
+      "Coverage Tracker",
+      "Endpoint Sync",
+      "Monitoring Flow",
+      "Feedback Hub",
+      "Requisition Pilot",
+      "Exhibitor Desk",
+      "Maintenance Radar",
+      "Menu Relay",
+      "Diagnosis Vault",
+      "Accrual Compass",
+      "Waiver Beacon",
+      "Fleet Forge",
+      "Rent Cascade",
+      "Renewal Bridge",
+      "Offboarding Anchor",
+      "Crew Signal",
+      "Loyalty Watch",
+      "Banquet Scope",
+      "Advisor Loop",
+      "Yield Grid",
+      "Greenhouse Pulse",
+      "Efficiency Wave",
+      "Membership Path",
+      "Compliance Point",
+      "Conversion Lock",
+      "Distribution Map",
+      "Terminal Lens",
+      "Latency Frame",
+      "Breach Base",
+      "Capacity Core",
+      "Resolution Ledger",
+      "Onboarding Board",
+      "Session Deck",
+      "Dealer Studio",
+      "Catering Lab",
+      "Discharge Station",
+      "Retainer Center",
+      "Dispatch Zone",
+      "Title Portal",
+      "Actuary Console",
+      "Compliance Panel",
+      "Jobsite Dial",
+      "Markdown Meter",
+      "Itinerary Scale",
+      "Scholarship Route",
+      "Supplier Dock",
+      "Fertilizer Rail",
+      "Compliance Trail",
+      "Outreach Chain",
+      "Segment Node",
+      "Rights Gate",
+      "Cargo Nexus",
+      "Churn Atlas",
+      "Firewall Sentry",
+      "Migration Keeper",
+      "Knowledge Manager",
+      "Assessment Guard",
+      "Catering Tracker",
+      "Fleet Sync",
+      "Staffing Flow",
+      "Intake Hub",
+      "Chargeback Pilot",
+      "Discovery Desk",
+      "Inventory Radar",
+      "Zoning Relay",
+      "Rider Vault",
+      "Candidate Compass",
+      "Warranty Beacon",
+      "Restock Forge",
+      "Shuttle Cascade",
+      "Classroom Bridge",
+      "Calibration Anchor",
+      "Rotation Signal",
+      "Inspection Watch",
+      "Stewardship Scope",
+      "Franchise Loop",
+      "Content Grid",
+      "Circulation Pulse",
+      "Schedule Wave",
+      "Activation Path",
+      "Patch Point",
+      "Configuration Lock",
+      "Chat Map",
+      "Placement Lens",
+      "Logistics Frame",
+      "Mileage Base",
+      "Allergen Core",
+      "Consent Ledger",
+      "Escrow Board",
+      "Statute Deck",
+      "Backorder Studio",
+      "Appraisal Lab",
+      "Binder Station",
+      "Lien Center",
+      "Bundle Zone",
+      "Feedback Portal",
+      "Alumni Console",
+      "Throughput Panel",
+      "Silo Dial",
+      "Ledger Scale",
+      "Ballot Route",
+      "Placement Dock",
+      "Feed Rail",
+      "Permit Trail",
+      "Network Chain",
+      "Perimeter Ring",
+      "Runbook Node",
+      "Callback Gate",
+      "Referral Nexus",
+      "Feedback Atlas",
+      "Appraisal Sentry",
+      "Franchise Keeper",
+      "Patient Manager",
+      "Ledger Guard",
+      "Contract Tracker",
+      "Freight Sync",
+      "Lease Flow",
+      "Policy Hub",
+      "Onboarding Pilot",
+      "Permit Desk",
+      "Reservation Relay",
+      "Enrollment Vault",
+      "Production Compass",
+      "Harvest Beacon",
+      "Meter Forge",
+      "Donor Cascade",
+      "Permit Bridge",
+      "Campaign Anchor",
+      "Editorial Signal",
+      "Route Watch",
+      "Subscriber Scope",
+      "Incident Loop",
+      "Deployment Grid",
+      "Ticket Pulse",
+      "Candidate Wave",
+      "Registration Path",
+      "Warranty Point",
+      "Inventory Lock",
+      "Referral Map",
+      "Invoice Lens",
+      "Docket Frame",
+      "Shipment Base",
+      "Tenant Core",
+      "Premium Ledger",
+      "Timesheet Board",
+      "Blueprint Deck",
+      "Variant Studio",
+      "Guest Lab",
+      "Curriculum Station",
+      "Livestock Center",
+      "Outage Zone",
+      "Grant Portal",
+      "Citation Console",
+      "Audience Panel",
+      "Subscriber Dial",
+      "Fleet Meter",
+      "Provisioning Scale",
+      "Vulnerability Route",
+      "Incident Dock",
+      "Escalation Rail",
+      "Pipeline Trail",
+      "Attendee Chain",
+      "Service Ring",
+      "Recipe Node",
+      "Prior Gate",
+      "Payroll Nexus",
+      "Filing Atlas",
+      "Manifest Sentry",
+      "Property Keeper",
+      "Underwriting Manager",
+      "Benefits Guard",
+      "Punchlist Tracker",
+      "Checkout Sync",
+      "Housekeeping Flow",
+      "Attendance Hub",
+      "Quality Pilot",
+      "Irrigation Desk",
+      "Grid Radar",
+      "Volunteer Relay",
+      "Ordinance Vault",
+      "Funnel Compass",
+      "Royalty Beacon",
+      "Fuel Forge",
+      "Outage Cascade",
+      "Access Bridge",
+      "Uptime Anchor",
+      "Response Signal",
+      "Interview Watch",
+      "Venue Scope",
+      "Inspection Loop",
+      "Supplier Grid",
+      "Claim Pulse",
+      "Expense Wave",
+      "Clause Path",
+      "Customs Point",
+      "Listing Lock",
+      "Claim Map",
+      "Roster Lens",
+      "Subcontractor Frame",
+      "Return Base",
+      "Checkin Core",
+      "Transcript Ledger",
+      "Defect Board",
+      "Yield Deck",
+      "Consumption Studio",
+      "Campaign Lab",
+      "Zoning Station",
+      "Syndication Center",
+      "Maintenance Zone",
+      "Bandwidth Portal",
+      "Credential Console",
+      "Backup Panel",
+      "Satisfaction Dial",
+      "Offer Meter",
+      "Sponsor Scale",
+      "Inventory Route",
+      "Reservation Dock",
+      "Provider Rail",
+      "Budget Trail",
+      "Compliance Chain",
+      "Warehouse Ring",
+      "Escrow Node",
+      "Adjuster Gate",
+      "Shift Nexus",
+      "Bid Atlas",
+      "Fulfillment Sentry",
+      "Amenity Keeper",
+      "Tuition Manager",
+      "Downtime Guard",
+      "Crop Tracker",
+      "Billing Sync",
+      "Fundraising Flow",
+      "Constituent Hub",
+      "Brand Pilot",
+      "Manuscript Desk",
+      "Dispatch Radar",
+      "Billing Relay",
+      "Threat Vault",
+      "Provisioning Compass",
+      "Queue Beacon",
+      "Sourcing Forge",
+      "Badge Cascade",
+      "Trade Bridge",
+      "Delivery Anchor",
+      "Appointment Signal",
+      "Payment Watch",
+      "Redline Scope",
+      "Pallet Loop",
+      "Coverage Pulse",
+      "Leave Wave",
+      "Change Path",
+      "Vendor Point",
+      "Concierge Lock",
+      "Grading Map",
+      "Maintenance Lens",
+      "Soil Frame",
+      "Maintenance Base",
+      "Pledge Core",
+      "Hearing Ledger",
+      "Creative Board",
+      "Archive Deck",
+      "Driver Studio",
+      "Roaming Lab",
+      "Audit Station",
+      "Refund Center",
+      "Reference Zone",
+      "Agenda Portal",
+      "Financing Console",
+      "Prescription Dial",
+      "Reconciliation Meter",
+      "Matter Scale",
+      "Container Route",
+      "Maintenance Dock",
+      "Deductible Rail",
+      "Recruiting Trail",
+      "Catalog Ring",
+      "Occupancy Node",
+      "Cohort Gate",
+      "Scheduling Nexus",
+      "Pesticide Atlas",
+      "Substation Sentry",
+      "Beneficiary Keeper",
+      "Records Manager",
+      "Engagement Guard",
+      "Broadcast Tracker",
+      "Compliance Sync",
+      "Ticket Flow",
+      "Compliance Hub",
+      "Rollback Pilot",
+      "Warranty Desk",
+      "Screening Radar",
+      "Ticketing Relay",
+      "Recall Vault",
+      "Waste Compass",
+      "Insurance Beacon",
+      "Audit Forge",
+      "Deposition Cascade",
+      "Route Bridge",
+      "Deposit Anchor",
+      "Subrogation Signal",
+      "Payroll Watch",
+      "Material Scope",
+      "Storefront Loop",
+      "Booking Grid",
+      "Syllabus Pulse",
+      "Batch Wave",
+      "Grazing Path",
+      "Demand Point",
+      "Impact Lock",
+      "Licensing Map",
+      "Licensing Frame",
+      "Coverage Core",
+      "Endpoint Ledger",
+      "Monitoring Board",
+      "Feedback Deck",
+      "Requisition Studio",
+      "Exhibitor Lab",
+      "Maintenance Station",
+      "Diagnosis Center",
+      "Accrual Zone",
+      "Waiver Portal",
+      "Fleet Console",
+      "Rent Panel",
+      "Renewal Dial",
+      "Offboarding Meter",
+      "Crew Scale",
+      "Loyalty Route",
+      "Banquet Dock",
+      "Advisor Rail",
+      "Yield Trail",
+      "Greenhouse Chain",
+      "Efficiency Ring",
+      "Membership Node",
+      "Compliance Gate",
+      "Conversion Nexus",
+      "Distribution Atlas",
+      "Terminal Sentry",
+      "Latency Keeper",
+      "Breach Manager",
+      "Capacity Guard",
+      "Resolution Tracker",
+      "Onboarding Sync",
+      "Session Flow",
+      "Dealer Hub",
+      "Catering Pilot",
+      "Discharge Desk",
+      "Refund Radar",
+      "Retainer Relay",
+      "Dispatch Vault",
+      "Title Compass",
+      "Actuary Beacon",
+      "Compliance Forge",
+      "Jobsite Cascade",
+      "Markdown Bridge",
+      "Itinerary Anchor",
+      "Scholarship Signal",
+      "Supplier Watch",
+      "Fertilizer Scope",
+      "Compliance Loop",
+      "Outreach Grid",
+      "Segment Wave",
+      "Rights Path",
+      "Cargo Point",
+      "Churn Lock",
+      "Firewall Map",
+      "Migration Lens",
+      "Knowledge Frame",
+      "Assessment Base",
+      "Catering Core",
+      "Fleet Ledger",
+      "Staffing Board",
+      "Intake Deck",
+      "Chargeback Studio",
+      "Discovery Lab",
+      "Inventory Station",
+      "Rider Center",
+      "Candidate Zone",
+      "Warranty Portal",
+      "Restock Console",
+      "Shuttle Panel",
+      "Classroom Dial",
+      "Calibration Meter",
+      "Rotation Scale",
+      "Inspection Route",
+      "Stewardship Dock",
+      "Franchise Rail",
+      "Content Trail",
+      "Circulation Chain",
+      "Schedule Ring",
+      "Activation Node",
+      "Patch Gate",
+      "Configuration Nexus",
+      "Chat Atlas",
+      "Placement Sentry",
+      "Logistics Keeper",
+      "Mileage Manager",
+      "Allergen Guard",
+      "Consent Tracker",
+      "Escrow Sync",
+      "Statute Flow",
+      "Backorder Hub",
+      "Appraisal Pilot",
+      "Binder Desk",
+      "Review Radar",
+      "Lien Relay",
+      "Bundle Vault",
+      "Feedback Compass",
+      "Alumni Beacon",
+      "Throughput Forge",
+      "Silo Cascade",
+      "Ledger Anchor",
+      "Ballot Signal",
+      "Placement Watch",
+      "Feed Scope",
+      "Permit Loop",
+      "Network Grid",
+      "Perimeter Pulse",
+      "Runbook Wave",
+      "Callback Path",
+      "Referral Point",
+      "Feedback Lock",
+      "Appraisal Map",
+      "Franchise Lens",
+      "Patient Frame",
+      "Ledger Base",
+      "Contract Core",
+      "Freight Ledger",
+      "Lease Board",
+      "Policy Deck",
+      "Onboarding Studio",
+      "Permit Lab",
+      "Enrollment Center",
+      "Production Zone",
+      "Harvest Portal",
+      "Meter Console",
+      "Donor Panel",
+      "Permit Dial",
+      "Campaign Meter",
+      "Editorial Scale",
+      "Subscriber Dock",
+      "Deployment Trail",
+      "Ticket Chain",
+      "Candidate Ring",
+      "Registration Node",
+      "Warranty Gate",
+      "Inventory Nexus",
+      "Referral Atlas",
+      "Invoice Sentry",
+      "Docket Keeper",
+      "Shipment Manager",
+      "Tenant Guard",
+      "Premium Tracker",
+      "Timesheet Sync",
+      "Blueprint Flow",
+      "Variant Hub",
+      "Guest Pilot",
+      "Curriculum Desk",
+      "Assembly Radar",
+      "Livestock Relay",
+      "Outage Vault",
+      "Grant Compass",
+      "Citation Beacon",
+      "Audience Forge",
+      "Subscriber Cascade",
+      "Fleet Bridge",
+      "Provisioning Anchor",
+      "Vulnerability Signal",
+      "Incident Watch",
+      "Escalation Scope",
+      "Pipeline Loop",
+      "Attendee Grid",
+      "Service Pulse",
+      "Recipe Wave",
+      "Prior Path",
+      "Payroll Point",
+      "Filing Lock",
+      "Manifest Map",
+      "Property Lens",
+      "Underwriting Frame"
+    ],
+    "generated_filename": "saas_words_20260816_224846_KST.txt",
+    "title_round": 2
+  },
+  "created_at": "2026-08-16T22:48:46.762809+09:00",
+  "mode": "production",
+  "run_id": "RUN-20260816-224846-KST",
+  "stage": "publish_mode_outputs",
+  "status": "RUNNING",
+  "target_title_count": 500,
+  "updated_at": "2026-08-16T22:50:02.913459+09:00"
+}
