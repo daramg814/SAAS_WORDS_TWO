@@ -17,6 +17,7 @@
 4. 정확·대소문자·역순·현재 실행·과거 이력·blocklist 중복을 코드로 제거한다. **(불변, `contracts.validate_title_set` 그대로 재사용.)**
 5. 최대 라운드 후에도 부족하면 RETRYING 상태로 남기고 최종 파일과 운영 이력을 갱신하지 않는다. **(불변.)** 부족 원인이 업계 다양성 부족이면(전환 이전: "기회 부족") 단어뱅크 확장을 검토한다 — 수요·공급 조사 단계로 복귀하는 경로는 보류 상태다.
 6. **(신규)** 조합 전략: `word_bank.py`의 도메인어(업계 특화 명사, 예: Vendor/Claim/Payroll)와 기능어(동작·역할 명사, 예: Guard/Tracker/Sync)를 하나씩 짝지어 "도메인어 + 기능어" 순서로 조합한다 — 완전 무작위 두 단어 조합보다 "어떤 SaaS인지 추측 가능"한 이름이 나올 확률이 높다(실측 근거 없이 이 순서를 기본값으로 채택했으므로, 실제 AI 검토 승인율을 보고 필요하면 조정할 것).
+7. **(2026-08-17 신규) Keyword Planner 필터 게이트**: AI 판정(명확성·의미중복·상표유사)을 통과한 후보만 `config/keyword_metrics.yaml`의 기준값으로 Google Ads Keyword Planner 조회를 거친다 — `avg_monthly_searches`가 `avg_monthly_searches_min` 이상이고 `competition_index`가 `competition_index_exact`(기본 0)와 정확히 같아야 `approved`에 편입된다. `competition_index`가 `NULL`(메트릭 없음)이면 무조건 탈락한다. 이 판정은 라운드 루프 안에서 이뤄지므로 기존 5라운드/부족분×2 재시도 전략이 이 게이트의 통과율 부족도 함께 흡수한다(별도 재시도 계층 불필요). 실측 통과율과 근거는 `memory/ACTIVE_ISSUES.md`의 `GKP-001` 참고 — 2026-08-17 QA 20개 실행에서 174개 조회 중 4개(약 2.3%)만 통과했다.
 
 ## 원본 설계 세부 규칙
 

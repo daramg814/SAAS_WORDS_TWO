@@ -7,6 +7,7 @@
 2. 500개 또는 QA 목표 수량 미만의 결과는 최종 위치에 게시하지 않는다.
 3. 운영 이력은 임시 파일 작성 후 원자적 교체하고 증가분을 검증한다.
 4. QA는 운영 이력의 읽기 전용 스냅샷만 사용한다.
+5. **(2026-08-17 신규)** AI 판정을 통과한 후보는 게시 전에 추가로 Google Ads Keyword Planner 필터(`config/keyword_metrics.yaml`의 `avg_monthly_searches_min`/`competition_index_exact`)를 통과해야 한다 — `memory/ACTIVE_ISSUES.md`의 `GKP-001` 참고. 이 필터 통과율이 낮으면(2026-08-17 QA 실측 약 2.3%) 목표 수량 미달로 `RETRYING`/`CAPABILITY_STAGNATION`이 될 수 있으며, 이는 정직한 결과이지 결함이 아니다.
 
 ## 원본 설계 세부 규칙
 
@@ -132,5 +133,47 @@ QA 결과는 운영용 `/output/generated/`와 `/output/history/words.txt`에 �
   "product_ids": ["S-001", "S-002"]
 }
 ```
+
+---
+
+## 2026-08-17 신규 — Keyword Planner 검색량·경쟁지수 필터 계약 (GKP-001)
+
+> 아래는 원본 설계서에 없는 신규 계약이다(CLAUDE.md §2.3/§4, `memory/ACTIVE_ISSUES.md`
+> GKP-001 참고). 위 2.1~2.3의 원본 보존 내용과 별개로, 현재(전환 이후) 유효한
+> `word_pipeline.py` 경로에 추가된 게이트를 기술한다.
+
+### 신규 입력
+
+| 경로 | 형식 | 역할 |
+|---|---|---|
+| `.env.local` | KEY=VALUE (git 제외) | Google Ads API OAuth 자격증명. `.env.example`이 키 이름 스키마. 없으면 `KeywordMetricsCredentialsError`로 명시적 실패(가짜 통과 없음) |
+| `config/keyword_metrics.yaml` | YAML | `avg_monthly_searches_min`/`competition_index_exact` 필터 기준값과 API 런타임 설정(batch_size, budget, rate limit). **이 파일의 두 기준값만 바꾸면 필터 동작이 바뀐다** — 코드 수정 불필요 |
+
+### 신규 중간 산출물
+
+```text
+/output/intermediate/<run_id>_keyword_metrics_evidence.jsonl
+```
+
+- 매 라운드 AI 판정 통과 후보 전원(통과/탈락 모두)의 `title`, `avg_monthly_searches`,
+  `competition_index`, `api_status`, `passed`, `checked_at`을 한 줄씩 append.
+- production/QA 공통 — QA도 동일 경로에 기록되며 `output/qa/<qa_run_id>/` 밖에
+  쓰는 것이 아니라 실행 전반의 판정 근거 로그이므로 `output/intermediate/`가
+  맞는 위치(CLAUDE.md §4 QA 출력 격리 규칙과 무관 — 격리 대상은 `output/generated`
+  /`output/history`뿐).
+
+### 게이트 규칙
+
+최종 `approved`에 편입되려면 AI 판정(명확성·의미중복·상표유사) 통과 **및** 아래
+두 조건을 모두 만족해야 한다:
+
+1. `avg_monthly_searches >= config/keyword_metrics.yaml.avg_monthly_searches_min`
+2. `competition_index == config/keyword_metrics.yaml.competition_index_exact`(기본 0)
+
+`competition_index`가 `NULL`(Keyword Planner가 해당 조합에 메트릭 자체를 반환하지
+않음 — 통계적으로 유의미하지 않은 "죽은 단어")인 경우는 조건 2를 항상 실패한다.
+`avg_monthly_searches`가 `NULL`인 경우도 마찬가지로 조건 1을 항상 실패한다. 코드가
+전담하는 순수 수치 비교이며(CLAUDE.md §2 역할 분리), 현재 세션의 판정 대상이
+아니다.
 
 ---

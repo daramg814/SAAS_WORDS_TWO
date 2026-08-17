@@ -1,5 +1,108 @@
 # ACTIVE ISSUES
 
+## GKP-001 — CLAUDE.md §2.3(Google Keyword Planner 의존 금지)과 검색량·경쟁지수 필터 통합 요청 충돌
+- 상태: RESOLVED(사용자 확정 예외, §2.3 개정 완료)
+- 날짜: 2026-08-17
+- 충돌 내용: 사용자가 별도 프로젝트 `Word_check`(`C:\Share\Claude_project\Word_check`,
+  Google Ads API `KeywordPlanIdeaService.generateKeywordIdeas`로 `avg_monthly_searches`/
+  `competition_index`를 조회하는 로컬 배치 파이프라인, `docs/portable-build-spec.md`
+  참고)를 참고해, SAAS_WORDS_TWO가 단어를 생성할 때마다 이 두 지표로 후보를
+  필터링하도록 요청했다. 그런데 CLAUDE.md §2.3(개정 전)은 "Google Keyword
+  Planner·Google Trends 의존을 구현하지 않는다"를 절대 규칙으로 명시하고 있었고,
+  이는 §2.4/§2.8과 달리 "보류" 표시가 없는 현재 유효 규칙이었다 — 요청과 정면
+  충돌.
+- 사용자 확정 결정(AskUserQuestion): "§2.3 규칙을 개정하고 통합 진행" 선택.
+  근거: Word_check는 스크래핑·CAPTCHA 우회·브라우저 자동화가 아니라 공식 Google
+  Ads REST API(OAuth 정식 인증)만 사용하므로, §2.3이 실제로 막으려던 대상
+  (검색 결과 페이지 긁기·자동화 우회)과는 다른 종류의 연동이다. §2.3을
+  "스크래핑/CAPTCHA우회/브라우저자동화는 계속 금지, 공식 API를 통한 Keyword
+  Planner 연동은 예외적으로 허용, Google Trends 의존은 계속 금지"로 개정했다
+  (`CLAUDE.md` §2.3 참고).
+- 구현 내용:
+  - `config/keyword_metrics.yaml` — 필터 기준값(`avg_monthly_searches_min`,
+    `competition_index_exact`) 및 API 런타임 설정. **이 파일의 두 숫자만 바꾸면
+    필터 동작이 바뀐다** — 사용자 요청대로 기준값을 문서 하나에 모아 코드 수정
+    없이 조정 가능하게 함.
+  - `src/saas_words_two/keyword_metrics_client.py` — Word_check의
+    `src/ads-api/local-client.ts`를 Python으로 이식(OAuth refresh token 인증,
+    `generateKeywordIdeas` REST 호출, 배치당 20개 하드 제한, 429/401 재시도,
+    일일 예산 가드). Word_check와 동일한 Google Ads 계정/자격증명을 재사용한다
+    (`.env.local`, git 제외 — Word_check의 자격증명 발급 절차를 그대로 따름).
+  - `src/saas_words_two/word_pipeline.py` — 제목 생성 라운드 루프 안에서, AI
+    판정(명확성·의미중복·상표유사)을 통과한 후보에 대해서만 Keyword Planner
+    조회를 실행하고, 두 조건을 모두 만족하는 것만 `approved`에 편입한다. 조회
+    결과(통과/탈락 모두)는 `output/intermediate/<run_id>_keyword_metrics_evidence.jsonl`에
+    기록해 추적 가능성을 확보한다.
+- **`avg_monthly_searches_min` 기준값 결정(AI 리서치, 사용자가 위임)**: 1,000/월
+  (전세계 기준)로 설정. 근거: (1) SEO/PPC 업계에 공식 고정 구간은 없지만, 일반적
+  실무 관행에서 월 1,000회 이상은 "고검색량/헤드텀" 영역 진입점으로 통상
+  간주되고, Semrush 등은 100회 이상을 "타겟팅할 가치가 있는" 최소선으로 제시한다
+  — 1,000은 그보다 한 단계 위인 "높다"에 해당하는 값이다. (2) 이 프로젝트가
+  필터링하는 대상은 사전에 없던 "도메인어+기능어" 신조어 조합이라, Keyword
+  Planner가 애초에 메트릭 자체를 반환하지 않는(통계적으로 유의미하지 않음) 경우가
+  대다수일 것으로 예상된다 — 값을 너무 높게(예: 10,000+) 잡으면 통과 후보가
+  사실상 영구히 0개가 되어 게이트 자체가 무의미해진다. 1,000은 "일부는 통과할 수
+  있는 현실적인 높은 기준"과 "고검색량이라는 취지 유지"의 균형점으로 AI가 판단해
+  선택했다. **이 값이 실측(QA/production 실행)으로 통과율이 지나치게 낮거나
+  높은 것으로 확인되면, `config/keyword_metrics.yaml` 값만 조정하면 된다** — 코드
+  변경 불필요.
+- `competition_index_exact = 0`은 사용자가 직접 지정(협상 대상 아님) — `NULL`
+  (메트릭 없음, "죽은 단어")과 `0`(경쟁 없음, 살아있는 단어)을 명확히 구분해서
+  `NULL`은 항상 탈락시킨다.
+- 남은 리스크(다음 세션 참고): 신조어 2단어 조합 대부분이 메트릭 없음으로
+  탈락할 가능성이 높아, 기존 `title_generation.MAX_ROUNDS=5`/부족분×2 라운드
+  확장 전략만으로 목표 수량(500/20)에 도달하지 못하고 `RETRYING`/
+  `CAPABILITY_STAGNATION`으로 끝나는 빈도가 높아질 수 있다. 이는 코드 결함이
+  아니라 이 필터의 본질적 특성(사용자가 명시적으로 요청한 "매우 드문 조건")이다.
+  실측 통과율을 확인한 뒤 필요하면 (a) 기준값 완화, (b) `MAX_ROUNDS`/후보
+  생성량 확대, (c) 단어뱅크 확장 중 사용자와 협의해 조정할 것 — "5명 기준
+  완화 금지"(DEMAND-001)처럼 기준을 몰래 낮추지 말고 반드시 근거와 함께
+  사용자 확인을 받을 것.
+
+### 실측 검증 결과 (2026-08-17, 실제 Google Ads API로 QA 20개 전체 실행)
+
+- `python run.py --mode qa --target-count 20`을 실제 자격증명(Word_check와
+  공유하는 테스트 계정)으로 5라운드(=`MAX_ROUNDS`) 전부 실행함
+  (run_id `QA-20260817-190618-KST`). 174개 후보를 실제 조회한 결과 **4개만
+  두 조건을 모두 통과**(`Audit Desk` 2,400/월·0, `Ticket Board` 40,500/월·0,
+  `Terminal Map` 3,600/월·0, `Dispatch Center` 1,300/월·0) — 통과율 약 2.3%.
+  20개 목표에 4개만 확보한 채 `RETRYING`으로 정직하게 종료(가짜로 채우지
+  않음, 운영 데이터 미접촉 확인).
+- 이 실행 도중 **진짜 결함 2개를 실측으로 발견해 즉시 수정**:
+  1. `.env.local`의 실제 형식(`GOOGLE_ADS_CUSTOMER_ID=123  # 주석` 같은 줄
+     끝 인라인 주석)을 최초 구현의 단순 파서가 값에 그대로 포함시켜 API가
+     404를 반환함 - `keyword_metrics_client.load_env_file`이 인라인 주석을
+     제거하도록 수정.
+  2. Google Ads API가 `avgMonthlySearches`(proto int64)를 JSON에서 **문자열로
+     직렬화**해서 반환하는데(proto3 JSON 매핑의 표준 동작, precision loss 방지
+     목적), 최초 구현이 이를 그대로 비교에 사용해 `avg >= threshold`에서
+     `TypeError`가 났다 - `_coerce_number`로 숫자 강제 변환 추가.
+     `competitionIndex`(int32)도 방어적으로 동일 처리.
+  둘 다 회귀 테스트로 고정함(`tests/test_keyword_metrics_client.py`의
+  `test_load_env_file_strips_trailing_inline_comments`,
+  `test_fetch_metrics_coerces_string_encoded_int64_avg_searches`).
+- **핵심 발견(중요, 다음 production 실행 전 반드시 참고)**: 실측 데이터를 보면
+  경쟁지수가 정확히 0인 단어는 검색량도 대체로 낮고(10~320대가 다수), 검색량이
+  1,000을 크게 넘는 단어는 경쟁지수도 0이 아닌 경우가 대부분이었다(예: `Grid
+  Station` 3,600/월·경쟁지수 1, `Brand Studio` 8,100/월·경쟁지수 5) - 시장
+  논리상 자연스러운 상관관계(검색량이 높으면 광고주가 붙어 경쟁지수도 올라감).
+  즉 "검색량 높음 AND 경쟁지수 정확히 0"은 사용자가 원한 대로 진짜 희귀한
+  "차익거래"급 조건이며, 통과율 2.3%는 우연이 아니라 이 필터의 본질이다.
+  **production(목표 500개)에 그대로 적용하면**: 현재 통과율(2.3%)과 라운드당
+  후보 생성량(`first_round_size`/`next_round_size`, 부족분×2, 최대 5라운드)
+  으로는 5라운드 누적 후보가 수천 개 수준에 그쳐 500개에 크게 못 미칠
+  가능성이 높다(단순 산술로 대략 100개 안팎 예상) - `RETRYING`으로 끝날
+  가능성이 실측상 높다. 이는 버그가 아니라 정직한 결과이지만, **다음
+  production 실행 전 사용자에게 이 실측 통과율을 알리고 (a) 그대로 실행해
+  `RETRYING`을 받아들일지, (b) `avg_monthly_searches_min`을 낮출지, (c)
+  `MAX_ROUNDS`/라운드당 후보 수를 늘릴지 확인할 것** - 기준을 몰래 낮추지
+  말 것.
+- QA 산출물: `output/runs/QA-20260817-190618-KST/run_state.json`(승인 4건
+  기록), `output/intermediate/QA-20260817-190618-KST_keyword_metrics_evidence.jsonl`
+  (174건 전체 조회 근거, `.gitignore` 대상이라 로컬에만 있음). 운영
+  `output/history/words.txt`는 이 실행으로 전혀 변경되지 않음(QA는 스냅샷만
+  사용).
+
 ## PROCESS-001 — SSH/원격 세션 push 정책이 원본 설계 §15 Git 원칙과 충돌
 - 상태: OPEN (사용자 확정 예외, 재논의 대상 아님 — 아래 참고)
 - 충돌 내용: 원본 설계서 `# 15. Git 원칙`은 "푸시 실패 시 `COMMIT_PENDING`으로 저장하고

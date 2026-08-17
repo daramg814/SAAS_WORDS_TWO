@@ -32,10 +32,26 @@ Git·완료 규칙, 코드/AI 판정 역할 분리의 원칙 자체(§5), 제목
 원본이 충돌하면 이 전환 결정을 따르고, 충돌 사실을 `memory/ACTIVE_ISSUES.md`에
 기록한 뒤 QA를 수행한다.
 
+**2026-08-17 Keyword Planner 필터 게이트 추가(사용자 지시, §2.3 개정 포함).**
+단어뱅크 조합 승인만으로는 부족하고, 최종 후보가 **Google Ads Keyword Planner
+기준 전세계 평균 월간 검색량이 높으면서 광고 경쟁지수가 정확히 0(=NULL이 아님,
+즉 "죽은 단어"가 아니라 "경쟁 전무"인 살아있는 단어)인 경우만** 출력에 포함하도록
+파이프라인에 코드 기반 게이트를 추가했다. 기준값(`avg_monthly_searches_min`,
+`competition_index_exact`)은 `config/keyword_metrics.yaml`에 있으며 그 값만 바꾸면
+동작이 바뀐다(§2.3, `memory/ACTIVE_ISSUES.md`의 `GKP-001` 참고). 이 게이트는 §2의
+코드/AI 역할 분리 원칙을 따라 순수 수치 비교이므로 전담 코드가 처리하고, 현재
+세션의 판정 대상이 아니다.
+
 ## 2. 절대 규칙
 1. **AI 판정은 현재 실행 중인 Claude Code 세션 또는 그 세션이 호출한 서브에이전트가 직접 수행한다.** 별도의 `anthropic` 패키지, Anthropic API 호출, API 키 설정을 추가하지 않는다.
 2. 단어뱅크 조합·형식 검증·정확/역순 중복 제거·원자적 저장은 코드로 처리한다. 업계 커버리지 판단, 단어 적합성 판단, 제목 명확성·의미 중복·유명 상표 유사 검토만 현재 세션/서브에이전트가 수행한다. *(수요/공급 재개 시 이전 역할 분리 표(§5 원표)가 함께 부활한다.)*
-3. Google 검색 결과 페이지 스크래핑, CAPTCHA 우회, 브라우저 자동화, Google Keyword Planner·Google Trends 의존을 구현하지 않는다.
+3. Google 검색 결과 페이지 스크래핑, CAPTCHA 우회, 브라우저 자동화를 구현하지 않는다.
+   **(2026-08-17 개정, 사용자 지시)** 공식 Google Ads API
+   (`KeywordPlanIdeaService.generateKeywordIdeas`, OAuth 정식 인증, 공개 REST
+   엔드포인트)를 통한 Keyword Planner 연동은 예외적으로 허용한다 — 검색 결과
+   페이지를 긁거나 CAPTCHA를 우회하거나 브라우저를 자동화하는 것이 아니라 공식
+   API 호출이기 때문이다. Google Trends 의존은 여전히 금지한다. 결정 근거와
+   충돌 처리 기록은 `memory/ACTIVE_ISSUES.md`의 `GKP-001` 참고.
 4. *(보류 — 데이터원 접근성 QA 규칙. 수요/공급 재개 시 적용.)* 접근성 QA를 통과하지 못한 선택 데이터원은 `DISABLED` 처리하고 가능한 데이터원만으로 계속한다.
 5. `production`은 승인 제목이 정확히 500개가 되기 전까지 완료하거나 최종 파일을 게시하지 않는다. 부족분은 중간 출력에만 저장한다.
 6. `qa`는 사용자와 동일한 `run.py` 진입점과 동일한 단계·검증·저장 함수를 사용한다. QA 전용 축약 소프트웨어나 별도 제목 생성 로직을 만들지 않는다.
@@ -58,10 +74,19 @@ Git·완료 규칙, 코드/AI 판정 역할 분리의 원칙 자체(§5), 제목
 7. 성능과 코드 미관
 
 ## 4. 입력·출력 계약
-- 입력: `config/project.yaml`, 선택 `input/brief.md`(업계 범위 지정용), `input/blocklist.txt`, 선택 `input/human_google_checks.csv`(제목 상표 충돌 확인용), 운영 이력 `output/history/words.txt`, 메모리 파일, `src/saas_words_two/word_bank.py`(업계별 단어뱅크). *(`config/sources.yaml`은 수요/공급 재개 시 다시 쓰인다 — 보류.)*
+- 입력: `config/project.yaml`, 선택 `input/brief.md`(업계 범위 지정용), `input/blocklist.txt`, 선택 `input/human_google_checks.csv`(제목 상표 충돌 확인용), 운영 이력 `output/history/words.txt`, 메모리 파일, `src/saas_words_two/word_bank.py`(업계별 단어뱅크), `config/keyword_metrics.yaml`(검색량·경쟁지수 기준값), `.env.local`(Google Ads API 자격증명, git 제외). *(`config/sources.yaml`은 수요/공급 재개 시 다시 쓰인다 — 보류.)*
 - 운영 출력: `output/generated/saas_words_YYYYMMDD_HHMMSS_KST.txt` 정확히 500줄, `output/history/words.txt` 원자적 증가. *(`output/final/opportunities.jsonl`은 기회 개념이 없어 더 이상 생성하지 않는다 — 수요/공급 재개 시 부활.)*
 - QA 출력: `output/qa/<qa_run_id>/` 내부에만 생성하며 기본 제목 파일은 정확히 20줄이다.
 - 제목 형식: UTF-8/LF, 한 줄 하나, 영문자 2단어, 단일 공백, Title Case, 숫자·기호·하이픈 금지, 정확·대소문자·역순·현재 실행·과거 이력 중복 0. **(전환 이전과 완전히 동일, 불변.)**
+- **(2026-08-17 신규) Keyword Planner 필터 게이트**: 최종 출력에 포함되려면 후보가
+  `config/keyword_metrics.yaml`의 `avg_monthly_searches_min` 이상의 전세계 평균
+  월간 검색량과, `competition_index_exact`(기본 0)와 **정확히 같은** 광고
+  경쟁지수를 가져야 한다. `competition_index`가 `NULL`(Keyword Planner 응답에
+  메트릭 자체가 없음, 통계적으로 유의미하지 않은 "죽은 단어")인 경우는 0과 다르므로
+  항상 탈락한다 — 이 둘을 혼동하지 않는 것이 이 게이트의 핵심 요건이다. 이
+  판정은 코드가 전담하며(§2 역할 분리), 매 라운드 판정 근거는
+  `output/intermediate/<run_id>_keyword_metrics_evidence.jsonl`에 기록되어
+  추적 가능하다(§3 우선순위 1).
 - 사람 검증: 입력 최소 필드는 `validation_id`, `user_result_count`, `user_checked_at`; 완전 동일한 `validation_id + result_count + checked_at`만 중복 거부한다(제목 상표 충돌 확인용으로 계속 사용 가능).
 
 상세 계약과 스키마는 `docs/contracts/02-input-output-contracts.md` 및 `docs/contracts/03-schema-reference.md`를 따른다(전환 반영됨).
@@ -81,11 +106,12 @@ Git·완료 규칙, 코드/AI 판정 역할 분리의 원칙 자체(§5), 제목
 
 ## 6. 고정 워크플로우
 
-**현재(2026-08-11 전환 이후) 유효한 워크플로우:**
+**현재(2026-08-17 Keyword Planner 게이트 추가 이후) 유효한 워크플로우:**
 세션 시작 → Git/HANDOFF/PLAYBOOK/이력 로드 → 단어뱅크에서 후보 조합 생성 →
 코드 기반 형식·중복 검증 → 제목 명확성·의미 중복·상표 유사 검토(현재 세션) →
-목표 수량 미달 시 반복 생성 → 목표 수량 도달 → 동일 파이프라인 QA → 모드별
-원자적 게시 → 메모리·Git 체크포인트.
+**코드 기반 Keyword Planner 검색량·경쟁지수 필터(§4 신규 게이트, 두 조건 모두
+충족해야 통과)** → 목표 수량 미달 시 반복 생성 → 목표 수량 도달 → 동일 파이프라인
+QA → 모드별 원자적 게시 → 메모리·Git 체크포인트.
 
 제목 생성 세부 규칙은 `docs/pipeline/10-title-generation.md`(전환 반영됨)를 따른다.
 

@@ -9,6 +9,7 @@ import csv
 import sys
 from pathlib import Path
 
+import pytest
 import requests
 
 from saas_words_two import (
@@ -360,3 +361,70 @@ def test_calibration_does_not_propagate_to_problems_without_observations(tmp_pat
     assert unobserved["human_adjusted_supply_scarcity_score"] is None
     assert unobserved["supply_scarcity_score"] == 80  # untouched base score
     conn.close()
+
+
+# 17-19. Keyword Planner 게이트 (GKP-001) - word_pipeline._apply_keyword_metrics_filter
+# 를 직접 호출해 세 회귀 사례를 재현한다.
+def _kw_state(tmp_path, run_id="QA-20260817-000000-KST"):
+    from saas_words_two import word_pipeline
+
+    options = word_pipeline.RunOptions(mode="qa", target_count=5, project_root=tmp_path, run_id=run_id)
+    return word_pipeline._load_or_create_state(options)
+
+
+# 17. competition_index NULL(죽은 단어)은 avg_monthly_searches가 아무리 높아도 항상 탈락
+def test_keyword_metrics_gate_rejects_null_competition_index_regardless_of_searches(tmp_path, monkeypatch):
+    from saas_words_two import word_pipeline
+    from saas_words_two.keyword_metrics_client import KeywordMetricRecord
+
+    class _NullMetricsClient:
+        def fetch_metrics(self, words):
+            return [
+                KeywordMetricRecord(
+                    word=w, avg_monthly_searches=999999, competition=None, competition_index=None, api_status="failed"
+                )
+                for w in words
+            ]
+
+    monkeypatch.setattr(word_pipeline, "_keyword_metrics_settings", lambda project_root: (1000, 0, None, Path(".")))
+    monkeypatch.setattr(word_pipeline, "_build_keyword_metrics_client", lambda project_root: _NullMetricsClient())
+
+    state = _kw_state(tmp_path)
+    passed = word_pipeline._apply_keyword_metrics_filter(tmp_path, state, [{"title": "Ledger Pilot", "industry": "finance"}])
+    assert passed == []
+
+
+# 18. avg_monthly_searches가 임계값 미만이면 탈락
+def test_keyword_metrics_gate_rejects_below_search_volume_threshold(tmp_path, monkeypatch):
+    from saas_words_two import word_pipeline
+    from saas_words_two.keyword_metrics_client import KeywordMetricRecord
+
+    class _LowVolumeClient:
+        def fetch_metrics(self, words):
+            return [
+                KeywordMetricRecord(word=w, avg_monthly_searches=10, competition="LOW", competition_index=0, api_status="success")
+                for w in words
+            ]
+
+    monkeypatch.setattr(word_pipeline, "_keyword_metrics_settings", lambda project_root: (1000, 0, None, Path(".")))
+    monkeypatch.setattr(word_pipeline, "_build_keyword_metrics_client", lambda project_root: _LowVolumeClient())
+
+    state = _kw_state(tmp_path)
+    passed = word_pipeline._apply_keyword_metrics_filter(tmp_path, state, [{"title": "Ledger Pilot", "industry": "finance"}])
+    assert passed == []
+
+
+# 19. 자격증명 누락/일일 예산 초과 시 가짜 통과 없이 예외가 그대로 전파된다
+def test_keyword_metrics_gate_credentials_error_does_not_silently_pass(tmp_path, monkeypatch):
+    from saas_words_two import word_pipeline
+    from saas_words_two.keyword_metrics_client import KeywordMetricsCredentialsError
+
+    def _raise_credentials_error(project_root):
+        raise KeywordMetricsCredentialsError("missing required credentials")
+
+    monkeypatch.setattr(word_pipeline, "_keyword_metrics_settings", lambda project_root: (1000, 0, None, Path(".")))
+    monkeypatch.setattr(word_pipeline, "_build_keyword_metrics_client", _raise_credentials_error)
+
+    state = _kw_state(tmp_path)
+    with pytest.raises(KeywordMetricsCredentialsError):
+        word_pipeline._apply_keyword_metrics_filter(tmp_path, state, [{"title": "Ledger Pilot", "industry": "finance"}])

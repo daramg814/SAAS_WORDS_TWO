@@ -16,3 +16,7 @@
 - Git push 실패
 - Google 입력 일부 행/중복/잘못된 형식/다른 날짜
 - 검색 노이즈, 공급 과소·과대, TITLE_QUERY 분리, 보정 전파 제한
+- Keyword Planner 게이트: competition_index NULL(죽은 단어)은 avg_monthly_searches가
+  아무리 높아도 항상 탈락(GKP-001)
+- Keyword Planner 게이트: avg_monthly_searches가 임계값 미만이면 탈락
+- Keyword Planner 게이트: 자격증명 누락/일일 예산 초과 시 가짜 통과 없이 RetryRequired

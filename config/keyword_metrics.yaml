@@ -1,0 +1,39 @@
+# Google Ads Keyword Planner 필터 기준값 (CLAUDE.md §4 신규 게이트, memory/ACTIVE_ISSUES.md GKP-001)
+#
+# 아래 두 값만 바꾸면 필터 동작이 바뀐다. 코드 수정은 필요 없다.
+#
+# avg_monthly_searches_min:
+#   전세계 평균 월간 검색량(Google Ads API avgMonthlySearches)이 이 값 "이상"인
+#   후보만 통과한다. 기준값 1000의 근거는 memory/ACTIVE_ISSUES.md의 GKP-001 참고.
+#
+# competition_index_exact:
+#   광고 경쟁지수(Google Ads API competitionIndex)가 이 값과 "정확히 같은" 후보만
+#   통과한다. 기본값 0 = 광고 경쟁이 전혀 없는 살아있는 단어.
+#   경쟁지수가 NULL(Keyword Planner가 해당 조합에 대해 메트릭 자체를 반환하지
+#   않음 = 통계적으로 유의미하지 않은 "죽은 단어")인 경우는 이 값과 절대 같다고
+#   보지 않는다 - NULL과 0을 혼동하면 안 된다는 것이 이 필터의 핵심 요건이다.
+avg_monthly_searches_min: 1000
+competition_index_exact: 0
+
+# --- 아래는 Google Ads API 호출 런타임 설정. 필터 기준값이 아니므로 위 두 값과
+# 섞어서 조정하지 말 것 (CLAUDE.md 8항: 점수 기준과 다른 설정을 같은 자리에서
+# 혼동하지 않는다).
+api:
+  # 배치당 최대 키워드 수. Google Ads API 하드 제한 20 (Word_check
+  # docs/portable-build-spec.md §8.2 실측 확인).
+  batch_size: 20
+  # 하루 허용 API 호출 수(호출 1회당 batch_size개 키워드 처리).
+  free_tier_budget: 1000
+  # 요청 간 최소 간격(ms), 429 방지.
+  min_request_interval_ms: 500
+  shard_retry_count: 3
+  # 비워두면(빈 문자열) 전세계 통합 결과. Word_check와 동일 관례
+  # (docs/portable-build-spec.md §8.3): 특정 지역으로 한정하려면
+  # "geoTargetConstants/2840"(미국) 같은 값을 넣는다.
+  geo_target_constants: ""
+  language: "languageConstants/1000"
+  keyword_plan_network: "GOOGLE_SEARCH"
+  # Google Ads 자격증명을 읽어올 .env 파일 경로(project_root 기준 상대경로 또는
+  # 절대경로). 기본은 이 프로젝트 자체의 .env.local. 파일이 없으면 명시적으로
+  # 실패한다(자격증명 없이 가짜로 통과시키지 않음).
+  credentials_env_path: ".env.local"

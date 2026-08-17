@@ -11,17 +11,26 @@ DB(`data/local.db`)를 전혀 쓰지 않는다(단어뱅크 조합은 결정론�
 
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
 from pathlib import Path
 
-from . import ids, judgment, run_state, title_generation, word_generation
+from . import config, ids, judgment, run_state, title_generation, word_generation
 from .contracts import (
     atomic_write_text,
     normalize_title,
     validate_title_set,
 )
 from .judgment import JudgmentRequired
+from .keyword_metrics_client import (
+    ApiRuntimeConfig,
+    KeywordMetricsBudgetExceeded,
+    KeywordMetricsClient,
+    KeywordMetricsCredentialsError,
+    credentials_from_env,
+    load_env_file,
+)
 from .pipeline import ImplementationPendingError, RecoveryRequired, RetryRequired, RunOptions
 
 __all__ = [
@@ -122,6 +131,93 @@ def _excluded_normalized(project_root: Path, state: run_state.RunState) -> set[s
     return excluded
 
 
+# ---------------------------------------------------------------------------
+# Keyword Planner filter gate (2026-08-17, CLAUDE.md §4, memory/ACTIVE_ISSUES.md
+# GKP-001) - applied to AI-judgment-approved candidates each round, before they
+# count toward target_count. Pure numeric comparison, so this stays code-only
+# per CLAUDE.md §2 role separation (no session judgment needed).
+# ---------------------------------------------------------------------------
+
+
+def _keyword_metrics_settings(project_root: Path) -> tuple[float, float, ApiRuntimeConfig, Path]:
+    cfg = config.load_keyword_metrics_config(project_root)
+    api_cfg = cfg.get("api", {})
+    runtime = ApiRuntimeConfig(
+        batch_size=api_cfg.get("batch_size", 20),
+        free_tier_budget=api_cfg.get("free_tier_budget", 1000),
+        min_request_interval_ms=api_cfg.get("min_request_interval_ms", 500),
+        geo_target_constants=api_cfg.get("geo_target_constants", ""),
+        language=api_cfg.get("language", "languageConstants/1000"),
+        keyword_plan_network=api_cfg.get("keyword_plan_network", "GOOGLE_SEARCH"),
+    )
+    credentials_path = Path(api_cfg.get("credentials_env_path", ".env.local"))
+    if not credentials_path.is_absolute():
+        credentials_path = project_root / credentials_path
+    return cfg["avg_monthly_searches_min"], cfg["competition_index_exact"], runtime, credentials_path
+
+
+def _build_keyword_metrics_client(project_root: Path) -> KeywordMetricsClient:
+    _, _, runtime, credentials_path = _keyword_metrics_settings(project_root)
+    env = load_env_file(credentials_path)
+    creds = credentials_from_env(env)
+    return KeywordMetricsClient(creds, runtime)
+
+
+def _write_metrics_evidence(project_root: Path, state: run_state.RunState, evidence: list[dict]) -> None:
+    path = project_root / "output" / "intermediate" / f"{state.run_id}_keyword_metrics_evidence.jsonl"
+    existing = path.read_text(encoding="utf-8").splitlines() if path.exists() else []
+    lines = existing + [json.dumps(entry, ensure_ascii=False, sort_keys=True) for entry in evidence]
+    atomic_write_text(path, "\n".join(lines) + "\n" if lines else "")
+
+
+def _apply_keyword_metrics_filter(
+    project_root: Path, state: run_state.RunState, candidates: list[dict]
+) -> list[dict]:
+    """Keeps only candidates whose avg_monthly_searches >= threshold AND whose
+    competition_index is exactly the configured value (default 0). A missing
+    (NULL) competition_index means Keyword Planner has no data for that
+    combination - "dead word" - and never passes, regardless of
+    avg_monthly_searches. Every checked candidate (pass or fail) is logged to
+    the run's keyword_metrics_evidence.jsonl for traceability (CLAUDE.md §3.1).
+    """
+    if not candidates:
+        return []
+
+    searches_min, competition_exact, _, _ = _keyword_metrics_settings(project_root)
+    client = _build_keyword_metrics_client(project_root)
+    titles = [c["title"] for c in candidates]
+    records_by_title = {record.word: record for record in client.fetch_metrics(titles)}
+
+    checked_at = ids.now_kst().isoformat()
+    passed: list[dict] = []
+    evidence: list[dict] = []
+    for candidate in candidates:
+        record = records_by_title.get(candidate["title"])
+        avg = record.avg_monthly_searches if record else None
+        competition_index = record.competition_index if record else None
+        gate_passed = (
+            avg is not None
+            and competition_index is not None
+            and avg >= searches_min
+            and competition_index == competition_exact
+        )
+        evidence.append(
+            {
+                "title": candidate["title"],
+                "avg_monthly_searches": avg,
+                "competition_index": competition_index,
+                "api_status": record.api_status if record else "failed",
+                "passed": gate_passed,
+                "checked_at": checked_at,
+            }
+        )
+        if gate_passed:
+            passed.append(candidate)
+
+    _write_metrics_evidence(project_root, state, evidence)
+    return passed
+
+
 def _stage_generate_and_review_titles(project_root: Path, options: RunOptions, state: run_state.RunState) -> None:
     run_dir = _run_dir(project_root, state)
     stage_name = "review_titles"
@@ -146,7 +242,19 @@ def _stage_generate_and_review_titles(project_root: Path, options: RunOptions, s
 
         if judgment.has_response(run_dir, stage_name, round_no):
             response = judgment.read_response(run_dir, stage_name, round_no)
-            _consume_review(state, response)
+            newly_judged = _consume_review(state, response)
+            try:
+                newly_approved = _apply_keyword_metrics_filter(project_root, state, newly_judged)
+            except (KeywordMetricsCredentialsError, KeywordMetricsBudgetExceeded) as exc:
+                approved_so_far = state.context.get("approved", [])
+                status = "CAPABILITY_STAGNATION" if not approved_so_far else "RETRYING"
+                state.status = status
+                run_state.save(project_root, state)
+                _write_shortfall_intermediate(project_root, state, [item["title"] for item in approved_so_far])
+                raise RetryRequired(f"keyword metrics filter unavailable: {exc}", status=status)
+            approved = state.context.setdefault("approved", [])
+            approved.extend(newly_approved)
+            state.context["approved"] = approved
             state.context["title_round"] = round_no + 1
             run_state.save(project_root, state)
             continue
@@ -187,14 +295,17 @@ def _stage_generate_and_review_titles(project_root: Path, options: RunOptions, s
         _pause_for_judgment(project_root, state, stage_name, request_path)
 
 
-def _consume_review(state: run_state.RunState, response: dict) -> None:
-    approved = state.context.setdefault("approved", [])
+def _consume_review(state: run_state.RunState, response: dict) -> list[dict]:
+    """Returns this round's AI-judgment-approved candidates. Callers must still
+    run them through `_apply_keyword_metrics_filter` before counting them
+    toward `state.context["approved"]` / target_count (CLAUDE.md §4 신규 게이트)."""
     candidate_industry = state.context.get("candidate_industry", {})
+    newly_judged = []
     for decision in response["decisions"]:
         title = decision["title"]
         if decision.get("approve"):
-            approved.append({"title": title, "industry": candidate_industry.get(title, "")})
-    state.context["approved"] = approved
+            newly_judged.append({"title": title, "industry": candidate_industry.get(title, "")})
+    return newly_judged
 
 
 # ---------------------------------------------------------------------------

@@ -4,8 +4,42 @@ from pathlib import Path
 import pytest
 
 from saas_words_two import judgment, run_state, word_pipeline
+from saas_words_two.keyword_metrics_client import (
+    KeywordMetricRecord,
+    KeywordMetricsBudgetExceeded,
+    KeywordMetricsCredentialsError,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+class StubKeywordMetricsClient:
+    """By default every word passes the gate (avg_monthly_searches huge,
+    competition_index exactly 0) so existing round-loop tests keep their
+    pre-GKP-001 "judgment approval == final approval" semantics. Tests of the
+    gate itself override records_by_title or raise_error."""
+
+    def __init__(self, records_by_title=None, raise_error=None, default_factory=None):
+        self.records_by_title = records_by_title or {}
+        self.raise_error = raise_error
+        self.default_factory = default_factory or (
+            lambda word: KeywordMetricRecord(
+                word=word, avg_monthly_searches=999999, competition="LOW", competition_index=0, api_status="success"
+            )
+        )
+        self.fetched: list[str] = []
+
+    def fetch_metrics(self, words):
+        if self.raise_error is not None:
+            raise self.raise_error
+        self.fetched.extend(words)
+        return [self.records_by_title.get(word, self.default_factory(word)) for word in words]
+
+
+@pytest.fixture(autouse=True)
+def default_keyword_metrics_stub(monkeypatch):
+    monkeypatch.setattr(word_pipeline, "_keyword_metrics_settings", lambda project_root: (1000, 0, None, Path(".")))
+    monkeypatch.setattr(word_pipeline, "_build_keyword_metrics_client", lambda project_root: StubKeywordMetricsClient())
 
 
 def make_options(tmp_path, mode="qa", target_count=5, **overrides):
@@ -157,6 +191,149 @@ def test_generate_and_review_titles_partial_progress_stays_retrying(tmp_path):
     assert state.status == "RETRYING"
     assert excinfo.value.status == "RETRYING"
     assert len(state.context["approved"]) == 1
+
+
+# ---------------------------------------------------------------------------
+# Keyword Planner filter gate (GKP-001) - applied inside the round loop, on
+# top of AI judgment approval.
+# ---------------------------------------------------------------------------
+
+
+def test_keyword_metrics_gate_rejects_null_competition_index_regardless_of_searches(tmp_path, monkeypatch):
+    # NULL competition_index means "no data" (dead word), never "zero
+    # competition" - must reject even with a huge avg_monthly_searches.
+    stub = StubKeywordMetricsClient(
+        default_factory=lambda word: KeywordMetricRecord(
+            word=word, avg_monthly_searches=999999, competition=None, competition_index=None, api_status="failed"
+        )
+    )
+    monkeypatch.setattr(word_pipeline, "_build_keyword_metrics_client", lambda project_root: stub)
+
+    options = make_options(tmp_path, target_count=5, run_id="QA-20260811-190000-KST")
+    state = word_pipeline._load_or_create_state(options)
+    with_qa_history_snapshot(tmp_path, state)
+    run_dir = word_pipeline._run_dir(tmp_path, state)
+
+    for round_no in range(1, word_pipeline.word_generation.MAX_ROUNDS + 1):
+        with pytest.raises(judgment.JudgmentRequired):
+            word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)
+        run_state.save(tmp_path, state)
+        approve_all_response(run_dir, state.run_id, round_no)
+
+    with pytest.raises(word_pipeline.RetryRequired) as excinfo:
+        word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)
+    assert state.status == "CAPABILITY_STAGNATION"
+    assert excinfo.value.status == "CAPABILITY_STAGNATION"
+    assert state.context["approved"] == []
+
+
+def test_keyword_metrics_gate_rejects_below_search_volume_threshold(tmp_path, monkeypatch):
+    stub = StubKeywordMetricsClient(
+        default_factory=lambda word: KeywordMetricRecord(
+            word=word, avg_monthly_searches=10, competition="LOW", competition_index=0, api_status="success"
+        )
+    )
+    monkeypatch.setattr(word_pipeline, "_build_keyword_metrics_client", lambda project_root: stub)
+
+    options = make_options(tmp_path, target_count=5, run_id="QA-20260811-190000-KST")
+    state = word_pipeline._load_or_create_state(options)
+    with_qa_history_snapshot(tmp_path, state)
+    run_dir = word_pipeline._run_dir(tmp_path, state)
+
+    with pytest.raises(judgment.JudgmentRequired):
+        word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)
+    run_state.save(tmp_path, state)
+    approve_all_response(run_dir, state.run_id, 1)
+
+    for round_no in range(2, word_pipeline.word_generation.MAX_ROUNDS + 1):
+        with pytest.raises(judgment.JudgmentRequired):
+            word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)
+        run_state.save(tmp_path, state)
+        approve_all_response(run_dir, state.run_id, round_no)
+
+    with pytest.raises(word_pipeline.RetryRequired):
+        word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)
+    assert state.context["approved"] == []
+
+
+def test_keyword_metrics_gate_passes_when_both_conditions_met(tmp_path, monkeypatch):
+    stub = StubKeywordMetricsClient(
+        default_factory=lambda word: KeywordMetricRecord(
+            word=word, avg_monthly_searches=1000, competition="LOW", competition_index=0, api_status="success"
+        )
+    )
+    monkeypatch.setattr(word_pipeline, "_build_keyword_metrics_client", lambda project_root: stub)
+
+    options = make_options(tmp_path, target_count=5, run_id="QA-20260811-190000-KST")
+    state = word_pipeline._load_or_create_state(options)
+    with_qa_history_snapshot(tmp_path, state)
+    run_dir = word_pipeline._run_dir(tmp_path, state)
+
+    with pytest.raises(judgment.JudgmentRequired):
+        word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)
+    run_state.save(tmp_path, state)
+    approve_all_response(run_dir, state.run_id, 1)
+
+    word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)
+    assert len(state.context["approved"]) >= 5
+
+
+def test_keyword_metrics_gate_writes_evidence_for_pass_and_fail(tmp_path, monkeypatch):
+    def alternate_pass_fail(word):
+        passes = hash(word) % 2 == 0
+        return KeywordMetricRecord(
+            word=word,
+            avg_monthly_searches=5000 if passes else 5,
+            competition="LOW" if passes else "HIGH",
+            competition_index=0 if passes else 50,
+            api_status="success",
+        )
+
+    stub = StubKeywordMetricsClient(default_factory=alternate_pass_fail)
+    monkeypatch.setattr(word_pipeline, "_build_keyword_metrics_client", lambda project_root: stub)
+
+    options = make_options(tmp_path, target_count=5, run_id="QA-20260811-190000-KST")
+    state = word_pipeline._load_or_create_state(options)
+    with_qa_history_snapshot(tmp_path, state)
+    run_dir = word_pipeline._run_dir(tmp_path, state)
+
+    with pytest.raises(judgment.JudgmentRequired):
+        word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)
+    run_state.save(tmp_path, state)
+    approve_all_response(run_dir, state.run_id, 1)
+
+    try:
+        word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)
+    except (judgment.JudgmentRequired, word_pipeline.RetryRequired):
+        pass
+
+    evidence_path = tmp_path / "output" / "intermediate" / f"{state.run_id}_keyword_metrics_evidence.jsonl"
+    assert evidence_path.exists()
+    entries = [json.loads(line) for line in evidence_path.read_text(encoding="utf-8").splitlines()]
+    assert entries
+    assert any(e["passed"] for e in entries)
+    assert any(not e["passed"] for e in entries)
+    for entry in entries:
+        assert {"title", "avg_monthly_searches", "competition_index", "api_status", "passed", "checked_at"} <= entry.keys()
+
+
+def test_keyword_metrics_budget_exceeded_raises_retry_required(tmp_path, monkeypatch):
+    stub = StubKeywordMetricsClient(raise_error=word_pipeline.KeywordMetricsBudgetExceeded("out of budget"))
+    monkeypatch.setattr(word_pipeline, "_build_keyword_metrics_client", lambda project_root: stub)
+
+    options = make_options(tmp_path, target_count=5, run_id="QA-20260811-190000-KST")
+    state = word_pipeline._load_or_create_state(options)
+    with_qa_history_snapshot(tmp_path, state)
+    run_dir = word_pipeline._run_dir(tmp_path, state)
+
+    with pytest.raises(judgment.JudgmentRequired):
+        word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)
+    run_state.save(tmp_path, state)
+    approve_all_response(run_dir, state.run_id, 1)
+
+    with pytest.raises(word_pipeline.RetryRequired):
+        word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)
+    assert state.status == "CAPABILITY_STAGNATION"
 
 
 # ---------------------------------------------------------------------------
