@@ -1,0 +1,12 @@
+{
+  "awaiting_judgment": null,
+  "context": {
+    "backlog": []
+  },
+  "created_at": "2026-08-18T07:53:21.074891+09:00",
+  "mode": "production",
+  "run_id": "RUN-20260818-075321-KST",
+  "stage": "generate_and_review_titles",
+  "status": "CAPABILITY_STAGNATION",
+  "updated_at": "2026-08-18T07:53:21.249301+09:00"
+}

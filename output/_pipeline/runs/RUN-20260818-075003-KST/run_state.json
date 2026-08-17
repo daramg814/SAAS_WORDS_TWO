@@ -1088,7 +1088,7 @@
   "created_at": "2026-08-18T07:50:03.689055+09:00",
   "mode": "production",
   "run_id": "RUN-20260818-075003-KST",
-  "stage": "generate_and_review_titles",
-  "status": "RUNNING",
-  "updated_at": "2026-08-18T07:53:06.468236+09:00"
+  "stage": "update_memory_and_git_checkpoint",
+  "status": "DONE",
+  "updated_at": "2026-08-18T07:53:07.872547+09:00"
 }
