@@ -381,6 +381,28 @@ def test_append_metrics_cache_rows_writes_full_table_and_pass_only_subset(tmp_pa
     assert "Claim Sentry" not in passed_content
 
 
+def test_append_metrics_cache_rows_writes_lf_only_no_crlf(tmp_path):
+    # regression: csv.DictWriter defaults to \r\n, which survives into the
+    # buffer untouched by atomic_write_text's newline="\n" (it only affects
+    # how \n in the string is translated on write, not \r already present) -
+    # must pass lineterminator="\n" explicitly to csv.DictWriter itself.
+    word_pipeline._append_metrics_cache_rows(
+        tmp_path, [{"title": "Ledger Pilot", "avg_monthly_searches": 2000, "competition_index": 0, "api_status": "success", "gate_passed": "True", "checked_at": "t0"}]
+    )
+    cache_bytes = word_pipeline._metrics_cache_path(tmp_path).read_bytes()
+    passed_bytes = word_pipeline._metrics_passed_path(tmp_path).read_bytes()
+    assert b"\r\n" not in cache_bytes
+    assert b"\r\n" not in passed_bytes
+
+
+def test_append_generated_ledger_rows_writes_lf_only_no_crlf(tmp_path):
+    word_pipeline._append_generated_ledger_rows(
+        tmp_path, [{"title": "Vendor Guard", "industry": "finance", "ai_approved": "True", "ai_reason": "", "judged_at": "t0"}]
+    )
+    ledger_bytes = word_pipeline._generated_ledger_path(tmp_path).read_bytes()
+    assert b"\r\n" not in ledger_bytes
+
+
 def test_append_metrics_cache_rows_merges_without_duplicating(tmp_path):
     word_pipeline._append_metrics_cache_rows(
         tmp_path, [{"title": "Ledger Pilot", "avg_monthly_searches": 2000, "competition_index": 0, "api_status": "success", "gate_passed": "True", "checked_at": "t0"}]

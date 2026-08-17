@@ -167,7 +167,7 @@ def _append_generated_ledger_rows(project_root: Path, new_rows: list[dict]) -> N
     ordered = sorted(ledger.values(), key=lambda r: r["title"])
 
     buffer = io.StringIO()
-    writer = csv.DictWriter(buffer, fieldnames=_LEDGER_COLUMNS)
+    writer = csv.DictWriter(buffer, fieldnames=_LEDGER_COLUMNS, lineterminator="\n")
     writer.writeheader()
     writer.writerows(ordered)
     atomic_write_text(_generated_ledger_path(project_root), buffer.getvalue())
@@ -277,13 +277,13 @@ def _append_metrics_cache_rows(project_root: Path, new_rows: list[dict]) -> None
     ordered = sorted(cache.values(), key=lambda r: r["title"])
 
     full_buffer = io.StringIO()
-    writer = csv.DictWriter(full_buffer, fieldnames=_CACHE_COLUMNS)
+    writer = csv.DictWriter(full_buffer, fieldnames=_CACHE_COLUMNS, lineterminator="\n")
     writer.writeheader()
     writer.writerows(ordered)
     atomic_write_text(_metrics_cache_path(project_root), full_buffer.getvalue())
 
     passed_buffer = io.StringIO()
-    passed_writer = csv.DictWriter(passed_buffer, fieldnames=_CACHE_COLUMNS)
+    passed_writer = csv.DictWriter(passed_buffer, fieldnames=_CACHE_COLUMNS, lineterminator="\n")
     passed_writer.writeheader()
     passed_writer.writerows([r for r in ordered if r["gate_passed"] == "True"])
     atomic_write_text(_metrics_passed_path(project_root), passed_buffer.getvalue())
