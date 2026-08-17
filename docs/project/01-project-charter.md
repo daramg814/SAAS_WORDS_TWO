@@ -93,8 +93,8 @@ Google Keyword Planner와 Google Trends는 필수 데이터원에서 제외한�
 - 최종 제목은 영어 알파벳 2단어, Title Case, 한 줄 한 제목 형식이다.
 - 제목 생성 실행 1회당 최종 승인 제목 수는 정확히 500개다.
 - 500개를 채우지 못한 실행은 완료로 처리하거나 최종 파일을 게시하지 않는다.
-- 실행별 제목은 `/output/generated/saas_words_YYYYMMDD_HHMMSS_KST.txt`에 저장한다.
-- 전체 누적 제목은 `/output/history/words.txt`에 저장한다.
+- 실행별 제목은 `/output/deliverables/generated/saas_words_YYYYMMDD_HHMMSS_KST.txt`에 저장한다.
+- 전체 누적 제목은 `/output/deliverables/history/words.txt`에 저장한다.
 - `words.txt`와 현재 실행 내부에 정확 중복이 없다.
 - 코드나 설계 변경 후 사용자와 동일한 진입점·처리 단계·검증 로직을 사용하는 축소 수량 QA가 PASS한다.
 - QA 기본 목표는 최종 승인 제목 20개이며, 운영 목표 500개와 동일한 코드 경로를 사용한다.

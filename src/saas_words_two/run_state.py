@@ -64,7 +64,7 @@ class RunState:
 
 
 def run_dir(project_root: Path, run_id: str) -> Path:
-    return project_root / "output" / "runs" / run_id
+    return project_root / "output" / "_pipeline" / "runs" / run_id
 
 
 def state_path(project_root: Path, run_id: str) -> Path:
@@ -84,7 +84,7 @@ def exists(project_root: Path, run_id: str) -> bool:
 
 
 def latest_run_id(project_root: Path, mode: str) -> str | None:
-    runs_root = project_root / "output" / "runs"
+    runs_root = project_root / "output" / "_pipeline" / "runs"
     if not runs_root.exists():
         return None
     prefix = "QA-" if mode == "qa" else "RUN-"

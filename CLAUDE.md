@@ -55,7 +55,7 @@ Git·완료 규칙, 코드/AI 판정 역할 분리의 원칙 자체(§5), 제목
 4. *(보류 — 데이터원 접근성 QA 규칙. 수요/공급 재개 시 적용.)* 접근성 QA를 통과하지 못한 선택 데이터원은 `DISABLED` 처리하고 가능한 데이터원만으로 계속한다.
 5. `production`은 승인 제목이 정확히 500개가 되기 전까지 완료하거나 최종 파일을 게시하지 않는다. 부족분은 중간 출력에만 저장한다.
 6. `qa`는 사용자와 동일한 `run.py` 진입점과 동일한 단계·검증·저장 함수를 사용한다. QA 전용 축약 소프트웨어나 별도 제목 생성 로직을 만들지 않는다.
-7. QA 전후 운영 `output/history/words.txt` 체크섬은 동일해야 한다. QA 출력은 `output/qa/<qa_run_id>/` 밖에 쓰지 않는다.
+7. QA 전후 운영 `output/deliverables/history/words.txt` 체크섬은 동일해야 한다. QA 출력은 `output/_pipeline/qa/<qa_run_id>/` 밖에 쓰지 않는다.
 8. *(보류 — MARKET_QUERY는 수요/공급 재개 시 적용.)* `TITLE_QUERY`(제목 충돌 보정)는 계속 유효하며, 다른 어떤 점수와도 섞지 않는다.
 9. 사람 Google 관측은 append-only 원장에 추가한다. 기존 행을 수정·덮어쓰기 하지 않는다. 제목 상표 충돌 확인용으로 계속 사용 가능하다.
 10. 코드·설정·문서 수정 뒤에는 반드시 `final-qa-runner`가 동일 파이프라인 QA를 실행하고 결과물을 검사해야 한다.
@@ -74,9 +74,9 @@ Git·완료 규칙, 코드/AI 판정 역할 분리의 원칙 자체(§5), 제목
 7. 성능과 코드 미관
 
 ## 4. 입력·출력 계약
-- 입력: `config/project.yaml`, 선택 `input/brief.md`(업계 범위 지정용), `input/blocklist.txt`, 선택 `input/human_google_checks.csv`(제목 상표 충돌 확인용), 운영 이력 `output/history/words.txt`, 메모리 파일, `src/saas_words_two/word_bank.py`(업계별 단어뱅크), `config/keyword_metrics.yaml`(검색량·경쟁지수 기준값), `.env.local`(Google Ads API 자격증명, git 제외). *(`config/sources.yaml`은 수요/공급 재개 시 다시 쓰인다 — 보류.)*
-- 운영 출력: `output/generated/saas_words_YYYYMMDD_HHMMSS_KST.txt` 정확히 500줄, `output/history/words.txt` 원자적 증가. *(`output/final/opportunities.jsonl`은 기회 개념이 없어 더 이상 생성하지 않는다 — 수요/공급 재개 시 부활.)*
-- QA 출력: `output/qa/<qa_run_id>/` 내부에만 생성하며 기본 제목 파일은 정확히 20줄이다.
+- 입력: `config/project.yaml`, 선택 `input/brief.md`(업계 범위 지정용), `input/blocklist.txt`, 선택 `input/human_google_checks.csv`(제목 상표 충돌 확인용), 운영 이력 `output/deliverables/history/words.txt`, 메모리 파일, `src/saas_words_two/word_bank.py`(업계별 단어뱅크), `config/keyword_metrics.yaml`(검색량·경쟁지수 기준값), `.env.local`(Google Ads API 자격증명, git 제외). *(`config/sources.yaml`은 수요/공급 재개 시 다시 쓰인다 — 보류.)*
+- 운영 출력: `output/deliverables/generated/saas_words_YYYYMMDD_HHMMSS_KST.txt` 정확히 500줄, `output/deliverables/history/words.txt` 원자적 증가. *(`output/_pipeline/final/opportunities.jsonl`은 기회 개념이 없어 더 이상 생성하지 않는다 — 수요/공급 재개 시 부활.)*
+- QA 출력: `output/_pipeline/qa/<qa_run_id>/` 내부에만 생성하며 기본 제목 파일은 정확히 20줄이다.
 - 제목 형식: UTF-8/LF, 한 줄 하나, 영문자 2단어, 단일 공백, Title Case, 숫자·기호·하이픈 금지, 정확·대소문자·역순·현재 실행·과거 이력 중복 0. **(전환 이전과 완전히 동일, 불변.)**
 - **(2026-08-17 신규) Keyword Planner 필터 게이트**: 최종 출력에 포함되려면 후보가
   `config/keyword_metrics.yaml`의 `avg_monthly_searches_min` 이상의 전세계 평균
@@ -85,7 +85,7 @@ Git·완료 규칙, 코드/AI 판정 역할 분리의 원칙 자체(§5), 제목
   메트릭 자체가 없음, 통계적으로 유의미하지 않은 "죽은 단어")인 경우는 0과 다르므로
   항상 탈락한다 — 이 둘을 혼동하지 않는 것이 이 게이트의 핵심 요건이다. 이
   판정은 코드가 전담하며(§2 역할 분리), 매 라운드 판정 근거는
-  `output/intermediate/<run_id>_keyword_metrics_evidence.jsonl`에 기록되어
+  `output/_pipeline/intermediate/<run_id>_keyword_metrics_evidence.jsonl`에 기록되어
   추적 가능하다(§3 우선순위 1).
 - 사람 검증: 입력 최소 필드는 `validation_id`, `user_result_count`, `user_checked_at`; 완전 동일한 `validation_id + result_count + checked_at`만 중복 거부한다(제목 상표 충돌 확인용으로 계속 사용 가능).
 
@@ -130,9 +130,9 @@ QA → 모드별 원자적 게시 → 메모리·Git 체크포인트.
 3. `memory/HANDOFF.md`
 4. `memory/PROJECT_PLAYBOOK.md`
 5. `memory/ACTIVE_ISSUES.md`
-6. 현재 `output/runs/<run_id>/run_state.json`
+6. 현재 `output/_pipeline/runs/<run_id>/run_state.json`
 7. 최근 `memory/QUALITY_TRENDS.jsonl`
-8. `output/history/words.txt`
+8. `output/deliverables/history/words.txt`
 9. `memory/human_feedback/google_calibration_metrics.json`
 10. 현재 생성 중인 제목과 관련된 최근 사람 Google 관측(상표 충돌 확인용)
 

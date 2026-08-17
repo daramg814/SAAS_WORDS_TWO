@@ -11,7 +11,7 @@ def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser()
     p.add_argument("input_file", type=Path)
     p.add_argument("output_file", type=Path)
-    p.add_argument("--history", type=Path, default=Path("output/history/words.txt"))
+    p.add_argument("--history", type=Path, default=Path("output/deliverables/history/words.txt"))
     args = p.parse_args(argv)
 
     history = set()

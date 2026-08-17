@@ -68,9 +68,9 @@ QA는 다음 전체 단계를 직접 수행한다.
 
 QA는 운영 데이터를 읽어 중복을 검사하지만 수정하지 않는다.
 
-- 운영 `/output/history/words.txt`는 읽기 전용 스냅샷 사용
-- QA 결과는 `/output/qa/<qa_run_id>/`에만 저장
-- `/output/generated/`에 파일 생성 금지
+- 운영 `/output/deliverables/history/words.txt`는 읽기 전용 스냅샷 사용
+- QA 결과는 `/output/_pipeline/qa/<qa_run_id>/`에만 저장
+- `/output/deliverables/generated/`에 파일 생성 금지
 - 운영 `words.txt` 증가분 0인지 전후 체크섬 비교
 - QA 실패 시 QA 폴더만 롤백
 - QA 제목은 운영 누적 제목으로 간주하지 않음
@@ -142,13 +142,13 @@ QA 보고서 생성
 - [ ] 한 번의 정상 완료 실행은 최종 승인 제목을 정확히 500개 생성한다.
 - [ ] 500개 미만의 부분 결과는 최종 출력과 `words.txt`에 반영되지 않는다.
 - [ ] 500개를 초과해 승인된 경우 품질·다양성 기준으로 정확히 500개만 선택한다.
-- [ ] 실행별 TXT와 `/output/history/words.txt`가 생성된다.
+- [ ] 실행별 TXT와 `/output/deliverables/history/words.txt`가 생성된다.
 - [ ] 정확·대소문자·역순 중복이 없다.
 - [ ] 세션 중단 후 마지막 검증 배치부터 재개한다.
 - [ ] 의미 있는 이슈와 검증된 노하우만 영속 문서에 남는다.
 - [ ] 모든 원자 배치가 커밋·푸시·원격 SHA 확인을 통과한다.
 - [ ] `final-qa-runner`가 운영과 동일한 진입점·코드 경로에서 기본 20개를 생성해 전체 파이프라인을 PASS한다.
 - [ ] QA 실행 전후 운영 `words.txt`의 체크섬이 동일하다.
-- [ ] QA 결과는 `/output/qa/<qa_run_id>/`에만 저장된다.
+- [ ] QA 결과는 `/output/_pipeline/qa/<qa_run_id>/`에만 저장된다.
 
 ---

@@ -59,12 +59,12 @@ def main(argv: list[str] | None = None) -> int:
         "--output",
         type=Path,
         default=None,
-        help="defaults to <project-root>/output/intermediate/problem_clusters.json",
+        help="defaults to <project-root>/output/_pipeline/intermediate/problem_clusters.json",
     )
     args = parser.parse_args(argv)
 
     project_root = args.project_root
-    output_path = args.output or project_root / "output" / "intermediate" / "problem_clusters.json"
+    output_path = args.output or project_root / "output" / "_pipeline" / "intermediate" / "problem_clusters.json"
 
     conn = db.connect(project_root)
     try:

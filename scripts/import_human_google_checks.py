@@ -158,7 +158,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--run-id", default=None)
     parser.add_argument("--input", type=Path, default=None, help="defaults to input/human_google_checks.csv")
     parser.add_argument(
-        "--queue", type=Path, default=None, help="defaults to output/review/google_validation_queue.csv"
+        "--queue", type=Path, default=None, help="defaults to output/deliverables/review/google_validation_queue.csv"
     )
     parser.add_argument(
         "--ledger",
@@ -167,7 +167,7 @@ def main(argv: list[str] | None = None) -> int:
         help="defaults to memory/human_feedback/google_supply_observations.jsonl",
     )
     parser.add_argument(
-        "--report", type=Path, default=None, help="defaults to output/review/google_feedback_import_report.md"
+        "--report", type=Path, default=None, help="defaults to output/deliverables/review/google_feedback_import_report.md"
     )
     args = parser.parse_args(argv)
 
@@ -175,9 +175,9 @@ def main(argv: list[str] | None = None) -> int:
     now = ids.now_kst()
     run_id = args.run_id or ids.format_run_id("production", now)
     input_path = args.input or project_root / "input" / "human_google_checks.csv"
-    queue_path = args.queue or project_root / "output" / "review" / "google_validation_queue.csv"
+    queue_path = args.queue or project_root / "output" / "deliverables" / "review" / "google_validation_queue.csv"
     ledger_path = args.ledger or project_root / "memory" / "human_feedback" / "google_supply_observations.jsonl"
-    report_path = args.report or project_root / "output" / "review" / "google_feedback_import_report.md"
+    report_path = args.report or project_root / "output" / "deliverables" / "review" / "google_feedback_import_report.md"
 
     conn = db.connect(project_root)
     try:

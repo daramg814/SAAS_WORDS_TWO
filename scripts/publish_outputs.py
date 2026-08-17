@@ -17,7 +17,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("final_file", type=Path)
     p.add_argument("--target-count", type=int, required=True)
     p.add_argument("--mode", choices=("production", "qa"), required=True)
-    p.add_argument("--history", type=Path, default=Path("output/history/words.txt"))
+    p.add_argument("--history", type=Path, default=Path("output/deliverables/history/words.txt"))
     p.add_argument("--blocklist", type=Path, default=Path("input/blocklist.txt"))
     args = p.parse_args(argv)
 

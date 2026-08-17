@@ -134,7 +134,7 @@ Roster Sync
 - 상태를 `RETRYING`으로 유지한다.
 - 부족 원인이 기회 부족이면 수요·공급 조사 단계로 복귀한다.
 - 부족 원인이 제목 다양성 부족이면 단어 조합 전략을 변경한다.
-- 부분 결과는 `/output/intermediate/`에 저장한다.
+- 부분 결과는 `/output/_pipeline/intermediate/`에 저장한다.
 - 실행별 최종 TXT와 `words.txt`는 갱신하지 않는다.
 - 같은 전략을 반복하지 않도록 `HANDOFF.md`에 실패 전략을 기록한다.
 

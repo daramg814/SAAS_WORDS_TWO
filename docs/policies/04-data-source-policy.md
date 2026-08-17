@@ -7,7 +7,7 @@
 2. 선택 데이터원은 샘플 다운로드·파싱·디스크·중복 방지 검사를 모두 통과한 뒤 활성화한다.
 3. 실패 데이터원은 3회 지수 백오프 후 DISABLED 처리하고 보고서에 기록한다.
 4. Common Crawl은 이미 확보한 후보 도메인의 기능·가격·활성 상태 보강에만 사용한다.
-5. **GH Archive는 접근성 검사(PASS, `output/logs/access_test_report.md`)를 거쳐
+5. **GH Archive는 접근성 검사(PASS, `output/_pipeline/logs/access_test_report.md`)를 거쳐
    `config/sources.yaml`에서 `enabled: true`로 전환됨(2026-08-10, `DEMAND-001` A안).**
    IssuesEvent(action=opened)·IssueCommentEvent(action=created)만 정규화하며(PR 이벤트는
    미포함 — 8절 공급 파이프라인의 향후 과제), 봇 액터(`login`이 `[bot]`로 끝나는 계정)는

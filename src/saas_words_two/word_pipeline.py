@@ -67,7 +67,7 @@ def _run_dir(project_root: Path, state: run_state.RunState) -> Path:
 def _history_path_for(project_root: Path, state: run_state.RunState) -> Path:
     if state.mode == "qa":
         return Path(state.context["qa_history_snapshot_path"])
-    return project_root / "output" / "history" / "words.txt"
+    return project_root / "output" / "deliverables" / "history" / "words.txt"
 
 
 def _read_lines(path: Path) -> list[str]:
@@ -75,7 +75,7 @@ def _read_lines(path: Path) -> list[str]:
 
 
 def _write_shortfall_intermediate(project_root: Path, state: run_state.RunState, titles: list[str]) -> Path:
-    path = project_root / "output" / "intermediate" / f"{state.run_id}_shortfall_titles.txt"
+    path = project_root / "output" / "_pipeline" / "intermediate" / f"{state.run_id}_shortfall_titles.txt"
     atomic_write_text(path, "\n".join(titles) + "\n" if titles else "")
     return path
 
@@ -109,8 +109,8 @@ def _run_or_raise(project_root: Path, script_name: str, *extra_args: str) -> sub
 
 def _stage_load_state(project_root: Path, options: RunOptions, state: run_state.RunState) -> None:
     if state.mode == "qa" and "qa_history_snapshot_path" not in state.context:
-        history_path = project_root / "output" / "history" / "words.txt"
-        snapshot_path = project_root / "output" / "qa" / state.run_id / "qa_history_snapshot.txt"
+        history_path = project_root / "output" / "deliverables" / "history" / "words.txt"
+        snapshot_path = project_root / "output" / "_pipeline" / "qa" / state.run_id / "qa_history_snapshot.txt"
         lines = _read_lines(history_path)
         atomic_write_text(snapshot_path, "\n".join(lines) + "\n" if lines else "")
         state.context["qa_history_snapshot_path"] = str(snapshot_path)
@@ -183,11 +183,11 @@ _CACHE_COLUMNS = ("title", "avg_monthly_searches", "competition_index", "api_sta
 
 
 def _metrics_cache_path(project_root: Path) -> Path:
-    return project_root / "output" / "history" / "keyword_metrics_cache.csv"
+    return project_root / "output" / "deliverables" / "history" / "keyword_metrics_cache.csv"
 
 
 def _metrics_passed_path(project_root: Path) -> Path:
-    return project_root / "output" / "history" / "keyword_metrics_passed.csv"
+    return project_root / "output" / "deliverables" / "history" / "keyword_metrics_passed.csv"
 
 
 def _load_metrics_cache(project_root: Path) -> dict[str, dict]:
@@ -258,7 +258,7 @@ def _build_keyword_metrics_client(project_root: Path) -> KeywordMetricsClient:
 
 
 def _write_metrics_evidence(project_root: Path, state: run_state.RunState, evidence: list[dict]) -> None:
-    path = project_root / "output" / "intermediate" / f"{state.run_id}_keyword_metrics_evidence.jsonl"
+    path = project_root / "output" / "_pipeline" / "intermediate" / f"{state.run_id}_keyword_metrics_evidence.jsonl"
     existing = path.read_text(encoding="utf-8").splitlines() if path.exists() else []
     lines = existing + [json.dumps(entry, ensure_ascii=False, sort_keys=True) for entry in evidence]
     atomic_write_text(path, "\n".join(lines) + "\n" if lines else "")
@@ -273,7 +273,7 @@ def _apply_keyword_metrics_filter(
     combination - "dead word" - and never passes, regardless of
     avg_monthly_searches. Every checked candidate (pass or fail) is logged to
     the run's keyword_metrics_evidence.jsonl for traceability (CLAUDE.md §3.1)
-    and to the cumulative output/history/keyword_metrics_cache.csv table.
+    and to the cumulative output/deliverables/history/keyword_metrics_cache.csv table.
 
     Candidates already present in the cache (previously checked, in this run
     or any earlier one) reuse that recorded result instead of re-querying the
@@ -486,10 +486,10 @@ def _stage_publish_mode_outputs(project_root: Path, options: RunOptions, state: 
     content = "\n".join(final_titles) + "\n"
 
     if state.mode == "production":
-        final_path = project_root / "output" / "generated" / state.context["generated_filename"]
+        final_path = project_root / "output" / "deliverables" / "generated" / state.context["generated_filename"]
         atomic_write_text(final_path, content)
 
-        history_path = project_root / "output" / "history" / "words.txt"
+        history_path = project_root / "output" / "deliverables" / "history" / "words.txt"
         history = _read_lines(history_path)
         history_norm = {normalize_title(t) for t in history}
         already_appended = bool(final_titles) and all(normalize_title(t) in history_norm for t in final_titles)
@@ -500,12 +500,12 @@ def _stage_publish_mode_outputs(project_root: Path, options: RunOptions, state: 
                 state.status = "RECOVERY_REQUIRED"
                 run_state.save(project_root, state)
                 raise RecoveryRequired(
-                    f"output/history/words.txt increment did not match this run's final_titles "
+                    f"output/deliverables/history/words.txt increment did not match this run's final_titles "
                     f"after atomic write (expected {len(final_titles)} new lines, "
                     f"found {len(history_after) - len(history)})"
                 )
     else:
-        qa_dir = project_root / "output" / "qa" / state.run_id
+        qa_dir = project_root / "output" / "_pipeline" / "qa" / state.run_id
         atomic_write_text(qa_dir / "generated" / "saas_words_qa.txt", content)
         report = (
             "# QA Report\n\n"

@@ -39,7 +39,7 @@ def test_load_candidates_joins_author_from_hn_items(tmp_path):
 def test_main_writes_intermediate_json(tmp_path):
     conn = seed_db(tmp_path)
     conn.close()
-    output_path = tmp_path / "output" / "intermediate" / "problem_clusters.json"
+    output_path = tmp_path / "output" / "_pipeline" / "intermediate" / "problem_clusters.json"
     exit_code = cluster_problems.main(["--project-root", str(tmp_path), "--output", str(output_path)])
     assert exit_code == 0
     assert output_path.exists()

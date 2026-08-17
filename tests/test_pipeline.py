@@ -24,7 +24,7 @@ def with_qa_history_snapshot(tmp_path, state):
     """_history_path_for(qa) reads state.context["qa_history_snapshot_path"],
     which _stage_load_state sets; seed it directly for tests that start past
     that stage."""
-    snapshot_path = tmp_path / "output" / "qa" / state.run_id / "qa_history_snapshot.txt"
+    snapshot_path = tmp_path / "output" / "_pipeline" / "qa" / state.run_id / "qa_history_snapshot.txt"
     snapshot_path.parent.mkdir(parents=True, exist_ok=True)
     snapshot_path.write_text("", encoding="utf-8")
     state.context["qa_history_snapshot_path"] = str(snapshot_path)
@@ -87,7 +87,7 @@ def test_load_or_create_state_resume_rejects_mode_mismatch(tmp_path):
 
 
 def test_stage_load_state_snapshots_history_for_qa(tmp_path):
-    history_path = tmp_path / "output" / "history" / "words.txt"
+    history_path = tmp_path / "output" / "deliverables" / "history" / "words.txt"
     history_path.parent.mkdir(parents=True)
     history_path.write_text("Vendor Guard\nPermit Flow\n", encoding="utf-8")
 
@@ -97,14 +97,14 @@ def test_stage_load_state_snapshots_history_for_qa(tmp_path):
     pipeline._stage_load_state(conn, tmp_path, options, state)
     conn.close()
 
-    snapshot_path = tmp_path / "output" / "qa" / state.run_id / "qa_history_snapshot.txt"
+    snapshot_path = tmp_path / "output" / "_pipeline" / "qa" / state.run_id / "qa_history_snapshot.txt"
     assert snapshot_path.exists()
     assert "Vendor Guard" in snapshot_path.read_text(encoding="utf-8")
     assert state.context["qa_history_snapshot_path"] == str(snapshot_path)
 
 
 def test_stage_load_state_snapshots_empty_history_as_truly_empty(tmp_path):
-    """Regression: an empty output/history/words.txt must snapshot to a
+    """Regression: an empty output/deliverables/history/words.txt must snapshot to a
     0-byte file, not "\n" - otherwise _read_lines() reads the snapshot back
     as [''] (one blank line) instead of [] (no lines), a mismatch with the
     real file the snapshot is supposed to mirror."""
@@ -114,7 +114,7 @@ def test_stage_load_state_snapshots_empty_history_as_truly_empty(tmp_path):
     pipeline._stage_load_state(conn, tmp_path, options, state)
     conn.close()
 
-    snapshot_path = tmp_path / "output" / "qa" / state.run_id / "qa_history_snapshot.txt"
+    snapshot_path = tmp_path / "output" / "_pipeline" / "qa" / state.run_id / "qa_history_snapshot.txt"
     assert snapshot_path.read_bytes() == b""
     assert pipeline._read_lines(snapshot_path) == []
 
@@ -802,8 +802,8 @@ def test_generate_and_review_titles_no_eligible_opportunities_is_capability_stag
     assert state.status == "CAPABILITY_STAGNATION"
     assert excinfo.value.status == "CAPABILITY_STAGNATION"
     # design 2.3/9.3: a shortfall must persist whatever partial result exists
-    # to output/intermediate/, never silently only in the DB.
-    intermediate = tmp_path / "output" / "intermediate" / f"{state.run_id}_shortfall_titles.txt"
+    # to output/_pipeline/intermediate/, never silently only in the DB.
+    intermediate = tmp_path / "output" / "_pipeline" / "intermediate" / f"{state.run_id}_shortfall_titles.txt"
     assert intermediate.exists()
     conn.close()
 
@@ -880,7 +880,7 @@ def test_generate_and_review_titles_exhausts_max_rounds_with_partial_progress_st
 
     assert retried, "expected RetryRequired after exhausting max rounds"
     assert state.status == "RETRYING"
-    intermediate = tmp_path / "output" / "intermediate" / f"{state.run_id}_shortfall_titles.txt"
+    intermediate = tmp_path / "output" / "_pipeline" / "intermediate" / f"{state.run_id}_shortfall_titles.txt"
     assert intermediate.exists()
     conn.close()
 
@@ -1013,7 +1013,7 @@ def test_stage_validate_outputs_retries_when_cap_prevents_reaching_target(tmp_pa
     with pytest.raises(pipeline.RetryRequired):
         pipeline._stage_validate_outputs(conn, tmp_path, options, state)
     assert state.status == "RETRYING"
-    intermediate = tmp_path / "output" / "intermediate" / f"{state.run_id}_shortfall_titles.txt"
+    intermediate = tmp_path / "output" / "_pipeline" / "intermediate" / f"{state.run_id}_shortfall_titles.txt"
     assert intermediate.exists()
     # 12 titles survive the 30%-per-opportunity cap (2 opportunities x 6 each), short of 20
     saved = [line for line in intermediate.read_text(encoding="utf-8").splitlines() if line]
@@ -1022,7 +1022,7 @@ def test_stage_validate_outputs_retries_when_cap_prevents_reaching_target(tmp_pa
 
 
 def test_stage_publish_mode_outputs_qa_does_not_touch_shared_history(tmp_path):
-    history_path = tmp_path / "output" / "history" / "words.txt"
+    history_path = tmp_path / "output" / "deliverables" / "history" / "words.txt"
     history_path.parent.mkdir(parents=True)
     history_path.write_text("Existing One\n", encoding="utf-8")
 
@@ -1038,10 +1038,10 @@ def test_stage_publish_mode_outputs_qa_does_not_touch_shared_history(tmp_path):
     checksum_after = history_path.read_bytes()
 
     assert checksum_before == checksum_after
-    qa_final = tmp_path / "output" / "qa" / state.run_id / "generated" / "saas_words_qa.txt"
+    qa_final = tmp_path / "output" / "_pipeline" / "qa" / state.run_id / "generated" / "saas_words_qa.txt"
     assert qa_final.exists()
     assert len(qa_final.read_text(encoding="utf-8").splitlines()) == 20
-    assert not (tmp_path / "output" / "generated").exists()
+    assert not (tmp_path / "output" / "deliverables" / "generated").exists()
     conn.close()
 
 
@@ -1054,14 +1054,14 @@ def test_stage_publish_mode_outputs_production_updates_history_atomically(tmp_pa
 
     pipeline._stage_publish_mode_outputs(conn, tmp_path, options, state)
 
-    final_path = tmp_path / "output" / "generated" / state.context["generated_filename"]
+    final_path = tmp_path / "output" / "deliverables" / "generated" / state.context["generated_filename"]
     assert final_path.exists()
     assert len(final_path.read_text(encoding="utf-8").splitlines()) == 20
 
-    history_path = tmp_path / "output" / "history" / "words.txt"
+    history_path = tmp_path / "output" / "deliverables" / "history" / "words.txt"
     assert len(history_path.read_text(encoding="utf-8").splitlines()) == 20
 
-    assert (tmp_path / "output" / "final" / "opportunities.jsonl").exists()
+    assert (tmp_path / "output" / "_pipeline" / "final" / "opportunities.jsonl").exists()
     conn.close()
 
 
@@ -1077,7 +1077,7 @@ def test_stage_publish_mode_outputs_history_mismatch_raises_recovery_required(tm
     pipeline._stage_validate_outputs(conn, tmp_path, options, state)
 
     real_atomic_write_text = pipeline.atomic_write_text
-    history_path = tmp_path / "output" / "history" / "words.txt"
+    history_path = tmp_path / "output" / "deliverables" / "history" / "words.txt"
 
     def corrupting_write(path, content):
         if path == history_path:
@@ -1094,7 +1094,7 @@ def test_stage_publish_mode_outputs_history_mismatch_raises_recovery_required(tm
 
 
 def test_stage_publish_mode_outputs_production_appends_to_existing_history(tmp_path):
-    history_path = tmp_path / "output" / "history" / "words.txt"
+    history_path = tmp_path / "output" / "deliverables" / "history" / "words.txt"
     history_path.parent.mkdir(parents=True)
     history_path.write_text("Old Title\n", encoding="utf-8")
 
@@ -1122,7 +1122,7 @@ def test_stage_publish_mode_outputs_resume_does_not_double_append_history(tmp_pa
     pipeline._stage_validate_outputs(conn, tmp_path, options, state)
 
     pipeline._stage_publish_mode_outputs(conn, tmp_path, options, state)
-    history_path = tmp_path / "output" / "history" / "words.txt"
+    history_path = tmp_path / "output" / "deliverables" / "history" / "words.txt"
     first_pass_lines = history_path.read_text(encoding="utf-8").splitlines()
     assert len(first_pass_lines) == 20
 

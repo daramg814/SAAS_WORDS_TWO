@@ -87,5 +87,5 @@ def test_main_writes_queue_file(tmp_path):
 
     exit_code = script.main(["--project-root", str(tmp_path)])
     assert exit_code == 0
-    queue_path = tmp_path / "output" / "review" / "google_validation_queue.csv"
+    queue_path = tmp_path / "output" / "deliverables" / "review" / "google_validation_queue.csv"
     assert queue_path.exists()

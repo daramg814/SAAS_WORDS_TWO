@@ -176,7 +176,7 @@ def run_access_test(
         }
 
     report = AccessTestReport(results=results, disk_usage=check_disk_usage(project_root))
-    report_path = project_root / "output" / "logs" / "access_test_report.md"
+    report_path = project_root / "output" / "_pipeline" / "logs" / "access_test_report.md"
     atomic_write_text(report_path, report.to_markdown(generated_at))
     return report
 

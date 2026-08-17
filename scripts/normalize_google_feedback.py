@@ -37,13 +37,13 @@ def main(argv: list[str] | None = None) -> int:
         "--ledger", type=Path, default=None, help="defaults to memory/human_feedback/google_supply_observations.jsonl"
     )
     parser.add_argument(
-        "--output", type=Path, default=None, help="defaults to output/logs/google_normalized_observations.json"
+        "--output", type=Path, default=None, help="defaults to output/_pipeline/logs/google_normalized_observations.json"
     )
     args = parser.parse_args(argv)
 
     project_root = args.project_root
     ledger_path = args.ledger or project_root / "memory" / "human_feedback" / "google_supply_observations.jsonl"
-    output_path = args.output or project_root / "output" / "logs" / "google_normalized_observations.json"
+    output_path = args.output or project_root / "output" / "_pipeline" / "logs" / "google_normalized_observations.json"
     observations = load_observations(ledger_path)
     normalized = [normalize_observation(observation) for observation in observations]
 

@@ -24,7 +24,7 @@ def main(argv: list[str] | None = None) -> int:
     report = parsing.validate_rows(rows)
     generated_at = ids.now_kst().isoformat()
     atomic_write_text(
-        project_root / "output" / "logs" / "parse_report.md",
+        project_root / "output" / "_pipeline" / "logs" / "parse_report.md",
         parsing.report_to_markdown(report, generated_at),
     )
 

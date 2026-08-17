@@ -86,7 +86,7 @@ def test_run_access_test_pass_writes_report(tmp_path):
     assert report.results["hacker_news"]["status"] == "PASS"
     assert report.results["stack_exchange_dump"]["status"] == "DISABLED"
     assert report.disk_usage["ok"] is True
-    report_path = tmp_path / "output" / "logs" / "access_test_report.md"
+    report_path = tmp_path / "output" / "_pipeline" / "logs" / "access_test_report.md"
     assert report_path.exists()
     assert "hacker_news" in report_path.read_text(encoding="utf-8")
     assert "disk_usage" in report_path.read_text(encoding="utf-8")

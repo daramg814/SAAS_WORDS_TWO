@@ -152,12 +152,12 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--project-root", type=Path, default=Path.cwd())
     parser.add_argument(
-        "--output", type=Path, default=None, help="defaults to output/review/google_validation_queue.csv"
+        "--output", type=Path, default=None, help="defaults to output/deliverables/review/google_validation_queue.csv"
     )
     args = parser.parse_args(argv)
 
     project_root = args.project_root
-    output_path = args.output or project_root / "output" / "review" / "google_validation_queue.csv"
+    output_path = args.output or project_root / "output" / "deliverables" / "review" / "google_validation_queue.csv"
     now = ids.now_kst()
     conn = db.connect(project_root)
     try:

@@ -1,7 +1,19 @@
 # HANDOFF
 
-- 상태: `DONE`(게이트 통합 + 대량 배치(`--round-size`) + 누적 캐시까지 완료·
-  검증 끝. production 500개 실행은 사용자가 별도로 요청할 때까지 보류)
+- 상태: `DONE`(게이트 통합 + 대량 배치(`--round-size`) + 누적 캐시 + `output/`
+  구조 재편까지 완료·검증 끝. production 500개 실행은 사용자가 별도로 요청할
+  때까지 보류)
+- **2026-08-17 `output/` 구조 재편**(사용자 지시 — "뭐가 최신이고 뭐가
+  중간자료인지 정리가 하나도 안 됨"): 8개 폴더가 전부 `output/` 바로 아래
+  나란히 있던 것을 `output/deliverables/{generated,history,review}`(사용자가
+  가져가는 결과물) / `output/_pipeline/{runs,intermediate,qa,logs,final}`
+  (순수 내부 기계장치)로 분리. `git mv`로 이력 보존하며 이동, 코드/문서/테스트
+  경로 전부 갱신(실제 파이썬 경로 조합 `"output" / "history"` 형태라 처음
+  정규식 치환에서 안 걸러진 걸 뒤늦게 발견해 별도 스크립트로 재수정 —
+  `docs/contracts/02-input-output-contracts.md` 상단에 새 구조 설명 추가).
+  `memory/ACTIVE_ISSUES.md`의 과거 사건 기록과 `docs/design/source/` 원본
+  설계서는 당시 실제 경로 그대로 보존(역사적 사실이라 수정 안 함). 테스트
+  496개 PASS, `verify_design_coverage.py` PASS 재확인.
 - **2026-08-17 추가 배치 요약**: 사용자 지시로 `--round-size` 옵션 신설(모든
   라운드에 고정 후보 수 적용, target 기반 공식 대신) + 누적 raw 데이터 캐시
   (`output/history/keyword_metrics_cache.csv`, `..._passed.csv`, 배치 단위

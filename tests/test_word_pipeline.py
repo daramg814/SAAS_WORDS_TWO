@@ -48,7 +48,7 @@ def make_options(tmp_path, mode="qa", target_count=5, **overrides):
 
 
 def with_qa_history_snapshot(tmp_path, state, existing_lines=()):
-    snapshot_path = tmp_path / "output" / "qa" / state.run_id / "qa_history_snapshot.txt"
+    snapshot_path = tmp_path / "output" / "_pipeline" / "qa" / state.run_id / "qa_history_snapshot.txt"
     snapshot_path.parent.mkdir(parents=True, exist_ok=True)
     content = "\n".join(existing_lines) + "\n" if existing_lines else ""
     snapshot_path.write_text(content, encoding="utf-8")
@@ -77,7 +77,7 @@ def reject_all_response(run_dir, run_id, round_no):
 
 
 def test_stage_load_state_snapshots_history_for_qa(tmp_path):
-    history_path = tmp_path / "output" / "history" / "words.txt"
+    history_path = tmp_path / "output" / "deliverables" / "history" / "words.txt"
     history_path.parent.mkdir(parents=True)
     history_path.write_text("Vendor Guard\n", encoding="utf-8")
 
@@ -85,7 +85,7 @@ def test_stage_load_state_snapshots_history_for_qa(tmp_path):
     state = word_pipeline._load_or_create_state(options)
     word_pipeline._stage_load_state(tmp_path, options, state)
 
-    snapshot_path = tmp_path / "output" / "qa" / state.run_id / "qa_history_snapshot.txt"
+    snapshot_path = tmp_path / "output" / "_pipeline" / "qa" / state.run_id / "qa_history_snapshot.txt"
     assert snapshot_path.exists()
     assert "Vendor Guard" in snapshot_path.read_text(encoding="utf-8")
 
@@ -192,7 +192,7 @@ def test_generate_and_review_titles_zero_progress_is_capability_stagnation(tmp_p
         word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)
     assert state.status == "CAPABILITY_STAGNATION"
     assert excinfo.value.status == "CAPABILITY_STAGNATION"
-    intermediate = tmp_path / "output" / "intermediate" / f"{state.run_id}_shortfall_titles.txt"
+    intermediate = tmp_path / "output" / "_pipeline" / "intermediate" / f"{state.run_id}_shortfall_titles.txt"
     assert intermediate.exists()
 
 
@@ -346,7 +346,7 @@ def test_keyword_metrics_gate_writes_evidence_for_pass_and_fail(tmp_path, monkey
     except (judgment.JudgmentRequired, word_pipeline.RetryRequired):
         pass
 
-    evidence_path = tmp_path / "output" / "intermediate" / f"{state.run_id}_keyword_metrics_evidence.jsonl"
+    evidence_path = tmp_path / "output" / "_pipeline" / "intermediate" / f"{state.run_id}_keyword_metrics_evidence.jsonl"
     assert evidence_path.exists()
     entries = [json.loads(line) for line in evidence_path.read_text(encoding="utf-8").splitlines()]
     assert entries
@@ -478,7 +478,7 @@ def test_apply_keyword_metrics_filter_evidence_marks_source_cache_vs_api(tmp_pat
     candidates = [{"title": "Ledger Pilot", "industry": "finance"}, {"title": "Claim Sentry", "industry": "insurance"}]
     word_pipeline._apply_keyword_metrics_filter(tmp_path, state, candidates)
 
-    evidence_path = tmp_path / "output" / "intermediate" / f"{state.run_id}_keyword_metrics_evidence.jsonl"
+    evidence_path = tmp_path / "output" / "_pipeline" / "intermediate" / f"{state.run_id}_keyword_metrics_evidence.jsonl"
     entries = {json.loads(line)["title"]: json.loads(line) for line in evidence_path.read_text(encoding="utf-8").splitlines()}
     assert entries["Ledger Pilot"]["source"] == "cache"
     assert entries["Claim Sentry"]["source"] == "api"
@@ -563,10 +563,10 @@ def test_stage_publish_mode_outputs_qa_writes_only_under_qa_dir(tmp_path):
 
     word_pipeline._stage_publish_mode_outputs(tmp_path, options, state)
 
-    qa_output = tmp_path / "output" / "qa" / state.run_id / "generated" / "saas_words_qa.txt"
+    qa_output = tmp_path / "output" / "_pipeline" / "qa" / state.run_id / "generated" / "saas_words_qa.txt"
     assert qa_output.read_text(encoding="utf-8") == "Vendor Guard\nClaim Tracker\n"
-    assert not (tmp_path / "output" / "history" / "words.txt").exists()
-    assert not (tmp_path / "output" / "generated").exists()
+    assert not (tmp_path / "output" / "deliverables" / "history" / "words.txt").exists()
+    assert not (tmp_path / "output" / "deliverables" / "generated").exists()
 
 
 def test_stage_publish_mode_outputs_production_appends_history_atomically(tmp_path):
@@ -576,9 +576,9 @@ def test_stage_publish_mode_outputs_production_appends_history_atomically(tmp_pa
 
     word_pipeline._stage_publish_mode_outputs(tmp_path, options, state)
 
-    final_path = tmp_path / "output" / "generated" / state.context["generated_filename"]
+    final_path = tmp_path / "output" / "deliverables" / "generated" / state.context["generated_filename"]
     assert final_path.read_text(encoding="utf-8") == "Vendor Guard\nClaim Tracker\n"
-    history = (tmp_path / "output" / "history" / "words.txt").read_text(encoding="utf-8")
+    history = (tmp_path / "output" / "deliverables" / "history" / "words.txt").read_text(encoding="utf-8")
     assert history == "Vendor Guard\nClaim Tracker\n"
 
 
@@ -606,5 +606,5 @@ def test_stage_publish_mode_outputs_production_is_idempotent_on_resume(tmp_path)
     word_pipeline._stage_publish_mode_outputs(tmp_path, options, state)
     word_pipeline._stage_publish_mode_outputs(tmp_path, options, state)  # simulated resume
 
-    history = (tmp_path / "output" / "history" / "words.txt").read_text(encoding="utf-8")
+    history = (tmp_path / "output" / "deliverables" / "history" / "words.txt").read_text(encoding="utf-8")
     assert history == "Vendor Guard\nClaim Tracker\n"  # not doubled

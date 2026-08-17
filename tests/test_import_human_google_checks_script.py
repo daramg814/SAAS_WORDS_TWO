@@ -160,13 +160,13 @@ def test_import_observations_counts_untouched_rows_as_queued(tmp_path):
 
 def test_main_writes_report(tmp_path):
     (tmp_path / "input").mkdir()
-    (tmp_path / "output" / "review").mkdir(parents=True)
+    (tmp_path / "output" / "deliverables" / "review").mkdir(parents=True)
     (tmp_path / "memory" / "human_feedback").mkdir(parents=True)
     (tmp_path / "input" / "human_google_checks.csv").write_text(
         SAMPLE_CSV.read_text(encoding="utf-8"), encoding="utf-8"
     )
     exit_code = script.main(["--project-root", str(tmp_path)])
     assert exit_code == 0
-    report_path = tmp_path / "output" / "review" / "google_feedback_import_report.md"
+    report_path = tmp_path / "output" / "deliverables" / "review" / "google_feedback_import_report.md"
     assert report_path.exists()
     assert "imported: 1" in report_path.read_text(encoding="utf-8")

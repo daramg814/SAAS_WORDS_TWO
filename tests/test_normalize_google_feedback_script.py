@@ -33,7 +33,7 @@ def test_main_writes_normalized_json(tmp_path):
 
     exit_code = script.main(["--project-root", str(tmp_path)])
     assert exit_code == 0
-    output_path = tmp_path / "output" / "logs" / "google_normalized_observations.json"
+    output_path = tmp_path / "output" / "_pipeline" / "logs" / "google_normalized_observations.json"
     data = json.loads(output_path.read_text(encoding="utf-8"))
     assert len(data) == 1
     assert data[0]["result_band"] == "LOW"

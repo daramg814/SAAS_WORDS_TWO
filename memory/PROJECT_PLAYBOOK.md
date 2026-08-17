@@ -14,7 +14,7 @@
   - `CAPABILITY_STAGNATION`: 제목 생성 라운드가 전부 소진되거나 기회 풀이 비었는데
     **그 시점까지 승인된 제목이 0개**인 경우(=이 실행의 현재 데이터/방식으로는 아무것도
     못 만든다는 신호). 일부라도 진행됐으면(0개가 아니면) 그대로 `RETRYING` 유지.
-  - `RECOVERY_REQUIRED`: 운영 이력(`output/history/words.txt`) 원자적 쓰기 직후
+  - `RECOVERY_REQUIRED`: 운영 이력(`output/deliverables/history/words.txt`) 원자적 쓰기 직후
     증가분을 재검증했는데 기대한 제목과 실제로 파일에 쓰인 내용이 다른 경우 — 자동
     재시도가 안전하지 않은(중복 append 위험) 상황이라 사람 확인 없이는 다음 단계로
     진행하지 않는다.

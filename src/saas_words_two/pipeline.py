@@ -47,7 +47,7 @@ class RetryRequired(RuntimeError):
 
 class RecoveryRequired(RuntimeError):
     """design 11's RECOVERY_REQUIRED: an atomic operation's own postcondition
-    check failed after the write (e.g. output/history/words.txt's on-disk
+    check failed after the write (e.g. output/deliverables/history/words.txt's on-disk
     tail doesn't match what was just atomically written). Retrying
     automatically is not safe here - continuing could double-append or
     otherwise compound the corruption - so this is a distinct exception from
@@ -138,7 +138,7 @@ def _run_dir(project_root: Path, state: run_state.RunState) -> Path:
 def _history_path_for(project_root: Path, state: run_state.RunState) -> Path:
     if state.mode == "qa":
         return Path(state.context["qa_history_snapshot_path"])
-    return project_root / "output" / "history" / "words.txt"
+    return project_root / "output" / "deliverables" / "history" / "words.txt"
 
 
 def _read_lines(path: Path) -> list[str]:
@@ -163,11 +163,11 @@ def _brief_context(project_root: Path) -> str:
 
 def _write_shortfall_intermediate(project_root: Path, state: run_state.RunState, titles: list[str]) -> Path:
     """Design 2.3/9.3: a run that ends short of its target count must save
-    what it has to /output/intermediate/, never to the published outputs.
+    what it has to /output/_pipeline/intermediate/, never to the published outputs.
     Called at every RetryRequired shortfall point so the partial result
     survives the run (recoverable for inspection or a future --resume-style
     continuation) instead of being visible only inside data/local.db."""
-    path = project_root / "output" / "intermediate" / f"{state.run_id}_shortfall_titles.txt"
+    path = project_root / "output" / "_pipeline" / "intermediate" / f"{state.run_id}_shortfall_titles.txt"
     atomic_write_text(path, "\n".join(titles) + "\n" if titles else "")
     return path
 
@@ -189,8 +189,8 @@ def _pause_for_judgment(
 
 def _stage_load_state(conn, project_root: Path, options: RunOptions, state: run_state.RunState) -> None:
     if state.mode == "qa" and "qa_history_snapshot_path" not in state.context:
-        history_path = project_root / "output" / "history" / "words.txt"
-        snapshot_path = project_root / "output" / "qa" / state.run_id / "qa_history_snapshot.txt"
+        history_path = project_root / "output" / "deliverables" / "history" / "words.txt"
+        snapshot_path = project_root / "output" / "_pipeline" / "qa" / state.run_id / "qa_history_snapshot.txt"
         lines = _read_lines(history_path)
         # An empty operational history must snapshot to a truly empty file -
         # "\n".join([]) + "\n" would instead write a single "\n", which
@@ -242,7 +242,7 @@ def _stage_extract_and_cluster_problems(
         return
 
     _run_or_raise(project_root, "cluster_problems.py")
-    clusters_path = project_root / "output" / "intermediate" / "problem_clusters.json"
+    clusters_path = project_root / "output" / "_pipeline" / "intermediate" / "problem_clusters.json"
     clusters = json.loads(clusters_path.read_text(encoding="utf-8"))["clusters"]
     if not clusters:
         return
@@ -976,10 +976,10 @@ def _stage_publish_mode_outputs(
     content = "\n".join(final_titles) + "\n"
 
     if state.mode == "production":
-        final_path = project_root / "output" / "generated" / state.context["generated_filename"]
+        final_path = project_root / "output" / "deliverables" / "generated" / state.context["generated_filename"]
         atomic_write_text(final_path, content)
 
-        history_path = project_root / "output" / "history" / "words.txt"
+        history_path = project_root / "output" / "deliverables" / "history" / "words.txt"
         history = _read_lines(history_path)
         # Idempotency guard: if this stage previously wrote final_path but then
         # failed/crashed before (or during) the history append, a resume would
@@ -1004,14 +1004,14 @@ def _stage_publish_mode_outputs(
                 state.status = "RECOVERY_REQUIRED"
                 run_state.save(project_root, state)
                 raise RecoveryRequired(
-                    f"output/history/words.txt increment did not match this run's final_titles "
+                    f"output/deliverables/history/words.txt increment did not match this run's final_titles "
                     f"after atomic write (expected {len(final_titles)} new lines, "
                     f"found {len(history_after) - len(history)})"
                 )
 
-        _write_opportunities_jsonl(conn, project_root / "output" / "final" / "opportunities.jsonl", final_titles)
+        _write_opportunities_jsonl(conn, project_root / "output" / "_pipeline" / "final" / "opportunities.jsonl", final_titles)
     else:
-        qa_dir = project_root / "output" / "qa" / state.run_id
+        qa_dir = project_root / "output" / "_pipeline" / "qa" / state.run_id
         atomic_write_text(qa_dir / "generated" / "saas_words_qa.txt", content)
         _write_opportunities_jsonl(conn, qa_dir / "opportunities.jsonl", final_titles)
         report = (
@@ -1026,7 +1026,7 @@ def _stage_publish_mode_outputs(
 
 # ---------------------------------------------------------------------------
 # Stage: build_google_validation_queue / import_and_apply_human_feedback
-# QA writes to its own run directory rather than the shared output/review and
+# QA writes to its own run directory rather than the shared output/deliverables/review and
 # memory/human_feedback locations, per output isolation rules; it still
 # exercises every step (QA acceptance 15.2 items 15-19) using the bundled
 # qa/samples fixture for the human-input CSV.
@@ -1037,7 +1037,7 @@ def _stage_build_google_validation_queue(
     conn, project_root: Path, options: RunOptions, state: run_state.RunState
 ) -> None:
     if state.mode == "qa":
-        output_path = project_root / "output" / "qa" / state.run_id / "google_validation_queue.csv"
+        output_path = project_root / "output" / "_pipeline" / "qa" / state.run_id / "google_validation_queue.csv"
         _run_or_raise(project_root, "build_google_validation_queue.py", "--output", str(output_path))
     else:
         _run_or_raise(project_root, "build_google_validation_queue.py")
@@ -1047,7 +1047,7 @@ def _stage_import_and_apply_human_feedback(
     conn, project_root: Path, options: RunOptions, state: run_state.RunState
 ) -> None:
     if state.mode == "qa":
-        qa_dir = project_root / "output" / "qa" / state.run_id
+        qa_dir = project_root / "output" / "_pipeline" / "qa" / state.run_id
         input_path = project_root / "qa" / "samples" / "human_google_checks_valid.csv"
         queue_path = qa_dir / "google_validation_queue.csv"
         ledger_path = qa_dir / "google_supply_observations.jsonl"
@@ -1056,10 +1056,10 @@ def _stage_import_and_apply_human_feedback(
         metrics_path = qa_dir / "google_calibration_metrics.json"
     else:
         input_path = project_root / "input" / "human_google_checks.csv"
-        queue_path = project_root / "output" / "review" / "google_validation_queue.csv"
+        queue_path = project_root / "output" / "deliverables" / "review" / "google_validation_queue.csv"
         ledger_path = project_root / "memory" / "human_feedback" / "google_supply_observations.jsonl"
-        report_path = project_root / "output" / "review" / "google_feedback_import_report.md"
-        normalized_path = project_root / "output" / "logs" / "google_normalized_observations.json"
+        report_path = project_root / "output" / "deliverables" / "review" / "google_feedback_import_report.md"
+        normalized_path = project_root / "output" / "_pipeline" / "logs" / "google_normalized_observations.json"
         metrics_path = project_root / "memory" / "human_feedback" / "google_calibration_metrics.json"
 
     _run_or_raise(

@@ -6,7 +6,7 @@ read_order:
   - memory/ACTIVE_ISSUES.md
   - current_run_state
   - recent_quality_trends
-  - output/history/words.txt
+  - output/deliverables/history/words.txt
   - memory/human_feedback/google_calibration_metrics.json
 canonical_documents:
   charter: docs/project/01-project-charter.md

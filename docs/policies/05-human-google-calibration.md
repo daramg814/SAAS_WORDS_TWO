@@ -41,7 +41,7 @@ TITLE_QUERY:
 프로젝트는 다음 파일을 자동 생성한다.
 
 ```text
-/output/review/google_validation_queue.csv
+/output/deliverables/review/google_validation_queue.csv
 ```
 
 권장 열:
