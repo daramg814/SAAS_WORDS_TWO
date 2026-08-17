@@ -55,7 +55,14 @@ Git·완료 규칙, 코드/AI 판정 역할 분리의 원칙 자체(§5), 제목
 4. *(보류 — 데이터원 접근성 QA 규칙. 수요/공급 재개 시 적용.)* 접근성 QA를 통과하지 못한 선택 데이터원은 `DISABLED` 처리하고 가능한 데이터원만으로 계속한다.
 5. `production`은 승인 제목이 정확히 500개가 되기 전까지 완료하거나 최종 파일을 게시하지 않는다. 부족분은 중간 출력에만 저장한다.
 6. `qa`는 사용자와 동일한 `run.py` 진입점과 동일한 단계·검증·저장 함수를 사용한다. QA 전용 축약 소프트웨어나 별도 제목 생성 로직을 만들지 않는다.
-7. QA 전후 운영 `output/deliverables/history/words.txt` 체크섬은 동일해야 한다. QA 출력은 `output/_pipeline/qa/<qa_run_id>/` 밖에 쓰지 않는다.
+7. QA 전후 운영 `output/deliverables/history/words.txt` 체크섬은 동일해야 한다(이 조항이 지키려는 것은
+   바로 이 파일이다). QA가 생성하는 **제목 산출물**은 `output/_pipeline/qa/<qa_run_id>/` 밖에 쓰지
+   않는다. **(2026-08-17 명확화, GKP-001)** `output/deliverables/history/keyword_metrics_cache.csv`/
+   `keyword_metrics_passed.csv`와 그 스냅샷(`output/deliverables/history/snapshots/`,
+   `output/deliverables/final_words/`)은 이 조항이 말하는 "QA 출력"이 아니라 QA·production이
+   함께 쓰는 **부가 북키핑 테이블**이다 — 같은 조합을 두 번 조회하지 않기 위해 8/17 배치에서
+   의도적으로 모드 구분 없이 공유하도록 설계됐다(`memory/ACTIVE_ISSUES.md`의 GKP-001 "누적
+   raw 데이터 캐시 신설" 참고). QA 실행이 이 파일들에 기록을 남기는 것은 위반이 아니라 설계대로다.
 8. *(보류 — MARKET_QUERY는 수요/공급 재개 시 적용.)* `TITLE_QUERY`(제목 충돌 보정)는 계속 유효하며, 다른 어떤 점수와도 섞지 않는다.
 9. 사람 Google 관측은 append-only 원장에 추가한다. 기존 행을 수정·덮어쓰기 하지 않는다. 제목 상표 충돌 확인용으로 계속 사용 가능하다.
 10. 코드·설정·문서 수정 뒤에는 반드시 `final-qa-runner`가 동일 파이프라인 QA를 실행하고 결과물을 검사해야 한다.
