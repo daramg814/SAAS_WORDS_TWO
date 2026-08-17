@@ -1,8 +1,24 @@
 # HANDOFF
 
 - 상태: `DONE`(게이트 통합 + 대량 배치(`--round-size`) + 누적 캐시 + `output/`
-  구조 재편까지 완료·검증 끝. production 500개 실행은 사용자가 별도로 요청할
-  때까지 보류)
+  구조 재편 + 최종 단어목록/히스토리 스냅샷까지 완료·검증 끝. production
+  500개 실행은 사용자가 별도로 요청할 때까지 보류)
+- **2026-08-17 최종 단어목록 + 히스토리 스냅샷 추가**(사용자 지시 —
+  "keyword_metrics_passed.csv의 단어를 엔터로만 구분된 txt로", "history
+  폴더 파일도 날짜/시간 기록이 보존되게"): `words.txt`/`keyword_metrics_
+  cache.csv`/`keyword_metrics_passed.csv`는 코드가 고정 경로로 읽고 쓰므로
+  파일명 자체는 그대로 유지하기로 사용자와 확인(대안이었던 "파일명 자체를
+  날짜로 변경"은 파이프라인이 못 찾게 되어 기각). 대신:
+  - `output/deliverables/final_words/passed_words_<타임스탬프>.txt` — pass한
+    제목만 한 줄씩(CSV 아님).
+  - `output/deliverables/history/snapshots/{words,keyword_metrics_cache,
+    keyword_metrics_passed}_<타임스탬프>.{txt,csv}` — 세 원본의 그 시점 전체
+    사본, 원본은 미수정.
+  - `_apply_keyword_metrics_filter` 종료 시(라운드당 1회, API 배치마다는
+    아님) 자동 생성. `word_pipeline._export_final_words_and_history_
+    snapshots` 신규, 테스트 6개 추가(501개 전체 PASS). 오늘 확보한 실제
+    86개 단어로 최초 산출물 생성 완료
+    (`output/deliverables/final_words/passed_words_20260817_211638_KST.txt`).
 - **2026-08-17 `output/` 구조 재편**(사용자 지시 — "뭐가 최신이고 뭐가
   중간자료인지 정리가 하나도 안 됨"): 8개 폴더가 전부 `output/` 바로 아래
   나란히 있던 것을 `output/deliverables/{generated,history,review}`(사용자가

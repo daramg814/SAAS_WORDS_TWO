@@ -1,5 +1,5 @@
-import csv
 import json
+from datetime import datetime
 from pathlib import Path
 
 import pytest
@@ -382,8 +382,6 @@ def test_keyword_metrics_budget_exceeded_raises_retry_required(tmp_path, monkeyp
 
 
 def write_cache_row(tmp_path, *, title, avg, competition_index, api_status, gate_passed, checked_at="t0"):
-    cache_path = word_pipeline._metrics_cache_path(tmp_path)
-    cache_path.parent.mkdir(parents=True, exist_ok=True)
     row = {
         "title": title,
         "avg_monthly_searches": "" if avg is None else avg,
@@ -392,12 +390,9 @@ def write_cache_row(tmp_path, *, title, avg, competition_index, api_status, gate
         "gate_passed": str(gate_passed),
         "checked_at": checked_at,
     }
-    is_new_file = not cache_path.exists()
-    with cache_path.open("a", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=word_pipeline._CACHE_COLUMNS)
-        if is_new_file:
-            writer.writeheader()
-        writer.writerow(row)
+    # goes through the real merge/rewrite path (also updates the pass-only
+    # subset file) so test fixtures stay consistent with production behavior
+    word_pipeline._append_metrics_cache_rows(tmp_path, [row])
 
 
 def test_record_to_cache_row_serializes_none_as_empty_string():
@@ -482,6 +477,76 @@ def test_apply_keyword_metrics_filter_evidence_marks_source_cache_vs_api(tmp_pat
     entries = {json.loads(line)["title"]: json.loads(line) for line in evidence_path.read_text(encoding="utf-8").splitlines()}
     assert entries["Ledger Pilot"]["source"] == "cache"
     assert entries["Claim Sentry"]["source"] == "api"
+
+
+# ---------------------------------------------------------------------------
+# Final word-list export + history snapshots (2026-08-17 user request):
+# words.txt/keyword_metrics_cache.csv/keyword_metrics_passed.csv keep a fixed
+# path (code depends on it), but the user also wants a plain take-away word
+# list and dated point-in-time copies preserved alongside them.
+# ---------------------------------------------------------------------------
+
+FIXED_WHEN = datetime(2026, 8, 17, 21, 30, 0)
+
+
+def test_export_final_words_writes_title_only_newline_separated_list(tmp_path):
+    write_cache_row(tmp_path, title="Ledger Pilot", avg=2000, competition_index=0, api_status="success", gate_passed=True)
+    write_cache_row(tmp_path, title="Claim Sentry", avg=3000, competition_index=0, api_status="success", gate_passed=True)
+
+    word_pipeline._export_final_words_and_history_snapshots(tmp_path, FIXED_WHEN)
+
+    out_path = word_pipeline._final_words_dir(tmp_path) / "passed_words_20260817_213000_KST.txt"
+    assert out_path.exists()
+    # _append_metrics_cache_rows sorts alphabetically for a deterministic table
+    assert out_path.read_text(encoding="utf-8") == "Claim Sentry\nLedger Pilot\n"
+
+
+def test_export_final_words_skipped_when_no_passed_cache_yet(tmp_path):
+    word_pipeline._export_final_words_and_history_snapshots(tmp_path, FIXED_WHEN)
+    assert not word_pipeline._final_words_dir(tmp_path).exists()
+
+
+def test_export_history_snapshots_copies_live_files_with_timestamped_names(tmp_path):
+    write_cache_row(tmp_path, title="Ledger Pilot", avg=2000, competition_index=0, api_status="success", gate_passed=True)
+    history_dir = tmp_path / "output" / "deliverables" / "history"
+    history_dir.mkdir(parents=True, exist_ok=True)
+    (history_dir / "words.txt").write_text("Vendor Guard\n", encoding="utf-8")
+
+    word_pipeline._export_final_words_and_history_snapshots(tmp_path, FIXED_WHEN)
+
+    snap_dir = word_pipeline._history_snapshots_dir(tmp_path)
+    assert (snap_dir / "words_20260817_213000_KST.txt").read_text(encoding="utf-8") == "Vendor Guard\n"
+    assert (snap_dir / "keyword_metrics_cache_20260817_213000_KST.csv").exists()
+    assert (snap_dir / "keyword_metrics_passed_20260817_213000_KST.csv").exists()
+    # live files must be untouched (still at their fixed path, unrenamed)
+    assert (history_dir / "words.txt").read_text(encoding="utf-8") == "Vendor Guard\n"
+
+
+def test_export_history_snapshots_skips_missing_words_txt_without_error(tmp_path):
+    write_cache_row(tmp_path, title="Ledger Pilot", avg=2000, competition_index=0, api_status="success", gate_passed=True)
+    # no words.txt written - must not raise
+    word_pipeline._export_final_words_and_history_snapshots(tmp_path, FIXED_WHEN)
+    snap_dir = word_pipeline._history_snapshots_dir(tmp_path)
+    assert not (snap_dir / "words_20260817_213000_KST.txt").exists()
+    assert (snap_dir / "keyword_metrics_cache_20260817_213000_KST.csv").exists()
+
+
+def test_apply_keyword_metrics_filter_triggers_export_and_snapshots(tmp_path, monkeypatch):
+    # StubKeywordMetricsClient (unlike the real KeywordMetricsClient) doesn't
+    # persist fresh fetches via on_batch_fn, so seed the passed cache
+    # directly - this test verifies _apply_keyword_metrics_filter triggers
+    # the export/snapshot step at all, not the on_batch_fn wiring itself
+    # (covered separately by the real client's own tests).
+    write_cache_row(tmp_path, title="Ledger Pilot", avg=2000, competition_index=0, api_status="success", gate_passed=True)
+    stub = StubKeywordMetricsClient()
+    monkeypatch.setattr(word_pipeline, "_build_keyword_metrics_client", lambda project_root: stub)
+    state = word_pipeline._load_or_create_state(make_options(tmp_path, target_count=5, run_id="QA-20260817-210000-KST"))
+
+    word_pipeline._apply_keyword_metrics_filter(tmp_path, state, [{"title": "Claim Sentry", "industry": "insurance"}])
+
+    final_words_files = list(word_pipeline._final_words_dir(tmp_path).glob("passed_words_*.txt"))
+    assert len(final_words_files) == 1
+    assert "Ledger Pilot" in final_words_files[0].read_text(encoding="utf-8")
 
 
 # ---------------------------------------------------------------------------

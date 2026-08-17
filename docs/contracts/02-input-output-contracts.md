@@ -9,7 +9,9 @@
 output/
 ├── deliverables/    # 사용자가 가져가는 최종 산출물
 │   ├── generated/   # production 확정 배치
-│   ├── history/     # words.txt(누적 승인 제목), keyword_metrics_cache.csv, keyword_metrics_passed.csv
+│   ├── history/     # words.txt(누적 승인 제목), keyword_metrics_cache.csv, keyword_metrics_passed.csv (전부 고정 경로 - 코드가 이 경로로 읽고/씀)
+│   │   └── snapshots/    # (2026-08-17 신규) 위 세 파일의 날짜/시간 스냅샷 사본. 원본은 고정 경로 유지, 여기에만 시점별 기록 보존
+│   ├── final_words/  # (2026-08-17 신규) keyword_metrics_passed.csv에서 제목만 뽑은 순수 단어 목록(한 줄 하나, CSV 아님) - 사용자가 그대로 가져가는 파일
 │   └── review/       # google_validation_queue.csv 등 사람이 직접 처리하는 큐
 └── _pipeline/        # 순수 내부 기계장치 (사용자가 볼 필요 없음, `_`로 시작해 파일탐색기에서도 맨 위/아래로 정렬)
     ├── runs/          # run_state.json, 판정 요청/응답 원문(라운드당 최대 수 MB)
@@ -22,6 +24,25 @@ output/
 읽을 것 — 단, `memory/ACTIVE_ISSUES.md`의 과거 사건 기록과
 `docs/design/source/`의 원본 설계서는 **당시 실제 경로를 그대로 보존**하므로
 수정하지 않는다(역사적 사실 왜곡 금지).
+
+### `final_words/` + `history/snapshots/` 상세 (2026-08-17 사용자 요청)
+
+- `word_pipeline._export_final_words_and_history_snapshots`가
+  `_apply_keyword_metrics_filter` 종료 시(=라운드 하나가 키워드 지표 처리를
+  마칠 때마다, API 배치 하나가 아니라 라운드 단위) 실행된다.
+- `output/deliverables/final_words/passed_words_YYYYMMDD_HHMMSS_KST.txt`:
+  `keyword_metrics_passed.csv`의 `title` 컬럼만 뽑아 한 줄에 하나씩,
+  UTF-8/LF로 저장(제목 알파벳순 - `_append_metrics_cache_rows`가 정렬해
+  저장하므로). `keyword_metrics_passed.csv`가 아직 없으면(첫 라운드에서 아무도
+  통과 못한 경우) 생성하지 않는다.
+- `output/deliverables/history/snapshots/{words,keyword_metrics_cache,
+  keyword_metrics_passed}_YYYYMMDD_HHMMSS_KST.{txt,csv}`: 세 원본 파일의
+  그 시점 전체 사본. **원본(`output/deliverables/history/words.txt` 등)은
+  이 스냅샷 생성으로 전혀 수정되지 않는다** - 코드가 항상 참조하는 고정 경로는
+  그대로 유지하고, 스냅샷은 순수 추가 기록용.
+- 매 API 배치(20개)마다가 아니라 라운드 종료 시 1회만 생성 - 10,000단어
+  라운드가 배치마다 스냅샷을 만들면 수백 개의 거의 동일한 대용량 파일이
+  생기므로 의도적으로 라운드 단위로 묶음.
 
 ## Claude Code 실행 지침
 1. production과 qa는 동일 코드 경로를 사용하고 설정값만 다르게 전달한다.

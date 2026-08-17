@@ -236,6 +236,53 @@ def _append_metrics_cache_rows(project_root: Path, new_rows: list[dict]) -> None
     atomic_write_text(_metrics_passed_path(project_root), passed_buffer.getvalue())
 
 
+def _final_words_dir(project_root: Path) -> Path:
+    return project_root / "output" / "deliverables" / "final_words"
+
+
+def _history_snapshots_dir(project_root: Path) -> Path:
+    return project_root / "output" / "deliverables" / "history" / "snapshots"
+
+
+def _export_final_words_and_history_snapshots(project_root: Path, when) -> None:
+    """2026-08-17 user request, two parts:
+
+    1. A plain word list (title only, one per line, no CSV columns) the user
+       can take away as-is - exported from the cumulative pass-only table.
+    2. Dated snapshots of the live history tables (words.txt,
+       keyword_metrics_cache.csv, keyword_metrics_passed.csv) so point-in-time
+       state is preserved even though those live files keep a fixed path
+       (word_pipeline/run_state code depends on that path staying stable -
+       CLAUDE.md 12 - so the live files themselves are never renamed).
+
+    Called once per round that does keyword-metrics work (not once per API
+    batch) - a 10,000-word round batches in chunks of 20, and snapshotting on
+    every chunk would create hundreds of near-duplicate multi-MB files."""
+    stamp = when.strftime("%Y%m%d_%H%M%S") + "_KST"
+
+    passed_path = _metrics_passed_path(project_root)
+    if passed_path.exists():
+        with passed_path.open("r", encoding="utf-8", newline="") as f:
+            titles = [row["title"] for row in csv.DictReader(f)]
+        atomic_write_text(
+            _final_words_dir(project_root) / f"passed_words_{stamp}.txt",
+            "\n".join(titles) + "\n" if titles else "",
+        )
+
+    snapshot_sources = (
+        (project_root / "output" / "deliverables" / "history" / "words.txt", "words", "txt"),
+        (_metrics_cache_path(project_root), "keyword_metrics_cache", "csv"),
+        (_metrics_passed_path(project_root), "keyword_metrics_passed", "csv"),
+    )
+    for src_path, prefix, ext in snapshot_sources:
+        if not src_path.exists():
+            continue
+        atomic_write_text(
+            _history_snapshots_dir(project_root) / f"{prefix}_{stamp}.{ext}",
+            src_path.read_text(encoding="utf-8"),
+        )
+
+
 def _build_keyword_metrics_client(project_root: Path) -> KeywordMetricsClient:
     searches_min, competition_exact, runtime, credentials_path = _keyword_metrics_settings(project_root)
     env = load_env_file(credentials_path)
@@ -340,6 +387,7 @@ def _apply_keyword_metrics_filter(
             passed.append(candidate)
 
     _write_metrics_evidence(project_root, state, evidence)
+    _export_final_words_and_history_snapshots(project_root, ids.now_kst())
     return passed
 
 
