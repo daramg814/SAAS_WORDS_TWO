@@ -4,17 +4,19 @@
 
 ## Claude Code 실행 지침
 
-**2026-08-11 전환(CLAUDE.md §1, 현재 유효)**: QA는 이제 데이터원 접근성→수요
-군집화→공급 조사→기회 점수 단계를 거치지 않는다(보류). 아래 3번의 "전체 단계"는
-`load_state → generate_word_candidates → review_titles → validate_outputs →
-publish_mode_outputs → update_memory_and_git_checkpoint`를 뜻한다. 나머지
-1·2·4·5번은 출력 계약이 불변이므로 그대로 유효하다.
+**2026-08-18 전환(CLAUDE.md §1, 현재 유효)**: "정확히 500/20개" 목표·완료 개념이
+폐기되면서 아래 "원본 설계 세부 규칙"(회귀 사례·인수 기준 원본, 정보 손실 방지
+목적으로 보존)의 수요/공급 관련 항목뿐 아니라 목표수량·30%상한 관련 항목도 더
+이상 유효하지 않다. 실제로 적용되는 필수 회귀 사례는 `qa/regression/REQUIRED_CASES.md`
+(2026-08-18 개정판)를 따른다. STAGES는
+`load_state → generate_and_review_titles → update_memory_and_git_checkpoint`
+3단계다(`validate_outputs`/`publish_mode_outputs`는 삭제됨).
 
-1. QA 기본 목표는 20개이며 10개 미만으로 낮추지 않는다.
-2. 19개 또는 21개가 생성되면 실패다.
-3. QA는 단어뱅크 조합부터 제목 검토·게시·Git 체크포인트까지 전체 단계를 직접 수행한다. *(전환 이전: "접근성부터 사람 Google 입력 보정과 Git 체크포인트까지" — 그 경로는 보류.)*
-4. 운영 words.txt 전후 체크섬과 운영 generated 폴더 미변경을 확인한다.
-5. 필수 회귀 사례와 최종 인수 체크리스트를 모두 통과하기 전 DONE으로 전환하지 않는다. 아래 "원본 설계 세부 규칙"의 회귀 사례·인수 기준 중 수요/공급/기회 관련 항목은 보류 상태이며, 전환 이후 실제로 적용되는 항목은 `memory/PROJECT_PLAYBOOK.md`와 `HANDOFF.md`에 최신 목록을 유지한다.
+1. QA는 소규모 round-size(기본 50)로 실행한다는 것 외에 production과 동일한 코드 경로를 쓴다 - 별도 축약 로직 금지.
+2. QA/production 모두 실행마다 4개 문서(CLAUDE.md §4)를 동일하게 병합 갱신한다 - QA가 이 문서들에 기록을 남기는 것은 위반이 아니다(§2 규칙6).
+3. QA는 단어뱅크 조합부터 제목 검토·Keyword Planner 게이트·Git 체크포인트까지 전체 단계를 직접 수행한다.
+4. `python tools/verify_design_coverage.py`와 `python -m pytest -q`가 PASS해야 한다.
+5. 필수 회귀 사례(`qa/regression/REQUIRED_CASES.md`)를 모두 통과하기 전 DONE으로 전환하지 않는다.
 
 ## 원본 설계 세부 규칙
 

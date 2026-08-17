@@ -13,16 +13,6 @@ __pycache__/
 *.token
 *.cookie
 
-# Large/local data
-data/raw/*
-!data/raw/.gitkeep
-data/cache/*
-!data/cache/.gitkeep
-data/local.db
-*.7z
-*.gz
-*.parquet
-
 # Runtime temporary files
 output/_pipeline/logs/*
 !output/_pipeline/logs/.gitkeep

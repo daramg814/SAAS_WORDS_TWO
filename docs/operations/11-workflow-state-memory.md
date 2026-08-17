@@ -11,44 +11,29 @@
 
 ## 원본 설계 세부 규칙
 
-> 아래 내용은 정보 손실 방지를 위해 원본 설계서의 해당 절을 그대로 보존한다.
+> 원본 설계서의 §11(워크플로우) mermaid 다이어그램과 §13 읽기 순서는 수요/공급
+> 파이프라인(2026-08-18 완전 삭제)과 "정확히 500/20개" 계약(같은 날 폐기) 기준으로
+> 그려져 있었다. 원본은 `git log`(커밋 `d1ca668` 이후)로 확인 가능하며, 아래는
+> 현재(2026-08-18 이후) 실제 실행되는 워크플로우로 교체했다.
 
 # 11. 워크플로우와 상태 전이
 
 ```mermaid
 flowchart TD
-    A[세션 시작] --> B[Git·HANDOFF·PLAYBOOK 로드]
-    B --> C[데이터원 접근성 검사]
-    C --> D[신규 원문 증분 수집]
-    D --> E[코드 기반 후보 문장 필터]
-    E --> F[문제 구조 추출]
-    F --> G[동일 문제 군집화]
-    G --> H[수요 점수 계산]
-    H --> I{수요 통과?}
-    I -- 아니오 --> J[보류·근거 저장]
-    I -- 예 --> K[공급 후보 수집]
-    K --> L[활성 제품 검증·분류]
-    L --> M[공급 부족·희소성 우선 점수]
-    M --> N{기회 통과?}
-    N -- 아니오 --> J
-    N -- 예 --> O[공급 희소성 순 독립 검토]
-    O --> P[영어 2단어 후보 생성]
-    P --> Q[형식·중복·의미 검토]
-    Q --> U{목표 수량 승인?}
-    U -- 아니오 --> V[부족 원인 분석·추가 후보 생성]
-    V --> Q
-    U -- 예 --> R[동일 파이프라인 QA]
-    R --> S{실행 모드}
-    S -- production --> W[500줄 TXT·운영 words.txt 원자적 저장]
-    S -- qa --> X[20줄 QA 결과만 별도 저장]
-    W --> Y[Google 검증 추천 큐 생성]
-    X --> Y
-    Y --> Z{새 사용자 검증 입력 존재?}
-    Z -- 아니오 --> T[메모리·Git 체크포인트]
-    Z -- 예 --> AA[검증 원장 추가·예측 오차 계산]
-    AA --> AB[공급·제목 보정 규칙 갱신]
-    AB --> T
-    S --> T[메모리·Git 체크포인트]
+    A[세션 시작] --> B[Git·HANDOFF 로드]
+    B --> C[load_state: ledger에서 AI승인·KP미확인 backlog 스윕]
+    C --> D[단어뱅크에서 round-size만큼 신규 후보 생성]
+    D --> E{신규 후보 있음?}
+    E -- 아니오, backlog도 없음 --> F[CAPABILITY_STAGNATION]
+    E -- 아니오, backlog 있음 --> H
+    E -- 예 --> G[제목 명확성·의미중복·상표유사 검토]
+    G --> GL[ledger 기록 문서①]
+    GL --> H[Keyword Planner 게이트: backlog+승인분]
+    H --> I{예산/자격증명 문제?}
+    I -- 예 --> J[RETRYING]
+    I -- 아니오 --> K[문서②③④ 갱신]
+    K --> L[메모리·Git 체크포인트]
+    L --> M[DONE]
 ```
 
 표준 상태:
@@ -68,11 +53,8 @@ flowchart TD
 3. `HANDOFF.md`
 4. `PROJECT_PLAYBOOK.md`
 5. `ACTIVE_ISSUES.md`
-6. 현재 Run 상태
-7. 최근 `QUALITY_TRENDS.jsonl`
-8. `words.txt`
-9. `human_feedback/google_calibration_metrics.json`
-10. 최근 사용자 검증 원장 중 현재 기회와 관련된 항목
+6. 현재 Run 상태(`output/_pipeline/runs/<run_id>/run_state.json`)
+7. `output/deliverables/history/generated_candidates.csv`/`keyword_metrics_passed.csv` 최근 상태
 
 전체 `ACTIVITY_LOG.jsonl`은 매번 읽지 않는다. 필요한 Action ID 범위만 검색한다.
 

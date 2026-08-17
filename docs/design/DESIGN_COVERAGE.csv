@@ -18,46 +18,46 @@ source_heading,target_document,status
 ### QA 출력,docs/contracts/02-input-output-contracts.md,COVERED
 ### 사용자 Google 검증 출력,docs/contracts/02-input-output-contracts.md,COVERED
 ### 기회 데이터,docs/contracts/02-input-output-contracts.md,COVERED
-# 3. 데이터원 정책,docs/policies/04-data-source-policy.md,COVERED
-## 3.1 기본 데이터원,docs/policies/04-data-source-policy.md,COVERED
-### Hacker News 공식 API,docs/policies/04-data-source-policy.md,COVERED
-## 3.2 선택 데이터원,docs/policies/04-data-source-policy.md,COVERED
-## 3.3 접근성 테스트,docs/policies/04-data-source-policy.md,COVERED
-# 4. 사용자 Google 검증 자산화,docs/policies/05-human-google-calibration.md,COVERED
-## 4.1 목적,docs/policies/05-human-google-calibration.md,COVERED
-## 4.2 사용자가 입력하는 방식,docs/policies/05-human-google-calibration.md,COVERED
-## 4.3 검증 대상 추천 방식,docs/policies/05-human-google-calibration.md,COVERED
-## 4.4 append-only 검증 원장,docs/policies/05-human-google-calibration.md,COVERED
-## 4.5 Google 결과 수의 정규화,docs/policies/05-human-google-calibration.md,COVERED
-## 4.6 AI 예측과 사람 관측 비교,docs/policies/05-human-google-calibration.md,COVERED
-## 4.7 공급 점수 보정,docs/policies/05-human-google-calibration.md,COVERED
-## 4.8 제목 충돌 점수 보정,docs/policies/05-human-google-calibration.md,COVERED
-## 4.9 누적 자기개선,docs/policies/05-human-google-calibration.md,COVERED
-## 4.10 편향 방지,docs/policies/05-human-google-calibration.md,COVERED
-## 4.11 처리 상태,docs/policies/05-human-google-calibration.md,COVERED
-# 5. 최소 에이전트 구조,docs/architecture/06-agents-and-role-separation.md,COVERED
-## 4.1 선택 근거,docs/architecture/06-agents-and-role-separation.md,COVERED
-## 4.2 에이전트,docs/architecture/06-agents-and-role-separation.md,COVERED
+# 3. 데이터원 정책,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 3.1 기본 데이터원,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+### Hacker News 공식 API,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 3.2 선택 데이터원,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 3.3 접근성 테스트,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+# 4. 사용자 Google 검증 자산화,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 4.1 목적,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 4.2 사용자가 입력하는 방식,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 4.3 검증 대상 추천 방식,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 4.4 append-only 검증 원장,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 4.5 Google 결과 수의 정규화,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 4.6 AI 예측과 사람 관측 비교,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 4.7 공급 점수 보정,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 4.8 제목 충돌 점수 보정,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 4.9 누적 자기개선,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 4.10 편향 방지,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 4.11 처리 상태,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+# 5. 최소 에이전트 구조,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 4.1 선택 근거,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 4.2 에이전트,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
 # 6. 판단과 코드 역할 분리,CLAUDE.md + docs/architecture/06-agents-and-role-separation.md,COVERED
-# 7. 수요 예측 파이프라인,docs/pipeline/07-demand-pipeline.md,COVERED
-## 6.1 원문 수집,docs/pipeline/07-demand-pipeline.md,COVERED
-## 6.2 후보 문제 문장 필터,docs/pipeline/07-demand-pipeline.md,COVERED
-## 6.3 문제 구조 추출,docs/pipeline/07-demand-pipeline.md,COVERED
-## 6.4 동일 문제 군집화,docs/pipeline/07-demand-pipeline.md,COVERED
-## 6.5 수요 점수,docs/pipeline/07-demand-pipeline.md,COVERED
-# 8. 공급 예측 파이프라인,docs/pipeline/08-supply-pipeline.md,COVERED
-## 7.1 공급 후보 수집,docs/pipeline/08-supply-pipeline.md,COVERED
-## 7.2 제품 중복 제거,docs/pipeline/08-supply-pipeline.md,COVERED
-## 7.3 활성 제품 검증,docs/pipeline/08-supply-pipeline.md,COVERED
-## 7.4 공급 유형 분류,docs/pipeline/08-supply-pipeline.md,COVERED
-## 7.5 공급 부족 점수,docs/pipeline/08-supply-pipeline.md,COVERED
-## 7.6 공급 희소성 등급,docs/pipeline/08-supply-pipeline.md,COVERED
-# 9. 공급 희소성 우선 기회 판정,docs/pipeline/09-opportunity-scoring.md,COVERED
-## 8.1 희소성 우선 점수,docs/pipeline/09-opportunity-scoring.md,COVERED
-## 8.2 신뢰도,docs/pipeline/09-opportunity-scoring.md,COVERED
-## 8.3 제목 생성 조건,docs/pipeline/09-opportunity-scoring.md,COVERED
-## 8.4 최종 정렬 순서,docs/pipeline/09-opportunity-scoring.md,COVERED
-## 8.5 검토 판정,docs/pipeline/09-opportunity-scoring.md,COVERED
+# 7. 수요 예측 파이프라인,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 6.1 원문 수집,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 6.2 후보 문제 문장 필터,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 6.3 문제 구조 추출,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 6.4 동일 문제 군집화,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 6.5 수요 점수,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+# 8. 공급 예측 파이프라인,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 7.1 공급 후보 수집,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 7.2 제품 중복 제거,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 7.3 활성 제품 검증,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 7.4 공급 유형 분류,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 7.5 공급 부족 점수,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 7.6 공급 희소성 등급,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+# 9. 공급 희소성 우선 기회 판정,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 8.1 희소성 우선 점수,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 8.2 신뢰도,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 8.3 제목 생성 조건,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 8.4 최종 정렬 순서,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
+## 8.5 검토 판정,docs/design/DEPRECATED_DEMAND_SUPPLY.md,COVERED
 # 10. 영어 2단어 제목 생성,docs/pipeline/10-title-generation.md,COVERED
 ## 9.1 실행 목표,docs/pipeline/10-title-generation.md,COVERED
 ## 9.2 핵심 개념 추출,docs/pipeline/10-title-generation.md,COVERED

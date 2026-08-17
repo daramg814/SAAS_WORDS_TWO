@@ -1,5 +1,37 @@
 # ACTIVE ISSUES
 
+## PROJECT-002 — 2026-08-18 두 번째 프로젝트 정의 전환: "정확히 500개" 폐기 + 수요/공급 완전 삭제
+- 상태: RESOLVED(사용자 확정, CLAUDE.md §1에 최종 반영)
+- 배경: `--round-size 10000` 대량 배치를 여러 번 실제 실행(GKP-001 참고)한 결과,
+  Keyword Planner 게이트의 실측 통과율(1~3%)로는 "정확히 500개 승인·발행" 계약이
+  실제 운영 방식과 맞지 않는다는 게 반복 확인됐다. 사용자가 이 불일치를 직접
+  지적("왠지 앞뒤가 안 맞지 않아?")하며 프로젝트 정의를 다시 바꿨다.
+- 새 정의: 목표 개수·완료 개념 폐기. 산출물은 정확히 4개 문서(원시 생성 전체 ①/
+  Keyword Planner OK+NG 전체 ②/OK만 정리된 표 ③/OK 단어리스트 ④), 각각 마스터
+  (고정경로, 항상 최신) + 날짜시간 스냅샷. 업계 30% 분산 상한도 폐기. 실행 모델은
+  "한 번의 CLI 실행 = 한 라운드"로 단순화(`MAX_ROUNDS`/shortfall*2 재생성 루프 삭제).
+- 부수 결정: 이 계약 변경으로 필요 없어진 수요/공급(demand/supply) 파이프라인을
+  이번엔 **완전 삭제**하기로 확정(2026-08-11엔 "보류/코드 보존"이었으나 번복) —
+  `src/saas_words_two/pipeline.py`와 전용 의존성(`db.py`/`google_calibration.py`/
+  `opportunity_scoring.py`/`clustering.py`/`text_filter.py`/`collection.py`와 6개
+  데이터원 클라이언트/`supply.py`/`demand_scoring.py`/`title_generation.py`),
+  전용 스크립트 14개 + 이미 고아였던 스크립트 4개, `data/local.db`(387MB)와
+  `data/cache`/`data/raw`, 관련 테스트 약 30개, 관련 문서 6개, 전용 에이전트 2개
+  (`opportunity-reviewer`/`human-feedback-calibrator`), 전용 스킬 3개
+  (`demand-analysis`/`source-access`/`supply-analysis`), `config/project.yaml`/
+  `sources.yaml`, `input/brief.md`/`human_google_checks.csv` 전부 삭제.
+- **설계 결함 발견·수정(중요)**: 최초 안(ledger에 기록된 조합은 verdict와 무관하게
+  전부 영구 재생성 제외)은 "AI 승인은 됐지만 Keyword Planner 미확인인 후보가, 그
+  run을 재개하지 않고 새 run을 시작하면 영원히 유실"되는 결함이 있었다(예산
+  소진/크래시로 KP 조회가 끝나기 전에 멈춘 경우 실제로 GKP-001에서 2번 발생한
+  패턴). 수정: 그런 후보는 "backlog"로 남아 **다음 실행(같은 run 재개든 새 run이든)
+  시작 시 `_stage_load_state`가 자동으로 쓸어담아 재판정 없이 게이트에 먼저
+  태운다.** 이 발견은 다른 세션(Plan 서브에이전트)의 설계 검토로 나왔다.
+- 삭제된 코드/문서는 `git log`(커밋 `d1ca668` 이후)로 전부 복원 가능. `DEMAND-001`
+  등 실측 교훈은 아래에 역사적 기록으로 계속 보존.
+- 관련 커밋: word_pipeline.py 재작성, run_state/cli/ids/config 정리, 테스트 재작성,
+  수요/공급 삭제, 문서/에이전트/스킬/규칙 정리(커밋 해시는 `git log` 참고).
+
 ## GKP-001 — CLAUDE.md §2.3(Google Keyword Planner 의존 금지)과 검색량·경쟁지수 필터 통합 요청 충돌
 - 상태: RESOLVED(사용자 확정 예외, §2.3 개정 완료)
 - 날짜: 2026-08-17

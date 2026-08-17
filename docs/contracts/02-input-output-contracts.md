@@ -2,54 +2,44 @@
 
 **목적:** 모드별 입력, 최종 산출물, 부분 결과, 이력 반영, 파일명과 저장 격리를 고정한다.
 
-**(2026-08-17 신규) `output/` 최상위 구조**: 사용자가 실제로 가져가는 결과물과 순수
-내부 기계장치가 같은 레벨(`generated`/`history`/`qa`/`runs`/`intermediate`/`logs`/
-`review`/`final` 8개 폴더)에 나란히 있어 구분이 안 되던 문제를 정리했다.
+**(2026-08-18 개정) `output/` 최상위 구조**: "정확히 500개 발행" 계약 폐기로
+`generated/`(production 확정 배치)와 `words.txt`(누적 승인 이력)가 사라졌다.
+산출물은 정확히 4개 문서 카테고리 + 마스터/스냅샷 쌍이다(CLAUDE.md §4).
 ```text
 output/
 ├── deliverables/    # 사용자가 가져가는 최종 산출물
-│   ├── generated/   # production 확정 배치
-│   ├── history/     # words.txt(누적 승인 제목), keyword_metrics_cache.csv, keyword_metrics_passed.csv (전부 고정 경로 - 코드가 이 경로로 읽고/씀)
-│   │   └── snapshots/    # (2026-08-17 신규) 위 세 파일의 날짜/시간 스냅샷 사본. 원본은 고정 경로 유지, 여기에만 시점별 기록 보존
-│   ├── final_words/  # (2026-08-17 신규) keyword_metrics_passed.csv에서 제목만 뽑은 순수 단어 목록(한 줄 하나, CSV 아님) - 사용자가 그대로 가져가는 파일
-│   └── review/       # google_validation_queue.csv 등 사람이 직접 처리하는 큐
-└── _pipeline/        # 순수 내부 기계장치 (사용자가 볼 필요 없음, `_`로 시작해 파일탐색기에서도 맨 위/아래로 정렬)
-    ├── runs/          # run_state.json, 판정 요청/응답 원문(라운드당 최대 수 MB)
-    ├── intermediate/  # 라운드 미달 시 임시 저장, keyword_metrics evidence jsonl
-    ├── qa/             # QA 모드 산출물(운영과 격리 목적, 최종 채택본 아님)
-    └── final/          # 레거시(수요/공급 opportunities.jsonl, 현재 미사용)
+│   ├── history/     # generated_candidates.csv(①), keyword_metrics_cache.csv(②), keyword_metrics_passed.csv(③) - 전부 고정 경로(코드가 이 경로로 읽고/씀), 매 실행마다 병합 갱신
+│   │   └── snapshots/    # 위 세 파일의 날짜/시간 스냅샷 사본. 원본은 고정 경로 유지, 여기에만 시점별 기록 보존
+│   └── final_words/  # passed_words_latest.txt(④ 마스터, 항상 최신 전체) + passed_words_<타임스탬프>.txt(④ 날짜시간 스냅샷)
+└── _pipeline/        # 순수 내부 기계장치 (사용자가 볼 필요 없음)
+    ├── runs/          # run_state.json, 판정 요청/응답 원문
+    └── intermediate/  # keyword_metrics evidence jsonl
 ```
-아래 모든 경로 표기는 이 새 구조를 기준으로 한다. 예전 `output/history/words.txt`
-같은 표기를 다른 문서·기억에서 보게 되면 `output/deliverables/history/words.txt`로
-읽을 것 — 단, `memory/ACTIVE_ISSUES.md`의 과거 사건 기록과
+`output/deliverables/generated/`, `output/deliverables/history/words.txt`,
+`output/deliverables/review/`, `output/_pipeline/qa/`, `output/_pipeline/final/`은
+2026-08-18 전환으로 더 이상 쓰이지 않는다(과거 실행 기록은 archival로 남아있을 수
+있으나 새 코드가 생성/참조하지 않음). `memory/ACTIVE_ISSUES.md`의 과거 사건 기록과
 `docs/design/source/`의 원본 설계서는 **당시 실제 경로를 그대로 보존**하므로
 수정하지 않는다(역사적 사실 왜곡 금지).
 
-### `final_words/` + `history/snapshots/` 상세 (2026-08-17 사용자 요청)
+### 문서①②③④ 상세
 
-- `word_pipeline._export_final_words_and_history_snapshots`가
-  `_apply_keyword_metrics_filter` 종료 시(=라운드 하나가 키워드 지표 처리를
-  마칠 때마다, API 배치 하나가 아니라 라운드 단위) 실행된다.
-- `output/deliverables/final_words/passed_words_YYYYMMDD_HHMMSS_KST.txt`:
-  `keyword_metrics_passed.csv`의 `title` 컬럼만 뽑아 한 줄에 하나씩,
-  UTF-8/LF로 저장(제목 알파벳순 - `_append_metrics_cache_rows`가 정렬해
-  저장하므로). `keyword_metrics_passed.csv`가 아직 없으면(첫 라운드에서 아무도
-  통과 못한 경우) 생성하지 않는다.
-- `output/deliverables/history/snapshots/{words,keyword_metrics_cache,
-  keyword_metrics_passed}_YYYYMMDD_HHMMSS_KST.{txt,csv}`: 세 원본 파일의
-  그 시점 전체 사본. **원본(`output/deliverables/history/words.txt` 등)은
-  이 스냅샷 생성으로 전혀 수정되지 않는다** - 코드가 항상 참조하는 고정 경로는
-  그대로 유지하고, 스냅샷은 순수 추가 기록용.
-- 매 API 배치(20개)마다가 아니라 라운드 종료 시 1회만 생성 - 10,000단어
-  라운드가 배치마다 스냅샷을 만들면 수백 개의 거의 동일한 대용량 파일이
-  생기므로 의도적으로 라운드 단위로 묶음.
+- `word_pipeline._stage_generate_and_review_titles`가 판정 응답을 소비할 때마다
+  전체 후보(승인+거절)를 `generated_candidates.csv`(①)에 병합 기록하고 날짜시간
+  스냅샷을 쓴다. `_apply_keyword_metrics_filter`가 종료될 때마다 ②③④를 갱신한다
+  (API 배치 하나가 아니라 라운드 단위 - 10,000단어 라운드가 배치마다 스냅샷을
+  만들면 대용량 파일이 폭증하므로 의도적으로 라운드 단위로 묶음).
+- `passed_words_latest.txt`(④ 마스터)는 `keyword_metrics_passed.csv`의 전체
+  `title` 컬럼을 매번 덮어써서 항상 최신 전체 목록을 유지한다. 아직 아무도
+  통과 못했으면(빈 캐시) 생성하지 않는다.
+- 마스터 파일들(①②③④)은 QA/production이 공유한다(CLAUDE.md §2 규칙6) - 같은
+  조합을 두 번 조회/판정하지 않기 위한 의도된 설계.
 
 ## Claude Code 실행 지침
-1. production과 qa는 동일 코드 경로를 사용하고 설정값만 다르게 전달한다.
-2. 500개 또는 QA 목표 수량 미만의 결과는 최종 위치에 게시하지 않는다.
-3. 운영 이력은 임시 파일 작성 후 원자적 교체하고 증가분을 검증한다.
-4. QA는 운영 이력의 읽기 전용 스냅샷만 사용한다.
-5. **(2026-08-17 신규)** AI 판정을 통과한 후보는 게시 전에 추가로 Google Ads Keyword Planner 필터(`config/keyword_metrics.yaml`의 `avg_monthly_searches_min`/`competition_index_exact`)를 통과해야 한다 — `memory/ACTIVE_ISSUES.md`의 `GKP-001` 참고. 이 필터 통과율이 낮으면(2026-08-17 QA 실측 약 2.3%) 목표 수량 미달로 `RETRYING`/`CAPABILITY_STAGNATION`이 될 수 있으며, 이는 정직한 결과이지 결함이 아니다.
+1. production과 qa는 동일 코드 경로를 사용하고 round-size만 다르게 전달한다.
+2. 목표 수량·완료 개념이 없다 - 매 실행이 4개 문서를 누적 갱신하고 끝난다.
+3. ledger/캐시는 임시 파일 작성 후 원자적 교체하고 정규화 키로 병합한다(재조회/재판정 방지).
+4. AI 판정을 통과한 후보는 추가로 Google Ads Keyword Planner 필터(`config/keyword_metrics.yaml`의 `avg_monthly_searches_min`/`competition_index_exact`)를 통과해야 한다 — `memory/ACTIVE_ISSUES.md`의 `GKP-001` 참고. 이 필터 통과율이 낮아도(실측 1~3%) 그 자체가 목표 미달로 취급되지 않는다(목표가 없으므로) - 예산 소진 등으로만 `RETRYING`/`CAPABILITY_STAGNATION`이 된다.
 
 ## 원본 설계 세부 규칙
 
@@ -223,12 +213,14 @@ competition_index,api_status,gate_passed,checked_at`.
   게 아니므로, 중간에 네트워크 오류로 죽어도 이미 확인한 단어는 남는다(실측 근거:
   GKP-001에서 9,645개 라운드가 49%·91% 지점에서 각각 다른 이유로 죽어 아무것도
   안 남았던 사고 2건, `memory/ACTIVE_ISSUES.md` GKP-001 참고).
-- **재조회 생략**: `word_generation.generate_combinations`에 전달되는 exclude
-  집합(`word_pipeline._excluded_normalized`)이 `gate_passed=False`로 기록된 단어를
-  전부 포함한다 — 이미 탈락으로 확인된 조합은 이후 어떤 실행에서도 다시
-  생성·판정·API 조회되지 않는다. `gate_passed=True`인 단어는 제외 대상이
-  **아니다**(아직 안 쓴 좋은 후보이므로 계속 후보 풀에 남아야 함) — 대신 이미
-  캐시에 있으므로 API만 다시 호출하지 않고 재사용한다(`_apply_keyword_metrics_filter`).
+- **재생성/재조회 생략 (2026-08-18 개정)**: `word_generation.generate_combinations`에
+  전달되는 exclude 집합(`word_pipeline._excluded_normalized`)은 이제
+  `generated_candidates.csv`(문서①) ledger에 기록된 **모든** 제목(승인/거절
+  verdict와 무관)을 포함한다 — 한 번 생성+판정된 조합은 다시 생성·판정되지
+  않는다. AI 승인됐지만 아직 Keyword Planner 미확인인 후보는 "backlog"로 별도
+  관리되어 다음 실행 시작 시 자동으로 게이트에 태워진다(재판정 없이) — 예산
+  소진으로 중단돼도 유실되지 않는다. `keyword_metrics_cache.csv`(문서②)에 이미
+  있는 제목은 API만 다시 호출하지 않고 캐시값을 재사용한다(`_apply_keyword_metrics_filter`).
 
 ### 게이트 규칙
 

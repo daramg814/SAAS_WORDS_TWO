@@ -1,12 +1,12 @@
-"""단어뱅크 기반 제목 생성 파이프라인 (2026-08-11 프로젝트 정의 전환, CLAUDE.md §1).
+"""단어뱅크 기반 제목 생성 파이프라인 (2026-08-18 두 번째 프로젝트 정의 전환).
 
-`pipeline.py`(수요/공급/기회 기반)는 보류 상태로 그대로 보존하고, 이 모듈이
-`run.py`의 현재 진입점이 실제로 실행하는 경로다. RunOptions와 판정 예외
-클래스는 `pipeline.py`에서 그대로 재사용한다(순수 값 객체/예외 타입이라
-수요/공급에 종속되지 않음). `contracts.py`/`run_state.py`/`judgment.py`도
-DB에 의존하지 않는 순수 파일 기반 모듈이라 그대로 재사용한다 - 이 모듈은
-DB(`data/local.db`)를 전혀 쓰지 않는다(단어뱅크 조합은 결정론적 생성이라
-문제/증거/기회 같은 관계형 스키마가 필요 없음).
+`run.py`의 유일한 진입점. "정확히 500개 선정·발행" 계약과 업계 30% 분산 상한은
+폐기됐다 - 산출물은 목표 개수 없이 계속 누적되는 4개 문서(원시 생성 전체 /
+Keyword Planner OK+NG 전체 / OK만 정리된 표 / OK 단어 리스트) 모델이다. 실행
+모델도 "한 번의 CLI 실행 = 한 라운드"로 단순화됐다(더 이상 MAX_ROUNDS/
+shortfall*2 재생성 루프가 없다). 수요/공급(demand/supply) 파이프라인은 이
+전환으로 완전히 삭제됐으므로, `RunOptions`/판정 예외 클래스는 더 이상 다른
+모듈과 공유하지 않고 이 파일이 직접 소유한다.
 """
 
 from __future__ import annotations
@@ -16,14 +16,11 @@ import io
 import json
 import subprocess
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
-from . import config, ids, judgment, run_state, title_generation, word_generation
-from .contracts import (
-    atomic_write_text,
-    normalize_title,
-    validate_title_set,
-)
+from . import config, ids, judgment, run_state, word_generation
+from .contracts import atomic_write_text, normalize_title
 from .judgment import JudgmentRequired
 from .keyword_metrics_client import (
     ApiRuntimeConfig,
@@ -33,7 +30,6 @@ from .keyword_metrics_client import (
     credentials_from_env,
     load_env_file,
 )
-from .pipeline import ImplementationPendingError, RecoveryRequired, RetryRequired, RunOptions
 
 __all__ = [
     "ImplementationPendingError",
@@ -47,16 +43,65 @@ __all__ = [
 STAGES = (
     "load_state",
     "generate_and_review_titles",
-    "validate_outputs",
-    "publish_mode_outputs",
     "update_memory_and_git_checkpoint",
 )
 
+# 모드별 round-size 기본값(명시적으로 --round-size를 안 주면 이 값 사용).
+# QA=소규모 스모크 테스트, production=실제 대량 배치 - 두 모드의 유일한 차이.
+DEFAULT_ROUND_SIZE = {"qa": 50, "production": 10000}
+
 
 # ---------------------------------------------------------------------------
-# Shared helpers (duplicated in miniature from pipeline.py rather than
-# importing its private _-prefixed names across modules - each is a handful
-# of lines with no demand/supply coupling)
+# 판정 예외 클래스 (2026-08-18 이전엔 pipeline.py에서 재사용했으나, 그 모듈이
+# 수요/공급 삭제로 없어져서 이 파일이 직접 소유한다)
+# ---------------------------------------------------------------------------
+
+
+class ImplementationPendingError(RuntimeError):
+    pass
+
+
+class RetryRequired(RuntimeError):
+    """판정 대기가 아닌, 제어된 중단. 예: 이번 라운드에 신규 후보가 전혀 없거나
+    Keyword Planner API 예산이 소진된 경우. 최종 산출물은 갱신되지 않는다.
+
+    status는 기본 RETRYING이지만 CAPABILITY_STAGNATION(단어뱅크 조합공간이
+    진짜로 소진되어 이 실행/설정으로는 더 진행 불가)일 수도 있다 - 둘 다 이
+    예외 타입으로 발생하며, HANDOFF/ACTIVE_ISSUES 기록 목적으로만 구분된다.
+    """
+
+    def __init__(self, reason: str, *, status: str = "RETRYING"):
+        self.reason = reason
+        self.status = status
+        super().__init__(f"{status}: {reason}")
+
+
+class RecoveryRequired(RuntimeError):
+    """원자적 쓰기 자체의 사후 검증이 실패한 경우(예: 캐시 파일의 병합 결과가
+    방금 쓴 내용과 다름) - 자동 재시도가 안전하지 않아 수동 점검을 위해 멈춘다."""
+
+    def __init__(self, reason: str):
+        self.reason = reason
+        super().__init__(f"RECOVERY_REQUIRED: {reason}")
+
+
+@dataclass(frozen=True)
+class RunOptions:
+    mode: str
+    project_root: Path
+    resume: bool = False
+    run_id: str | None = None
+    round_size: int | None = None
+
+    def validate(self) -> None:
+        if self.mode not in {"production", "qa"}:
+            raise ValueError("mode must be production or qa")
+        if self.round_size is not None and self.round_size <= 0:
+            raise ValueError("round_size, if given, must be positive")
+
+
+# ---------------------------------------------------------------------------
+# Shared helpers
 # ---------------------------------------------------------------------------
 
 
@@ -64,20 +109,8 @@ def _run_dir(project_root: Path, state: run_state.RunState) -> Path:
     return run_state.run_dir(project_root, state.run_id)
 
 
-def _history_path_for(project_root: Path, state: run_state.RunState) -> Path:
-    if state.mode == "qa":
-        return Path(state.context["qa_history_snapshot_path"])
-    return project_root / "output" / "deliverables" / "history" / "words.txt"
-
-
 def _read_lines(path: Path) -> list[str]:
     return path.read_text(encoding="utf-8").splitlines() if path.exists() else []
-
-
-def _write_shortfall_intermediate(project_root: Path, state: run_state.RunState, titles: list[str]) -> Path:
-    path = project_root / "output" / "_pipeline" / "intermediate" / f"{state.run_id}_shortfall_titles.txt"
-    atomic_write_text(path, "\n".join(titles) + "\n" if titles else "")
-    return path
 
 
 def _pause_for_judgment(project_root: Path, state: run_state.RunState, stage_name: str, request_path: Path) -> None:
@@ -103,50 +136,84 @@ def _run_or_raise(project_root: Path, script_name: str, *extra_args: str) -> sub
 
 
 # ---------------------------------------------------------------------------
-# Stage: load_state
+# 문서 ① 원시 생성 전체 ledger (2026-08-18 신규): 생성+판정된 모든 후보를
+# verdict(승인/거절)와 무관하게 기록한다. 이게 있어야 (a) 같은 조합이 다시
+# 생성/판정되는 낭비를 막고, (b) AI 승인은 됐지만 아직 Keyword Planner로 확인
+# 안 된 후보("backlog")가 다음 실행에서 유실되지 않고 자동으로 이어진다.
+# keyword_metrics_cache.csv와 동일한 "정규화 키로 병합 후 전체 재기록" 패턴.
 # ---------------------------------------------------------------------------
 
-
-def _stage_load_state(project_root: Path, options: RunOptions, state: run_state.RunState) -> None:
-    if state.mode == "qa" and "qa_history_snapshot_path" not in state.context:
-        history_path = project_root / "output" / "deliverables" / "history" / "words.txt"
-        snapshot_path = project_root / "output" / "_pipeline" / "qa" / state.run_id / "qa_history_snapshot.txt"
-        lines = _read_lines(history_path)
-        atomic_write_text(snapshot_path, "\n".join(lines) + "\n" if lines else "")
-        state.context["qa_history_snapshot_path"] = str(snapshot_path)
+_LEDGER_COLUMNS = ("title", "industry", "ai_approved", "ai_reason", "judged_at")
 
 
-# ---------------------------------------------------------------------------
-# Stage: generate_and_review_titles (judgment checkpoint: code generates
-# word-bank combinations, the current session reviews clarity/semantic-
-# duplication/well-known-trademark conflict - design 9.2's hard-reject list
-# minus anything opportunity-specific)
-# ---------------------------------------------------------------------------
+def _generated_ledger_path(project_root: Path) -> Path:
+    return project_root / "output" / "deliverables" / "history" / "generated_candidates.csv"
+
+
+def _load_generated_ledger(project_root: Path) -> dict[str, dict]:
+    path = _generated_ledger_path(project_root)
+    if not path.exists():
+        return {}
+    with path.open("r", encoding="utf-8", newline="") as f:
+        return {normalize_title(row["title"]): row for row in csv.DictReader(f)}
+
+
+def _append_generated_ledger_rows(project_root: Path, new_rows: list[dict]) -> None:
+    if not new_rows:
+        return
+    ledger = _load_generated_ledger(project_root)
+    for row in new_rows:
+        ledger[normalize_title(row["title"])] = row
+    ordered = sorted(ledger.values(), key=lambda r: r["title"])
+
+    buffer = io.StringIO()
+    writer = csv.DictWriter(buffer, fieldnames=_LEDGER_COLUMNS)
+    writer.writeheader()
+    writer.writerows(ordered)
+    atomic_write_text(_generated_ledger_path(project_root), buffer.getvalue())
+
+
+def _export_generated_ledger_snapshot(project_root: Path, when) -> None:
+    src_path = _generated_ledger_path(project_root)
+    if not src_path.exists():
+        return
+    stamp = when.strftime("%Y%m%d_%H%M%S") + "_KST"
+    atomic_write_text(
+        _history_snapshots_dir(project_root) / f"generated_candidates_{stamp}.csv",
+        src_path.read_text(encoding="utf-8"),
+    )
 
 
 def _excluded_normalized(project_root: Path, state: run_state.RunState) -> set[str]:
-    history = _read_lines(_history_path_for(project_root, state))
     blocklist = _read_lines(project_root / "input" / "blocklist.txt")
-    excluded = {normalize_title(t) for t in history if t.strip()}
-    excluded |= {normalize_title(t) for t in blocklist if t.strip()}
-    excluded |= set(state.context.get("excluded_normalized", []))
-    # 2026-08-17 (GKP-001, user request): a combination already known to fail
-    # the keyword-metrics gate (see _load_metrics_cache below) is excluded
-    # from candidate generation itself - regenerating/re-judging/re-querying
-    # a combo whose avg_monthly_searches/competition_index are already on
-    # record as not meeting the bar wastes AI-judgment cycles and API budget
-    # for an outcome we already know. Passing combos are deliberately NOT
-    # excluded here - they remain eligible candidates until actually used.
-    cache = _load_metrics_cache(project_root)
-    excluded |= {norm for norm, row in cache.items() if row["gate_passed"] != "True"}
+    excluded = {normalize_title(t) for t in blocklist if t.strip()}
+    # 한 번 생성+판정된 조합은 승인/거절과 무관하게 다시 생성하지 않는다 -
+    # 승인분 중 아직 Keyword Planner 미확인인 것은 backlog로 별도 처리된다
+    # (_stage_load_state 참고), 재생성 대상에서는 제외되지만 유실되지 않는다.
+    excluded |= set(_load_generated_ledger(project_root).keys())
     return excluded
 
 
 # ---------------------------------------------------------------------------
-# Keyword Planner filter gate (2026-08-17, CLAUDE.md §4, memory/ACTIVE_ISSUES.md
-# GKP-001) - applied to AI-judgment-approved candidates each round, before they
-# count toward target_count. Pure numeric comparison, so this stays code-only
-# per CLAUDE.md §2 role separation (no session judgment needed).
+# Stage: load_state - backlog 스윕(AI 승인은 됐지만 Keyword Planner 미확인인
+# 후보를 다음 게이트 실행에 먼저 태운다)
+# ---------------------------------------------------------------------------
+
+
+def _stage_load_state(project_root: Path, options: RunOptions, state: run_state.RunState) -> None:
+    ledger = _load_generated_ledger(project_root)
+    cache = _load_metrics_cache(project_root)
+    backlog = [
+        {"title": row["title"], "industry": row["industry"]}
+        for norm, row in ledger.items()
+        if row["ai_approved"] == "True" and norm not in cache
+    ]
+    state.context["backlog"] = backlog
+
+
+# ---------------------------------------------------------------------------
+# Keyword Planner filter gate (변경 없음 - CLAUDE.md §4, memory/ACTIVE_ISSUES.md
+# GKP-001) - 순수 수치 비교라 코드 전담, 판정은 이 함수 호출 전에 이미 끝나 있다.
 # ---------------------------------------------------------------------------
 
 
@@ -168,15 +235,7 @@ def _keyword_metrics_settings(project_root: Path) -> tuple[float, float, ApiRunt
 
 
 # ---------------------------------------------------------------------------
-# Persistent, cumulative (cross-run) raw-data table (2026-08-17, user
-# request): every word ever checked against the Keyword Planner API, pass or
-# fail, survives here - not just in a single run's evidence log. Written
-# incrementally per API batch (KeywordMetricsClient.on_batch_fn), not once at
-# the end, so a mid-run crash never loses results already fetched (real
-# incidents: GKP-001 runs died at 49% and 91% through a 9,645-word round with
-# nothing persisted). _CACHE_COLUMNS order is the on-disk CSV column order -
-# do not reorder without a migration, per CLAUDE.md 12 (don't silently change
-# output contracts).
+# 문서 ②③ Keyword Planner 조회 결과(전체/OK만) - 기존 로직 그대로 유지.
 # ---------------------------------------------------------------------------
 
 _CACHE_COLUMNS = ("title", "avg_monthly_searches", "competition_index", "api_status", "gate_passed", "checked_at")
@@ -191,9 +250,6 @@ def _metrics_passed_path(project_root: Path) -> Path:
 
 
 def _load_metrics_cache(project_root: Path) -> dict[str, dict]:
-    """Returns {normalized_title: row} for every word ever recorded, keyed so
-    a later re-check of the same combo (if it ever happens) overwrites the
-    earlier row rather than duplicating it."""
     path = _metrics_cache_path(project_root)
     if not path.exists():
         return {}
@@ -213,9 +269,6 @@ def _record_to_cache_row(title: str, record, gate_passed: bool, checked_at: str)
 
 
 def _append_metrics_cache_rows(project_root: Path, new_rows: list[dict]) -> None:
-    """Merges new_rows into the cumulative cache (by normalized title) and
-    atomically rewrites both the full table and the pass-only subset table
-    (user request: passed combos collected separately for easy reuse)."""
     if not new_rows:
         return
     cache = _load_metrics_cache(project_root)
@@ -245,32 +298,21 @@ def _history_snapshots_dir(project_root: Path) -> Path:
 
 
 def _export_final_words_and_history_snapshots(project_root: Path, when) -> None:
-    """2026-08-17 user request, two parts:
-
-    1. A plain word list (title only, one per line, no CSV columns) the user
-       can take away as-is - exported from the cumulative pass-only table.
-    2. Dated snapshots of the live history tables (words.txt,
-       keyword_metrics_cache.csv, keyword_metrics_passed.csv) so point-in-time
-       state is preserved even though those live files keep a fixed path
-       (word_pipeline/run_state code depends on that path staying stable -
-       CLAUDE.md 12 - so the live files themselves are never renamed).
-
-    Called once per round that does keyword-metrics work (not once per API
-    batch) - a 10,000-word round batches in chunks of 20, and snapshotting on
-    every chunk would create hundreds of near-duplicate multi-MB files."""
+    """문서 ④(OK 단어 리스트)의 마스터(`passed_words_latest.txt`, 항상 최신
+    전체 누적)와 날짜시간 스냅샷을 쓰고, 문서 ②③의 날짜시간 스냅샷도 함께
+    쓴다. `words.txt`는 더 이상 존재하지 않으므로 스냅샷 소스에서 제외됐다
+    (2026-08-18 전환). 라운드당 1회 호출(_apply_keyword_metrics_filter 종료 시)."""
     stamp = when.strftime("%Y%m%d_%H%M%S") + "_KST"
 
     passed_path = _metrics_passed_path(project_root)
     if passed_path.exists():
         with passed_path.open("r", encoding="utf-8", newline="") as f:
             titles = [row["title"] for row in csv.DictReader(f)]
-        atomic_write_text(
-            _final_words_dir(project_root) / f"passed_words_{stamp}.txt",
-            "\n".join(titles) + "\n" if titles else "",
-        )
+        content = "\n".join(titles) + "\n" if titles else ""
+        atomic_write_text(_final_words_dir(project_root) / f"passed_words_{stamp}.txt", content)
+        atomic_write_text(_final_words_dir(project_root) / "passed_words_latest.txt", content)
 
     snapshot_sources = (
-        (project_root / "output" / "deliverables" / "history" / "words.txt", "words", "txt"),
         (_metrics_cache_path(project_root), "keyword_metrics_cache", "csv"),
         (_metrics_passed_path(project_root), "keyword_metrics_passed", "csv"),
     )
@@ -314,19 +356,10 @@ def _write_metrics_evidence(project_root: Path, state: run_state.RunState, evide
 def _apply_keyword_metrics_filter(
     project_root: Path, state: run_state.RunState, candidates: list[dict]
 ) -> list[dict]:
-    """Keeps only candidates whose avg_monthly_searches >= threshold AND whose
-    competition_index is exactly the configured value (default 0). A missing
-    (NULL) competition_index means Keyword Planner has no data for that
-    combination - "dead word" - and never passes, regardless of
-    avg_monthly_searches. Every checked candidate (pass or fail) is logged to
-    the run's keyword_metrics_evidence.jsonl for traceability (CLAUDE.md §3.1)
-    and to the cumulative output/deliverables/history/keyword_metrics_cache.csv table.
-
-    Candidates already present in the cache (previously checked, in this run
-    or any earlier one) reuse that recorded result instead of re-querying the
-    API - 2026-08-17 user request: never pay for the same lookup twice. Only
-    genuinely new titles are sent to the API.
-    """
+    """avg_monthly_searches>=임계값 AND competition_index==임계값(기본 0)인
+    후보만 통과시킨다. NULL competition_index는 항상 탈락(메트릭 자체가 없는
+    "죽은 단어"). pass/fail 전부 run별 evidence(jsonl)와 누적 캐시(문서②③)에
+    기록된다. 캐시에 이미 있는 후보는 API 재조회 없이 재사용."""
     if not candidates:
         return []
 
@@ -391,178 +424,107 @@ def _apply_keyword_metrics_filter(
     return passed
 
 
+# ---------------------------------------------------------------------------
+# Stage: generate_and_review_titles - "한 번의 CLI 실행 = 한 라운드"(2026-08-18
+# 전환). backlog(load_state에서 적재) + 이번에 새로 생성/판정한 승인분을 합쳐
+# Keyword Planner 게이트에 태우고 끝난다. 더 이상 target_count를 추격하는
+# 다중 라운드 루프가 없다 - 더 하고 싶으면 다시 실행(새 run 또는 --resume).
+# ---------------------------------------------------------------------------
+
+
 def _stage_generate_and_review_titles(project_root: Path, options: RunOptions, state: run_state.RunState) -> None:
     run_dir = _run_dir(project_root, state)
     stage_name = "review_titles"
-    target_count = options.target_count
+    round_no = 1
+    backlog = state.context.get("backlog", [])
 
-    while True:
-        approved = state.context.get("approved", [])
-        if len(approved) >= target_count:
-            return
-
-        round_no = state.context.get("title_round", 1)
-        if round_no > word_generation.MAX_ROUNDS:
-            status = "CAPABILITY_STAGNATION" if not approved else "RETRYING"
-            state.status = status
-            run_state.save(project_root, state)
-            _write_shortfall_intermediate(project_root, state, [item["title"] for item in approved])
-            raise RetryRequired(
-                f"reached max rounds ({word_generation.MAX_ROUNDS}) with only "
-                f"{len(approved)}/{target_count} approved titles",
-                status=status,
+    if judgment.has_response(run_dir, stage_name, round_no):
+        response = judgment.read_response(run_dir, stage_name, round_no)
+        candidate_industry = state.context.get("candidate_industry", {})
+        judged_at = ids.now_kst().isoformat()
+        ledger_rows = []
+        fresh_approved = []
+        for decision in response["decisions"]:
+            title = decision["title"]
+            approve = bool(decision.get("approve"))
+            ledger_rows.append(
+                {
+                    "title": title,
+                    "industry": candidate_industry.get(title, ""),
+                    "ai_approved": str(approve),
+                    "ai_reason": "" if approve else decision.get("reason", ""),
+                    "judged_at": judged_at,
+                }
             )
+            if approve:
+                fresh_approved.append({"title": title, "industry": candidate_industry.get(title, "")})
+        _append_generated_ledger_rows(project_root, ledger_rows)
+        _export_generated_ledger_snapshot(project_root, ids.now_kst())
 
-        if judgment.has_response(run_dir, stage_name, round_no):
-            response = judgment.read_response(run_dir, stage_name, round_no)
-            newly_judged = _consume_review(state, response)
-            try:
-                newly_approved = _apply_keyword_metrics_filter(project_root, state, newly_judged)
-            except (KeywordMetricsCredentialsError, KeywordMetricsBudgetExceeded) as exc:
-                approved_so_far = state.context.get("approved", [])
-                status = "CAPABILITY_STAGNATION" if not approved_so_far else "RETRYING"
-                state.status = status
-                run_state.save(project_root, state)
-                _write_shortfall_intermediate(project_root, state, [item["title"] for item in approved_so_far])
-                raise RetryRequired(f"keyword metrics filter unavailable: {exc}", status=status)
-            approved = state.context.setdefault("approved", [])
-            approved.extend(newly_approved)
-            state.context["approved"] = approved
-            state.context["title_round"] = round_no + 1
+        combined = backlog + fresh_approved
+        try:
+            approved = _apply_keyword_metrics_filter(project_root, state, combined)
+        except (KeywordMetricsCredentialsError, KeywordMetricsBudgetExceeded) as exc:
+            state.status = "RETRYING"
             run_state.save(project_root, state)
-            continue
+            raise RetryRequired(f"keyword metrics filter unavailable: {exc}", status="RETRYING")
+        state.context["approved"] = approved
+        state.context["round_stats"] = {
+            "generated": len(ledger_rows),
+            "ai_approved": len(fresh_approved),
+            "backlog_carried": len(backlog),
+            "kp_passed": len(approved),
+        }
+        state.status = "DONE"
+        run_state.save(project_root, state)
+        return
 
-        shortfall = target_count - len(approved)
-        if options.round_size:
-            candidate_count = options.round_size
-        elif round_no == 1:
-            candidate_count = title_generation.first_round_size(target_count)
-        else:
-            candidate_count = title_generation.next_round_size(shortfall)
-        excluded = _excluded_normalized(project_root, state)
-        candidates = word_generation.generate_combinations(candidate_count, exclude=excluded)
-        if not candidates:
-            status = "CAPABILITY_STAGNATION" if not approved else "RETRYING"
-            state.status = status
+    excluded = _excluded_normalized(project_root, state)
+    round_size = options.round_size or DEFAULT_ROUND_SIZE[options.mode]
+    candidates = word_generation.generate_combinations(round_size, exclude=excluded)
+
+    if not candidates:
+        if not backlog:
+            state.status = "CAPABILITY_STAGNATION"
             run_state.save(project_root, state)
-            _write_shortfall_intermediate(project_root, state, [item["title"] for item in approved])
-            raise RetryRequired("word bank exhausted - no new combinations available", status=status)
-
-        candidate_industry = state.context.setdefault("candidate_industry", {})
-        for item in candidates:
-            candidate_industry[item["title"]] = item["industry"]
-        state.context["candidate_industry"] = candidate_industry
-        state.context["excluded_normalized"] = sorted(excluded | {normalize_title(c["title"]) for c in candidates})
-
-        instructions = (
-            "각 제목의 의미 중복과 명확성을 검토하라. 다른 후보와 의미가 겹치거나, "
-            "어떤 SaaS인지 추측할 수 없을 만큼 추상적이거나, 유명 서비스·브랜드와 "
-            "명백히 동일/유사하면 approve=false로 판정하고 reason을 남겨라. "
-            "그렇지 않으면 approve=true. industry 필드는 참고용 맥락이다."
-        )
-        items = [{"title": c["title"], "industry": c["industry"]} for c in candidates]
-        request_path = judgment.write_request(
-            run_dir, stage_name, state.run_id, instructions, items,
-            round_no=round_no, generated_at=ids.now_kst().isoformat(),
-        )
-        state.context["title_round"] = round_no
-        _pause_for_judgment(project_root, state, stage_name, request_path)
-
-
-def _consume_review(state: run_state.RunState, response: dict) -> list[dict]:
-    """Returns this round's AI-judgment-approved candidates. Callers must still
-    run them through `_apply_keyword_metrics_filter` before counting them
-    toward `state.context["approved"]` / target_count (CLAUDE.md §4 신규 게이트)."""
-    candidate_industry = state.context.get("candidate_industry", {})
-    newly_judged = []
-    for decision in response["decisions"]:
-        title = decision["title"]
-        if decision.get("approve"):
-            newly_judged.append({"title": title, "industry": candidate_industry.get(title, "")})
-    return newly_judged
-
-
-# ---------------------------------------------------------------------------
-# Stage: validate_outputs
-# ---------------------------------------------------------------------------
-
-
-def _stage_validate_outputs(project_root: Path, options: RunOptions, state: run_state.RunState) -> None:
-    approved = state.context.get("approved", [])
-    scored = [
-        {"title": item["title"], "problem_id": item["industry"], "priority_score": 0.0}
-        for item in approved
-    ]
-    selected = title_generation.select_final_titles(scored, options.target_count)
-    if len(selected) != options.target_count:
-        state.status = "RETRYING"
+            raise RetryRequired(
+                "word bank exhausted - no new combinations and no pending backlog",
+                status="CAPABILITY_STAGNATION",
+            )
+        try:
+            approved = _apply_keyword_metrics_filter(project_root, state, backlog)
+        except (KeywordMetricsCredentialsError, KeywordMetricsBudgetExceeded) as exc:
+            state.status = "RETRYING"
+            run_state.save(project_root, state)
+            raise RetryRequired(f"keyword metrics filter unavailable: {exc}", status="RETRYING")
+        state.context["approved"] = approved
+        state.context["round_stats"] = {
+            "generated": 0,
+            "ai_approved": 0,
+            "backlog_carried": len(backlog),
+            "kp_passed": len(approved),
+        }
+        state.status = "DONE"
         run_state.save(project_root, state)
-        _write_shortfall_intermediate(project_root, state, [item["title"] for item in selected])
-        raise RetryRequired(
-            f"only {len(selected)}/{options.target_count} titles survive final selection "
-            "under the 30%-per-industry cap"
-        )
+        return
 
-    selected_titles = [item["title"] for item in selected]
-    history = _read_lines(_history_path_for(project_root, state))
-    blocklist = _read_lines(project_root / "input" / "blocklist.txt")
-    errors = validate_title_set(selected_titles, target_count=options.target_count, history=history, blocklist=blocklist)
-    if errors:
-        state.status = "FAILED"
-        run_state.save(project_root, state)
-        raise RuntimeError("final title set failed validate_title_set: " + "; ".join(errors))
+    candidate_industry = state.context.setdefault("candidate_industry", {})
+    for item in candidates:
+        candidate_industry[item["title"]] = item["industry"]
+    state.context["candidate_industry"] = candidate_industry
 
-    counts_by_industry: dict[str, int] = {}
-    for item in selected:
-        counts_by_industry[item["problem_id"]] = counts_by_industry.get(item["problem_id"], 0) + 1
-    violations = title_generation.check_distribution(counts_by_industry, options.target_count)
-    if violations:
-        state.status = "FAILED"
-        run_state.save(project_root, state)
-        raise RuntimeError("distribution check failed: " + "; ".join(violations))
-
-    state.context["final_titles"] = selected_titles
-
-
-# ---------------------------------------------------------------------------
-# Stage: publish_mode_outputs
-# ---------------------------------------------------------------------------
-
-
-def _stage_publish_mode_outputs(project_root: Path, options: RunOptions, state: run_state.RunState) -> None:
-    final_titles = state.context["final_titles"]
-    content = "\n".join(final_titles) + "\n"
-
-    if state.mode == "production":
-        final_path = project_root / "output" / "deliverables" / "generated" / state.context["generated_filename"]
-        atomic_write_text(final_path, content)
-
-        history_path = project_root / "output" / "deliverables" / "history" / "words.txt"
-        history = _read_lines(history_path)
-        history_norm = {normalize_title(t) for t in history}
-        already_appended = bool(final_titles) and all(normalize_title(t) in history_norm for t in final_titles)
-        if not already_appended:
-            atomic_write_text(history_path, "\n".join(history + final_titles) + "\n")
-            history_after = _read_lines(history_path)
-            if history_after[len(history):] != final_titles:
-                state.status = "RECOVERY_REQUIRED"
-                run_state.save(project_root, state)
-                raise RecoveryRequired(
-                    f"output/deliverables/history/words.txt increment did not match this run's final_titles "
-                    f"after atomic write (expected {len(final_titles)} new lines, "
-                    f"found {len(history_after) - len(history)})"
-                )
-    else:
-        qa_dir = project_root / "output" / "_pipeline" / "qa" / state.run_id
-        atomic_write_text(qa_dir / "generated" / "saas_words_qa.txt", content)
-        report = (
-            "# QA Report\n\n"
-            f"- run_id: {state.run_id}\n"
-            f"- target_title_count: {state.target_title_count}\n"
-            f"- approved_titles: {len(final_titles)}\n"
-            f"- status: {state.status}\n"
-        )
-        atomic_write_text(qa_dir / "qa_report.md", report)
+    instructions = (
+        "각 제목의 의미 중복과 명확성을 검토하라. 다른 후보와 의미가 겹치거나, "
+        "어떤 SaaS인지 추측할 수 없을 만큼 추상적이거나, 유명 서비스·브랜드와 "
+        "명백히 동일/유사하면 approve=false로 판정하고 reason을 남겨라. "
+        "그렇지 않으면 approve=true. industry 필드는 참고용 맥락이다."
+    )
+    items = [{"title": c["title"], "industry": c["industry"]} for c in candidates]
+    request_path = judgment.write_request(
+        run_dir, stage_name, state.run_id, instructions, items,
+        round_no=round_no, generated_at=ids.now_kst().isoformat(),
+    )
+    _pause_for_judgment(project_root, state, stage_name, request_path)
 
 
 # ---------------------------------------------------------------------------
@@ -571,15 +533,24 @@ def _stage_publish_mode_outputs(project_root: Path, options: RunOptions, state: 
 
 
 def _stage_update_memory_and_git_checkpoint(project_root: Path, options: RunOptions, state: run_state.RunState) -> None:
-    final_titles = state.context.get("final_titles", [])
-    done = len(final_titles) == options.target_count
+    # 이 스테이지에 도달했다는 것 자체가 generate_and_review_titles가 예외
+    # 없이 끝났다는 뜻이다(RetryRequired/CAPABILITY_STAGNATION은 그 안에서
+    # 즉시 예외로 전파되어 여기까지 오지 않는다) - 그래서 state.status를
+    # 다시 읽지 않고(run_pipeline의 스테이지 루프가 각 스테이지 성공 후
+    # "RUNNING"으로 되돌려놓으므로 신뢰할 수 없다) 항상 DONE으로 기록한다.
+    stats = state.context.get("round_stats", {})
+    approved = state.context.get("approved", [])
     atomic_write_text(
         project_root / "memory" / "HANDOFF.md",
         "# HANDOFF\n\n"
-        f"- 상태: `{'DONE' if done else state.status}`\n"
+        f"- 상태: `DONE`\n"
         f"- 현재 단계: update_memory_and_git_checkpoint (word_pipeline)\n"
-        f"- 마지막 검증: run {state.run_id} produced {len(final_titles)}/{options.target_count} titles\n"
-        f"- 다음 원자 작업: {'다음 실행 대기' if done else '추가 라운드 생성 후 재개'}\n",
+        f"- 마지막 실행: run {state.run_id} (mode={state.mode})\n"
+        f"- 이번 라운드: 신규생성 {stats.get('generated', 0)}개, "
+        f"AI승인 {stats.get('ai_approved', 0)}개, "
+        f"backlog반영 {stats.get('backlog_carried', 0)}개, "
+        f"Keyword Planner통과 {stats.get('kp_passed', len(approved))}개\n"
+        f"- 다음 원자 작업: 필요하면 다시 실행(같은 run_id --resume 또는 새 run)\n",
     )
     _run_or_raise(project_root, "git_checkpoint.py", "--message", f"chore: word pipeline checkpoint for {state.run_id}")
 
@@ -591,8 +562,6 @@ def _stage_update_memory_and_git_checkpoint(project_root: Path, options: RunOpti
 _STAGE_HANDLERS = {
     "load_state": _stage_load_state,
     "generate_and_review_titles": _stage_generate_and_review_titles,
-    "validate_outputs": _stage_validate_outputs,
-    "publish_mode_outputs": _stage_publish_mode_outputs,
     "update_memory_and_git_checkpoint": _stage_update_memory_and_git_checkpoint,
 }
 
@@ -606,11 +575,8 @@ def _load_or_create_state(options: RunOptions) -> run_state.RunState:
         if run_id is None:
             raise ValueError(f"--resume given but no existing {options.mode} run was found")
         state = run_state.load(project_root, run_id)
-        if state.mode != options.mode or state.target_title_count != options.target_count:
-            raise ValueError(
-                f"run {run_id} was started as mode={state.mode} target={state.target_title_count}; "
-                f"--mode {options.mode} --target-count {options.target_count} does not match"
-            )
+        if state.mode != options.mode:
+            raise ValueError(f"run {run_id} was started as mode={state.mode}; --mode {options.mode} does not match")
         return state
 
     run_id = options.run_id or ids.format_run_id(options.mode, now)
@@ -619,12 +585,11 @@ def _load_or_create_state(options: RunOptions) -> run_state.RunState:
     return run_state.RunState(
         run_id=run_id,
         mode=options.mode,
-        target_title_count=options.target_count,
         status="RUNNING",
         stage=STAGES[0],
         created_at=now.isoformat(),
         updated_at=now.isoformat(),
-        context={"generated_filename": ids.format_generated_filename(now)},
+        context={},
     )
 
 

@@ -11,7 +11,6 @@ from .word_pipeline import ImplementationPendingError, RecoveryRequired, RetryRe
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="SAAS_WORDS_TWO pipeline")
     parser.add_argument("--mode", choices=("production", "qa"), required=True)
-    parser.add_argument("--target-count", type=int, required=True)
     parser.add_argument(
         "--resume", action="store_true", help="continue the latest (or --run-id) run for this mode"
     )
@@ -21,12 +20,9 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         default=None,
         help=(
-            "override EVERY round's candidate count (default: title_generation's "
-            "target*1.6 for round 1, shortfall*2 for later rounds). Use this when a "
-            "downstream pass rate is low (e.g. the Keyword Planner gate, GKP-001) so "
-            "each round - not just the first - fetches a fixed, statistically "
-            "meaningful batch instead of a tiny shortfall-sized top-up that is likely "
-            "to yield zero approvals."
+            "how many new candidates this single run generates (default: mode-based "
+            "constant, see word_pipeline.DEFAULT_ROUND_SIZE - qa=50, production=10000). "
+            "One CLI invocation is one round; run again (optionally --resume) for more."
         ),
     )
     return parser
@@ -36,7 +32,6 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     options = RunOptions(
         mode=args.mode,
-        target_count=args.target_count,
         project_root=Path.cwd(),
         resume=args.resume,
         run_id=args.run_id,

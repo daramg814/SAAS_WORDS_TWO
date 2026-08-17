@@ -23,7 +23,6 @@ VALID_STATUSES = {
 class RunState:
     run_id: str
     mode: str
-    target_title_count: int
     status: str
     stage: str
     created_at: str
@@ -37,7 +36,6 @@ class RunState:
         payload = {
             "run_id": self.run_id,
             "mode": self.mode,
-            "target_title_count": self.target_title_count,
             "status": self.status,
             "stage": self.stage,
             "awaiting_judgment": self.awaiting_judgment,
@@ -53,7 +51,6 @@ class RunState:
         return cls(
             run_id=data["run_id"],
             mode=data["mode"],
-            target_title_count=data["target_title_count"],
             status=data["status"],
             stage=data["stage"],
             awaiting_judgment=data.get("awaiting_judgment"),

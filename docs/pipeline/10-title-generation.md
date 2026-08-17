@@ -1,23 +1,37 @@
 # 영어 2단어 제목 생성·검증
 
-**목적:** 여러 승인 기회에 분산된 신규 제목을 목표 수량까지 반복 생성하고 정확한 계약으로 게시한다.
+**목적:** 대량 원시 후보를 생성·판정하고 Keyword Planner로 걸러 4개 문서(CLAUDE.md
+§4)를 계속 누적한다. 목표 수량·완료 개념은 없다(2026-08-18 전환).
 
 ## Claude Code 실행 지침
 
-**2026-08-11 전환(CLAUDE.md §1, 현재 유효): 제목 후보는 더 이상 "기회"에서
-나오지 않는다.** `src/saas_words_two/word_bank.py`의 업계별 도메인어+기능어를
-코드가 조합해 후보를 만들고, 현재 세션이 명확성·의미 중복·유명 상표 유사만
-검토한다. 아래 1~5번 중 "기회" 관련 표현은 "업계"로 대체해 읽는다(§10 하단
-`docs/pipeline/10-title-generation.md`의 "원본 설계 세부 규칙"은 기회 기반 원본
-그대로 보존).
+**2026-08-18 전환(CLAUDE.md §1, 현재 유효): "정확히 500/20개" 목표와 업계 30%
+분산 상한이 폐기됐다.** 아래는 아래 "원본 설계 세부 규칙"(기회/500개 기준 원본
+그대로 정보 손실 방지 목적으로 보존)을 현재 실행이 실제로 따르는 규칙으로
+대체한 것이다. 1~5번의 "기회"/"500개" 관련 서술은 전부 폐기됐다고 읽는다.
 
-1. 1차 후보는 max(target×1.6, target+20), 이후 부족분×2를 최대 5라운드 생성한다. **(수치는 동일, `title_generation.first_round_size`/`next_round_size` 그대로 재사용.)**
-2. 최소 5개 업계에 분산하고 한 업계가 최종 결과의 30%를 초과하지 않게 한다. *(전환 이전: "기회"에 분산 — 이제 단어뱅크의 업계 카테고리 기준.)*
+1. **"한 번의 CLI 실행 = 한 라운드."** `--round-size`(선택, 기본 qa=50/production=10000)
+   만큼 신규 후보를 한 번 생성하고 끝난다. 다중 라운드 재시도 루프(`MAX_ROUNDS`/
+   부족분×2)는 없다 — 더 하려면 다시 실행한다(새 run 또는 `--resume`).
+2. 업계 분산·30% 상한은 없다. Keyword Planner를 통과한 모든 후보가 문서②③④에 반영된다.
 3. 정확히 두 영단어, 단일 공백, Title Case를 하드 검증한다. **(불변.)**
-4. 정확·대소문자·역순·현재 실행·과거 이력·blocklist 중복을 코드로 제거한다. **(불변, `contracts.validate_title_set` 그대로 재사용.)**
-5. 최대 라운드 후에도 부족하면 RETRYING 상태로 남기고 최종 파일과 운영 이력을 갱신하지 않는다. **(불변.)** 부족 원인이 업계 다양성 부족이면(전환 이전: "기회 부족") 단어뱅크 확장을 검토한다 — 수요·공급 조사 단계로 복귀하는 경로는 보류 상태다.
-6. **(신규)** 조합 전략: `word_bank.py`의 도메인어(업계 특화 명사, 예: Vendor/Claim/Payroll)와 기능어(동작·역할 명사, 예: Guard/Tracker/Sync)를 하나씩 짝지어 "도메인어 + 기능어" 순서로 조합한다 — 완전 무작위 두 단어 조합보다 "어떤 SaaS인지 추측 가능"한 이름이 나올 확률이 높다(실측 근거 없이 이 순서를 기본값으로 채택했으므로, 실제 AI 검토 승인율을 보고 필요하면 조정할 것).
-7. **(2026-08-17 신규) Keyword Planner 필터 게이트**: AI 판정(명확성·의미중복·상표유사)을 통과한 후보만 `config/keyword_metrics.yaml`의 기준값으로 Google Ads Keyword Planner 조회를 거친다 — `avg_monthly_searches`가 `avg_monthly_searches_min` 이상이고 `competition_index`가 `competition_index_exact`(기본 0)와 정확히 같아야 `approved`에 편입된다. `competition_index`가 `NULL`(메트릭 없음)이면 무조건 탈락한다. 이 판정은 라운드 루프 안에서 이뤄지므로 기존 5라운드/부족분×2 재시도 전략이 이 게이트의 통과율 부족도 함께 흡수한다(별도 재시도 계층 불필요). 실측 통과율과 근거는 `memory/ACTIVE_ISSUES.md`의 `GKP-001` 참고 — 2026-08-17 QA 20개 실행에서 174개 조회 중 4개(약 2.3%)만 통과했다.
+4. 정확·역순 중복은 `word_generation.generate_combinations`가 생성 단계에서부터
+   `output/deliverables/history/generated_candidates.csv`(ledger, 승인/거절
+   verdict와 무관하게 전량 기록)를 exclude 집합으로 써서 차단한다 — 한 번
+   생성+판정된 조합은 절대 다시 생성되지 않는다.
+5. 이번 라운드에 신규 후보가 0건이고 backlog(아래 7번)도 0건이면 `CAPABILITY_STAGNATION`,
+   Keyword Planner 예산/자격증명 문제로 중단되면 `RETRYING`으로 정직하게 끝난다 —
+   두 경우 모두 4개 문서 중 이미 확정된 부분은 그대로 유지된다.
+6. 조합 전략(불변): `word_bank.py`의 도메인어(업계 특화 명사)와 기능어(동작·역할
+   명사)를 하나씩 짝지어 "도메인어 + 기능어" 순서로 조합한다.
+7. **Keyword Planner 필터 게이트 + backlog**: AI 판정을 통과한 후보만
+   `config/keyword_metrics.yaml` 기준값으로 조회한다(`avg_monthly_searches>=`
+   `avg_monthly_searches_min` AND `competition_index==competition_index_exact`,
+   `NULL`은 항상 탈락). 조회가 끝나지 못한 채 라운드가 멈추면(예산 소진 등) 그
+   승인분은 ledger에 `ai_approved=True`로 남아있고, **다음 실행 시작 시
+   `_stage_load_state`가 자동으로 backlog로 수집해 재판정 없이 게이트에 먼저
+   태운다** — 유실되지 않는다. 실측 통과율 근거는 `memory/ACTIVE_ISSUES.md`의
+   `GKP-001` 참고(1~3% 수준).
 
 ## 원본 설계 세부 규칙
 

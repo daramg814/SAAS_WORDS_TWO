@@ -1,20 +1,16 @@
-"""단어뱅크 조합 생성 (2026-08-11 프로젝트 정의 전환).
+"""단어뱅크 조합 생성 (2026-08-18 두 번째 프로젝트 정의 전환).
 
-design 9.1/9.3의 라운드 확대 전략(부족분 x2, 최대 5라운드)과 9.1의 "최소 5개
-분산, 30% 상한" 원칙은 그대로 유지하되, 그 대상을 "기회(problem_id)"에서
-"업계(industry)"로 바꿨다. `title_generation.py`의 순수 수학 함수들
-(first_round_size/next_round_size/max_titles_per_opportunity/
-check_distribution/select_final_titles)은 애초에 opportunity-특정 로직이
-아니라 dict의 "problem_id"/"priority_score" 키만 보므로 그대로 재사용한다
-(industry를 problem_id 자리에 넣는다) - 중복 구현하지 않는다.
+"정확히 500개 선정" 목표와 업계 30% 분산 상한이 폐기되면서(word_pipeline.py
+참고), 이 모듈이 재사용하던 `title_generation.py`(라운드 확대 전략/분산 상한
+순수 함수)는 더 이상 어디서도 호출되지 않아 파일째 삭제됐다. 이 모듈은 이제
+`generate_combinations`(도메인어+기능어 조합 생성, exclude 집합 기반 중복
+방지) 하나만 담당한다.
 """
 
 from __future__ import annotations
 
-from . import title_generation, word_bank
+from . import word_bank
 from .contracts import normalize_title, reverse_normalized_title
-
-MAX_ROUNDS = title_generation.MAX_ROUNDS
 
 
 def _round_robin_domain_words() -> list[tuple[str, str]]:

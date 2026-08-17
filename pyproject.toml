@@ -6,18 +6,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "saas-words-two"
 version = "0.1.0"
-description = "High-demand low-supply SaaS opportunity and two-word title pipeline"
+description = "Word-bank based two-word SaaS title generation with Keyword Planner gate"
 requires-python = ">=3.11"
 dependencies = [
   "PyYAML>=6.0,<7",
   "requests>=2.31,<3",
   "tzdata>=2024.1; sys_platform == 'win32'",
-  # Stack Exchange data dumps (config/sources.yaml stack_exchange_dump) ship
-  # as .7z archives; Python's stdlib covers zip/tar/gzip/bz2/lzma but not 7z.
-  # py7zr is pure Python, LGPL-2.1+, actively maintained (~1-2M PyPI
-  # downloads/month) - see docs/policies/04-data-source-policy.md for the
-  # full license/maintenance justification required by CLAUDE.md §8.
-  "py7zr>=0.20,<2",
 ]
 
 [project.optional-dependencies]
