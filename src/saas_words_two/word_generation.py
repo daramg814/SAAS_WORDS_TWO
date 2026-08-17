@@ -12,7 +12,7 @@ check_distribution/select_final_titles)은 애초에 opportunity-특정 로직�
 from __future__ import annotations
 
 from . import title_generation, word_bank
-from .contracts import normalize_title
+from .contracts import normalize_title, reverse_normalized_title
 
 MAX_ROUNDS = title_generation.MAX_ROUNDS
 
@@ -21,9 +21,20 @@ def generate_combinations(count: int, *, exclude: set[str] = frozenset()) -> lis
     """Deterministic round-robin over industries and, within each industry,
     over its domain words - paired with a rotating function word so neither
     a single industry nor a single function word dominates a batch. Skips
-    any title whose normalized form is already in `exclude` (previously
-    generated/approved/rejected this run, plus history/blocklist - callers
-    pass the union) and any accidental domain==function collision.
+    any title whose normalized OR reverse-normalized form is already in
+    `exclude` (previously generated/approved/rejected this run, plus
+    history/blocklist - callers pass the union) and any accidental
+    domain==function collision.
+
+    Reverse-duplicate checking happens here, not just at final
+    `contracts.validate_title_set` time, because a handful of words (Grid,
+    Meter, Ledger, Terminal, Route as of 2026-08-17) are cross-listed as both
+    a domain word (in one industry) and a function word - at small batch
+    sizes the odds of generating both "A B" and "B A" in the same round were
+    low enough to go unnoticed, but a 10,000-candidate round (GKP-001's
+    --first-round-size override) produced 6 such pairs. Skipping them here
+    means the AI judgment step never sees them and `validate_title_set` can't
+    fail the whole run over it later.
 
     Returns fewer than `count` items only if the entire word bank is
     exhausted - callers should treat that as real exhaustion, not a bug.
@@ -38,7 +49,7 @@ def generate_combinations(count: int, *, exclude: set[str] = frozenset()) -> lis
     domain_cursors = {industry: 0 for industry in industries}
     function_cursor = 0
     industry_index = 0
-    seen = set(exclude)
+    seen = set(exclude) | {reverse_normalized_title(t) for t in exclude}
     results: list[dict] = []
 
     total_combinations = sum(len(words) for words in word_bank.DOMAIN_WORDS.values()) * len(
@@ -61,9 +72,11 @@ def generate_combinations(count: int, *, exclude: set[str] = frozenset()) -> lis
             continue
         title = f"{domain_word} {function_word}"
         norm = normalize_title(title)
-        if norm in seen:
+        rev = reverse_normalized_title(title)
+        if norm in seen or rev in seen:
             continue
         seen.add(norm)
+        seen.add(rev)
         results.append({"title": title, "industry": industry})
 
     return results

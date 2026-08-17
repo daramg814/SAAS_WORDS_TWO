@@ -141,6 +141,9 @@ class KeywordMetricsClient:
         session: SupportsRequests | None = None,
         sleep_fn=time.sleep,
         clock_fn=time.monotonic,
+        progress_fn=None,
+        connection_retry_attempts: int = 3,
+        on_batch_fn=None,
     ) -> None:
         self._creds = credentials
         self._config = config
@@ -152,6 +155,25 @@ class KeywordMetricsClient:
         self._request_count = 0
         self._last_request_time: float | None = None
         self._batch_size = min(config.batch_size, MAX_BATCH_SIZE)
+        self._connection_retry_attempts = connection_retry_attempts
+        # 2026-08-17: two real runs crashed near the end (49%, 91% through a
+        # 9,645-word round) with nothing persisted, because results only
+        # reached disk once the *entire* fetch_metrics call returned. Calling
+        # this after every batch lets the caller (word_pipeline.py) persist
+        # incrementally, so a crash only costs the words not yet checked, not
+        # everything already fetched - also the mechanism behind the
+        # cross-run "don't re-check a word we already have an answer for"
+        # cache.
+        self._on_batch_fn = on_batch_fn or (lambda records: None)
+        # 2026-08-17: a 9,645-word round (GKP-001 --first-round-size test) ran
+        # for 12+ minutes with zero visibility - fetch_metrics processed the
+        # whole list before returning anything observable. Default callback
+        # prints one flushed line per batch so `run.py` output (even
+        # redirected to a file/pipe) shows live progress; tests can pass a
+        # no-op or recorder instead.
+        self._progress_fn = progress_fn or (
+            lambda done, total: print(f"[keyword_metrics] {done}/{total} words checked", flush=True)
+        )
 
     def _authenticate(self) -> str:
         if self._access_token and self._clock_fn() < self._token_expiry:
@@ -212,28 +234,72 @@ class KeywordMetricsClient:
             )
 
         self._wait_for_rate_limit()
-        token = self._authenticate()
-        response = self._post_generate_keyword_ideas(words, token)
 
-        if response.status_code == 401:
-            self._access_token = None
-            self._token_expiry = 0.0
-            token = self._authenticate()
-            response = self._post_generate_keyword_ideas(words, token)
+        # 2026-08-17 (GKP-001): two real runs each died over a *different*
+        # transient fault - `RemoteDisconnected` ~49% through a 9,645-word
+        # round (no HTTP response at all, so 401/429 handling never even
+        # runs) and, after fixing that, a 503 Service Unavailable at 91%
+        # (a real response, but `raise_for_status()` turned it straight into
+        # an uncaught HTTPError). Both crashed the *entire* stage and lost
+        # every word already checked. python.md requires network boundaries
+        # to have explicit retries; retry connection failures AND 5xx server
+        # errors the same way. 4xx client errors (e.g. bad request) are NOT
+        # retried here - retrying won't fix a malformed request, and
+        # response.raise_for_status() below still raises those immediately.
+        for attempt in range(self._connection_retry_attempts):
+            is_last_attempt = attempt == self._connection_retry_attempts - 1
+            try:
+                token = self._authenticate()
+                response = self._post_generate_keyword_ideas(words, token)
 
-        if response.status_code == 429:
-            self._sleep_fn(_retry_after_seconds(response))
-            response = self._post_generate_keyword_ideas(words, token)
+                if response.status_code == 401:
+                    self._access_token = None
+                    self._token_expiry = 0.0
+                    token = self._authenticate()
+                    response = self._post_generate_keyword_ideas(words, token)
 
+                if response.status_code == 429:
+                    self._sleep_fn(_retry_after_seconds(response))
+                    response = self._post_generate_keyword_ideas(words, token)
+
+                if response.status_code >= 500:
+                    if not is_last_attempt:
+                        self._sleep_fn(2**attempt)
+                        continue
+                    self._request_count += 1
+                    return self._failed_records(words)
+
+                self._request_count += 1
+                response.raise_for_status()
+                return _normalize_response(words, response.json())
+            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+                if not is_last_attempt:
+                    self._sleep_fn(2**attempt)
+                    continue
+                self._request_count += 1
+                return self._failed_records(words)
+
+        # Unreachable (every branch above returns or continues) but keeps
+        # the function's return type honest for readers/tools.
         self._request_count += 1
-        response.raise_for_status()
-        return _normalize_response(words, response.json())
+        return self._failed_records(words)
+
+    @staticmethod
+    def _failed_records(words: list[str]) -> list[KeywordMetricRecord]:
+        return [
+            KeywordMetricRecord(word=w, avg_monthly_searches=None, competition=None, competition_index=None, api_status="failed")
+            for w in words
+        ]
 
     def fetch_metrics(self, words: list[str]) -> list[KeywordMetricRecord]:
         records: list[KeywordMetricRecord] = []
-        for start in range(0, len(words), self._batch_size):
+        total = len(words)
+        for start in range(0, total, self._batch_size):
             chunk = words[start : start + self._batch_size]
-            records.extend(self._fetch_batch(chunk))
+            batch_records = self._fetch_batch(chunk)
+            self._on_batch_fn(batch_records)
+            records.extend(batch_records)
+            self._progress_fn(len(records), total)
         return records
 
     @property

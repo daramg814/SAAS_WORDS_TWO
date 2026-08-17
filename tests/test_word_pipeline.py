@@ -1,3 +1,4 @@
+import csv
 import json
 from pathlib import Path
 
@@ -94,6 +95,44 @@ def test_stage_load_state_noop_for_production(tmp_path):
     state = word_pipeline._load_or_create_state(options)
     word_pipeline._stage_load_state(tmp_path, options, state)
     assert "qa_history_snapshot_path" not in state.context
+
+
+def test_round_size_override_controls_round1_candidate_count(tmp_path):
+    # default first_round_size(100) = max(round(100*1.6), 100+20) = 160 - the
+    # override must replace that, not add to it (GKP-001 low pass-rate fix).
+    options = make_options(tmp_path, target_count=100, run_id="QA-20260817-200000-KST", round_size=500)
+    state = word_pipeline._load_or_create_state(options)
+    with_qa_history_snapshot(tmp_path, state)
+    run_dir = word_pipeline._run_dir(tmp_path, state)
+
+    with pytest.raises(judgment.JudgmentRequired):
+        word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)
+
+    request = json.loads((run_dir / "judgment" / "review_titles_round1_request.json").read_text(encoding="utf-8"))
+    assert len(request["items"]) == 500
+
+
+def test_round_size_override_also_controls_round2_candidate_count(tmp_path):
+    # GKP-001: the old behavior only overrode round 1 - round 2+ fell back to
+    # next_round_size(shortfall), a tiny batch that's statistically ~0% likely
+    # to pass anything once the downstream gate's pass rate is ~1%. A real run
+    # hit exactly this: a 27-candidate round 2 (shortfall*2) yielded 0 passes.
+    # round_size must apply uniformly to every round, not just the first.
+    options = make_options(tmp_path, target_count=100, run_id="QA-20260817-200000-KST", round_size=500)
+    state = word_pipeline._load_or_create_state(options)
+    with_qa_history_snapshot(tmp_path, state)
+    run_dir = word_pipeline._run_dir(tmp_path, state)
+
+    with pytest.raises(judgment.JudgmentRequired):
+        word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)
+    run_state.save(tmp_path, state)
+    reject_all_response(run_dir, state.run_id, 1)  # 0 approved -> forces round 2
+
+    with pytest.raises(judgment.JudgmentRequired):
+        word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)
+
+    request = json.loads((run_dir / "judgment" / "review_titles_round2_request.json").read_text(encoding="utf-8"))
+    assert len(request["items"]) == 500  # not next_round_size(100) == 200
 
 
 # ---------------------------------------------------------------------------
@@ -334,6 +373,115 @@ def test_keyword_metrics_budget_exceeded_raises_retry_required(tmp_path, monkeyp
     with pytest.raises(word_pipeline.RetryRequired):
         word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)
     assert state.status == "CAPABILITY_STAGNATION"
+
+
+# ---------------------------------------------------------------------------
+# Cumulative keyword-metrics cache (GKP-001, 2026-08-17 user request):
+# raw pass/fail data persisted across runs, and reused instead of re-querying.
+# ---------------------------------------------------------------------------
+
+
+def write_cache_row(tmp_path, *, title, avg, competition_index, api_status, gate_passed, checked_at="t0"):
+    cache_path = word_pipeline._metrics_cache_path(tmp_path)
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    row = {
+        "title": title,
+        "avg_monthly_searches": "" if avg is None else avg,
+        "competition_index": "" if competition_index is None else competition_index,
+        "api_status": api_status,
+        "gate_passed": str(gate_passed),
+        "checked_at": checked_at,
+    }
+    is_new_file = not cache_path.exists()
+    with cache_path.open("a", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=word_pipeline._CACHE_COLUMNS)
+        if is_new_file:
+            writer.writeheader()
+        writer.writerow(row)
+
+
+def test_record_to_cache_row_serializes_none_as_empty_string():
+    from saas_words_two.keyword_metrics_client import KeywordMetricRecord
+
+    record = KeywordMetricRecord(word="Ledger Pilot", avg_monthly_searches=None, competition=None, competition_index=None, api_status="failed")
+    row = word_pipeline._record_to_cache_row("Ledger Pilot", record, gate_passed=False, checked_at="t0")
+    assert row == {
+        "title": "Ledger Pilot", "avg_monthly_searches": "", "competition_index": "",
+        "api_status": "failed", "gate_passed": "False", "checked_at": "t0",
+    }
+
+
+def test_append_metrics_cache_rows_writes_full_table_and_pass_only_subset(tmp_path):
+    rows = [
+        {"title": "Ledger Pilot", "avg_monthly_searches": 2000, "competition_index": 0, "api_status": "success", "gate_passed": "True", "checked_at": "t0"},
+        {"title": "Claim Sentry", "avg_monthly_searches": 10, "competition_index": 50, "api_status": "success", "gate_passed": "False", "checked_at": "t0"},
+    ]
+    word_pipeline._append_metrics_cache_rows(tmp_path, rows)
+
+    full = word_pipeline._load_metrics_cache(tmp_path)
+    assert set(full.keys()) == {"ledger pilot", "claim sentry"}
+
+    passed_path = word_pipeline._metrics_passed_path(tmp_path)
+    passed_content = passed_path.read_text(encoding="utf-8")
+    assert "Ledger Pilot" in passed_content
+    assert "Claim Sentry" not in passed_content
+
+
+def test_append_metrics_cache_rows_merges_without_duplicating(tmp_path):
+    word_pipeline._append_metrics_cache_rows(
+        tmp_path, [{"title": "Ledger Pilot", "avg_monthly_searches": 2000, "competition_index": 0, "api_status": "success", "gate_passed": "True", "checked_at": "t0"}]
+    )
+    word_pipeline._append_metrics_cache_rows(
+        tmp_path, [{"title": "Claim Sentry", "avg_monthly_searches": 10, "competition_index": 50, "api_status": "success", "gate_passed": "False", "checked_at": "t1"}]
+    )
+    full = word_pipeline._load_metrics_cache(tmp_path)
+    assert len(full) == 2  # not 1, not duplicated - both survive across separate append calls
+
+
+def test_excluded_normalized_includes_cached_gate_failures_but_not_passes(tmp_path):
+    write_cache_row(tmp_path, title="Curriculum Terminal", avg=5000, competition_index=30, api_status="success", gate_passed=False)
+    write_cache_row(tmp_path, title="Ledger Pilot", avg=2000, competition_index=0, api_status="success", gate_passed=True)
+    (tmp_path / "input").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "input" / "blocklist.txt").write_text("", encoding="utf-8")
+
+    options = make_options(tmp_path, target_count=5, run_id="QA-20260817-210000-KST")
+    state = word_pipeline._load_or_create_state(options)
+    with_qa_history_snapshot(tmp_path, state)
+    excluded = word_pipeline._excluded_normalized(tmp_path, state)
+
+    assert "curriculum terminal" in excluded  # known failure - never regenerate
+    assert "ledger pilot" not in excluded  # known pass - still an eligible candidate
+
+
+def test_apply_keyword_metrics_filter_reuses_cache_and_skips_api_for_cached_titles(tmp_path, monkeypatch):
+    write_cache_row(tmp_path, title="Ledger Pilot", avg=2000, competition_index=0, api_status="success", gate_passed=True)
+    stub = StubKeywordMetricsClient()
+    monkeypatch.setattr(word_pipeline, "_build_keyword_metrics_client", lambda project_root: stub)
+
+    state = word_pipeline._load_or_create_state(make_options(tmp_path, target_count=5, run_id="QA-20260817-210000-KST"))
+    candidates = [
+        {"title": "Ledger Pilot", "industry": "finance"},  # cached - must NOT hit the API
+        {"title": "Claim Sentry", "industry": "insurance"},  # new - must hit the API
+    ]
+    passed = word_pipeline._apply_keyword_metrics_filter(tmp_path, state, candidates)
+
+    assert stub.fetched == ["Claim Sentry"]  # cached title never sent to fetch_metrics
+    assert {c["title"] for c in passed} == {"Ledger Pilot", "Claim Sentry"}  # cached pass + fresh default-pass
+
+
+def test_apply_keyword_metrics_filter_evidence_marks_source_cache_vs_api(tmp_path, monkeypatch):
+    write_cache_row(tmp_path, title="Ledger Pilot", avg=2000, competition_index=0, api_status="success", gate_passed=True)
+    stub = StubKeywordMetricsClient()
+    monkeypatch.setattr(word_pipeline, "_build_keyword_metrics_client", lambda project_root: stub)
+
+    state = word_pipeline._load_or_create_state(make_options(tmp_path, target_count=5, run_id="QA-20260817-210000-KST"))
+    candidates = [{"title": "Ledger Pilot", "industry": "finance"}, {"title": "Claim Sentry", "industry": "insurance"}]
+    word_pipeline._apply_keyword_metrics_filter(tmp_path, state, candidates)
+
+    evidence_path = tmp_path / "output" / "intermediate" / f"{state.run_id}_keyword_metrics_evidence.jsonl"
+    entries = {json.loads(line)["title"]: json.loads(line) for line in evidence_path.read_text(encoding="utf-8").splitlines()}
+    assert entries["Ledger Pilot"]["source"] == "cache"
+    assert entries["Claim Sentry"]["source"] == "api"
 
 
 # ---------------------------------------------------------------------------

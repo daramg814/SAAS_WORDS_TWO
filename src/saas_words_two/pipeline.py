@@ -65,6 +65,16 @@ class RunOptions:
     project_root: Path
     resume: bool = False
     run_id: str | None = None
+    # 2026-08-17 (GKP-001): overrides EVERY round's candidate count (not just
+    # round 1) to a fixed size, replacing both title_generation.first_round_size
+    # and next_round_size(shortfall). Exists because the Keyword Planner gate's
+    # real-world pass rate (~1%) makes the normal shortfall*2 top-up strategy
+    # useless once close to target - a real run's round 2 requested only 27
+    # candidates for a 14-item shortfall and got exactly 0 passes (expected:
+    # at ~1%, a 27-item batch has ~78% odds of zero). User's directive: "use
+    # 10,000 extraction as the standard unit," not "chase an exact target
+    # count via small top-up rounds."
+    round_size: int | None = None
 
     def validate(self) -> None:
         if self.mode not in {"production", "qa"}:
@@ -73,6 +83,8 @@ class RunOptions:
             raise ValueError("production target_count must be exactly 500")
         if self.mode == "qa" and self.target_count < 10:
             raise ValueError("qa target_count must be at least 10")
+        if self.round_size is not None and self.round_size < self.target_count:
+            raise ValueError("round_size, if given, must be at least target_count")
 
 
 STAGES = (

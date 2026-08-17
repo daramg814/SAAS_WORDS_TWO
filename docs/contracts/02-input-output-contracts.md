@@ -156,11 +156,37 @@ QA 결과는 운영용 `/output/generated/`와 `/output/history/words.txt`에 �
 ```
 
 - 매 라운드 AI 판정 통과 후보 전원(통과/탈락 모두)의 `title`, `avg_monthly_searches`,
-  `competition_index`, `api_status`, `passed`, `checked_at`을 한 줄씩 append.
+  `competition_index`, `api_status`, `passed`, `source`(`cache`|`api`), `checked_at`을
+  한 줄씩 append.
 - production/QA 공통 — QA도 동일 경로에 기록되며 `output/qa/<qa_run_id>/` 밖에
   쓰는 것이 아니라 실행 전반의 판정 근거 로그이므로 `output/intermediate/`가
   맞는 위치(CLAUDE.md §4 QA 출력 격리 규칙과 무관 — 격리 대상은 `output/generated`
   /`output/history`뿐).
+
+### 신규 누적(cross-run) 출력 — 2026-08-17 사용자 요청
+
+```text
+/output/history/keyword_metrics_cache.csv    # 지금까지 조회한 모든 단어, pass/fail 전부 (표 형태)
+/output/history/keyword_metrics_passed.csv   # 위에서 gate_passed=True만 뽑은 부분집합
+```
+
+컬럼(고정 순서, CLAUDE.md 12항 — 임의 변경 금지): `title,avg_monthly_searches,
+competition_index,api_status,gate_passed,checked_at`.
+
+- **raw 데이터 보존**: pass든 fail이든 조회된 모든 단어가 여기 남는다(run 단위로
+  흩어지는 `output/intermediate/*_keyword_metrics_evidence.jsonl`과 달리, 여러 run에
+  걸쳐 누적되는 단일 문서).
+- **배치 단위 즉시 기록**: `KeywordMetricsClient.fetch_metrics`가 20개 배치를 받을
+  때마다(`on_batch_fn`) 바로 이 파일에 append한다 — 라운드 전체가 끝나야 기록되는
+  게 아니므로, 중간에 네트워크 오류로 죽어도 이미 확인한 단어는 남는다(실측 근거:
+  GKP-001에서 9,645개 라운드가 49%·91% 지점에서 각각 다른 이유로 죽어 아무것도
+  안 남았던 사고 2건, `memory/ACTIVE_ISSUES.md` GKP-001 참고).
+- **재조회 생략**: `word_generation.generate_combinations`에 전달되는 exclude
+  집합(`word_pipeline._excluded_normalized`)이 `gate_passed=False`로 기록된 단어를
+  전부 포함한다 — 이미 탈락으로 확인된 조합은 이후 어떤 실행에서도 다시
+  생성·판정·API 조회되지 않는다. `gate_passed=True`인 단어는 제외 대상이
+  **아니다**(아직 안 쓴 좋은 후보이므로 계속 후보 풀에 남아야 함) — 대신 이미
+  캐시에 있으므로 API만 다시 호출하지 않고 재사용한다(`_apply_keyword_metrics_filter`).
 
 ### 게이트 규칙
 

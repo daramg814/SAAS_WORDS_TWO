@@ -59,9 +59,12 @@ def no_sleep(_seconds):
     return None
 
 
-def make_client(session, *, config=CONFIG, sleep_recorder=None):
+def make_client(session, *, config=CONFIG, sleep_recorder=None, progress_fn=None):
     sleep_fn = sleep_recorder.append if sleep_recorder is not None else no_sleep
-    return KeywordMetricsClient(CREDS, config, session=session, sleep_fn=sleep_fn, clock_fn=lambda: 0.0)
+    return KeywordMetricsClient(
+        CREDS, config, session=session, sleep_fn=sleep_fn, clock_fn=lambda: 0.0,
+        progress_fn=progress_fn or (lambda done, total: None),
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -203,6 +206,112 @@ def test_fetch_metrics_splits_batches_at_hard_limit_20():
     assert len(generate_calls) == 2
     assert len(generate_calls[0][1]["keywordSeed"]["keywords"]) == 20
     assert len(generate_calls[1][1]["keywordSeed"]["keywords"]) == 5
+
+
+def test_fetch_metrics_reports_progress_after_every_batch():
+    # 2026-08-17 (GKP-001): a 9,645-word round gave zero visibility for 12+
+    # minutes because fetch_metrics returned nothing until fully done.
+    # progress_fn must fire once per completed batch with (done_so_far, total).
+    words = [f"Word{i} Pilot" for i in range(25)]
+    session = FakeSession(generate_responses=[FakeResponse({"results": []}), FakeResponse({"results": []})])
+    calls = []
+    client = make_client(session, progress_fn=lambda done, total: calls.append((done, total)))
+    client.fetch_metrics(words)
+    assert calls == [(20, 25), (25, 25)]
+
+
+def test_default_progress_fn_prints_a_flushed_line(capsys):
+    session = FakeSession(generate_responses=[FakeResponse({"results": []})])
+    client = KeywordMetricsClient(CREDS, CONFIG, session=session, sleep_fn=no_sleep, clock_fn=lambda: 0.0)
+    client.fetch_metrics(["Ledger Pilot"])
+    out = capsys.readouterr().out
+    assert "1/1" in out
+
+
+def test_fetch_metrics_retries_connection_error_then_succeeds():
+    # 2026-08-17 (GKP-001): real run hit RemoteDisconnected ~49% through a
+    # 9,645-word round - requests.ConnectionError (no HTTP response at all,
+    # so 401/429 handling never runs) must retry, not crash the whole round.
+    session = FakeSession(
+        generate_responses=[
+            requests.exceptions.ConnectionError("Connection aborted."),
+            FakeResponse(
+                {"results": [{"text": "Ledger Pilot", "keywordIdeaMetrics": {"avgMonthlySearches": 500, "competitionIndex": 0}}]}
+            ),
+        ]
+    )
+    client = make_client(session)
+    records = client.fetch_metrics(["Ledger Pilot"])
+    assert records[0].avg_monthly_searches == 500
+    assert records[0].api_status == "success"
+    generate_calls = [c for c in session.calls if "generateKeywordIdeas" in c[0]]
+    assert len(generate_calls) == 2  # first attempt failed, second succeeded
+
+
+def test_fetch_metrics_connection_error_exhausts_retries_returns_failed_not_raises():
+    session = FakeSession(
+        generate_responses=[requests.exceptions.ConnectionError("boom")] * 3
+    )
+    client = make_client(session, config=ApiRuntimeConfig(batch_size=20, free_tier_budget=1000, min_request_interval_ms=0))
+    records = client.fetch_metrics(["Ledger Pilot"])  # must not raise
+    assert records[0].api_status == "failed"
+    assert records[0].avg_monthly_searches is None
+    assert records[0].competition_index is None
+    assert client.request_count == 1  # one _fetch_batch call, despite 3 internal attempts
+
+
+def test_fetch_metrics_retries_5xx_server_error_then_succeeds():
+    # 2026-08-17 (GKP-001): real run hit "503 Service Unavailable" at 91%
+    # through a 9,645-word round - response.raise_for_status() turned this
+    # straight into an uncaught HTTPError with no retry. A 5xx is Google's
+    # server being transiently unavailable, not a bad request - must retry.
+    session = FakeSession(
+        generate_responses=[
+            FakeResponse({}, status_code=503),
+            FakeResponse(
+                {"results": [{"text": "Ledger Pilot", "keywordIdeaMetrics": {"avgMonthlySearches": 500, "competitionIndex": 0}}]}
+            ),
+        ]
+    )
+    client = make_client(session)
+    records = client.fetch_metrics(["Ledger Pilot"])
+    assert records[0].avg_monthly_searches == 500
+    assert records[0].api_status == "success"
+    generate_calls = [c for c in session.calls if "generateKeywordIdeas" in c[0]]
+    assert len(generate_calls) == 2
+
+
+def test_fetch_metrics_5xx_exhausts_retries_returns_failed_not_raises():
+    session = FakeSession(generate_responses=[FakeResponse({}, status_code=503)] * 3)
+    client = make_client(session)
+    records = client.fetch_metrics(["Ledger Pilot"])  # must not raise
+    assert records[0].api_status == "failed"
+    assert client.request_count == 1
+
+
+def test_fetch_metrics_calls_on_batch_fn_after_every_batch():
+    # 2026-08-17 (GKP-001): incremental persistence hook - the caller uses
+    # this to save results to disk per-batch so a crash mid-run doesn't lose
+    # everything already fetched.
+    words = [f"Word{i} Pilot" for i in range(25)]
+    session = FakeSession(generate_responses=[FakeResponse({"results": []}), FakeResponse({"results": []})])
+    batches = []
+    client = KeywordMetricsClient(
+        CREDS, CONFIG, session=session, sleep_fn=no_sleep, clock_fn=lambda: 0.0,
+        on_batch_fn=lambda records: batches.append(len(records)),
+    )
+    client.fetch_metrics(words)
+    assert batches == [20, 5]
+
+
+def test_fetch_metrics_4xx_client_error_raises_immediately_not_retried():
+    # A 4xx (e.g. bad request) is permanent - retrying wastes budget and time.
+    session = FakeSession(generate_responses=[FakeResponse({}, status_code=400)])
+    client = make_client(session)
+    with pytest.raises(requests.exceptions.HTTPError):
+        client.fetch_metrics(["Ledger Pilot"])
+    generate_calls = [c for c in session.calls if "generateKeywordIdeas" in c[0]]
+    assert len(generate_calls) == 1  # no retry attempts
 
 
 def test_fetch_metrics_401_refreshes_token_and_retries_once():

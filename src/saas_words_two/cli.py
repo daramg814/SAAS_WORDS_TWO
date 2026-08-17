@@ -16,6 +16,19 @@ def build_parser() -> argparse.ArgumentParser:
         "--resume", action="store_true", help="continue the latest (or --run-id) run for this mode"
     )
     parser.add_argument("--run-id", default=None, help="explicit run id to start or resume")
+    parser.add_argument(
+        "--round-size",
+        type=int,
+        default=None,
+        help=(
+            "override EVERY round's candidate count (default: title_generation's "
+            "target*1.6 for round 1, shortfall*2 for later rounds). Use this when a "
+            "downstream pass rate is low (e.g. the Keyword Planner gate, GKP-001) so "
+            "each round - not just the first - fetches a fixed, statistically "
+            "meaningful batch instead of a tiny shortfall-sized top-up that is likely "
+            "to yield zero approvals."
+        ),
+    )
     return parser
 
 
@@ -27,6 +40,7 @@ def main(argv: list[str] | None = None) -> int:
         project_root=Path.cwd(),
         resume=args.resume,
         run_id=args.run_id,
+        round_size=args.round_size,
     )
     try:
         return run_pipeline(options)

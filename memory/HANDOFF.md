@@ -1,7 +1,15 @@
 # HANDOFF
 
-- 상태: `DONE`(게이트 통합 자체는 완료·검증 끝. production 500개 실행은
-  사용자가 별도로 요청할 때까지 보류 - 아래 2b 참고)
+- 상태: `DONE`(게이트 통합 + 대량 배치(`--round-size`) + 누적 캐시까지 완료·
+  검증 끝. production 500개 실행은 사용자가 별도로 요청할 때까지 보류)
+- **2026-08-17 추가 배치 요약**: 사용자 지시로 `--round-size` 옵션 신설(모든
+  라운드에 고정 후보 수 적용, target 기반 공식 대신) + 누적 raw 데이터 캐시
+  (`output/history/keyword_metrics_cache.csv`, `..._passed.csv`, 배치 단위
+  즉시 기록 + 재조회 생략). 실제 10,000개 배치 실행 중 두 번의 네트워크
+  크래시(49%, 91% 지점)를 실측으로 발견·수정(연결오류/5xx 재시도 로직 추가)
+  했고, 세 번째 시도에서 완주해 86개 승인(0.89%) 확보. 상세는
+  `memory/ACTIVE_ISSUES.md` GKP-001의 "10,000개 대량 배치 실측..." 절 참고.
+  테스트 496개 PASS, `verify_design_coverage.py` PASS.
 - 요약 한 줄: **`Word_check` 프로젝트의 Google Ads Keyword Planner 연동을 통합해,
   단어 생성 시 `avg_monthly_searches`(전세계 평균 월간 검색량) ≥ 1,000 AND
   `competition_index`(광고 경쟁지수) == 0(NULL 아님)인 후보만 통과시키는

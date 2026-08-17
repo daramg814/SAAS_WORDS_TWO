@@ -11,6 +11,8 @@ DB(`data/local.db`)를 전혀 쓰지 않는다(단어뱅크 조합은 결정론�
 
 from __future__ import annotations
 
+import csv
+import io
 import json
 import subprocess
 import sys
@@ -128,6 +130,15 @@ def _excluded_normalized(project_root: Path, state: run_state.RunState) -> set[s
     excluded = {normalize_title(t) for t in history if t.strip()}
     excluded |= {normalize_title(t) for t in blocklist if t.strip()}
     excluded |= set(state.context.get("excluded_normalized", []))
+    # 2026-08-17 (GKP-001, user request): a combination already known to fail
+    # the keyword-metrics gate (see _load_metrics_cache below) is excluded
+    # from candidate generation itself - regenerating/re-judging/re-querying
+    # a combo whose avg_monthly_searches/competition_index are already on
+    # record as not meeting the bar wastes AI-judgment cycles and API budget
+    # for an outcome we already know. Passing combos are deliberately NOT
+    # excluded here - they remain eligible candidates until actually used.
+    cache = _load_metrics_cache(project_root)
+    excluded |= {norm for norm, row in cache.items() if row["gate_passed"] != "True"}
     return excluded
 
 
@@ -156,11 +167,94 @@ def _keyword_metrics_settings(project_root: Path) -> tuple[float, float, ApiRunt
     return cfg["avg_monthly_searches_min"], cfg["competition_index_exact"], runtime, credentials_path
 
 
+# ---------------------------------------------------------------------------
+# Persistent, cumulative (cross-run) raw-data table (2026-08-17, user
+# request): every word ever checked against the Keyword Planner API, pass or
+# fail, survives here - not just in a single run's evidence log. Written
+# incrementally per API batch (KeywordMetricsClient.on_batch_fn), not once at
+# the end, so a mid-run crash never loses results already fetched (real
+# incidents: GKP-001 runs died at 49% and 91% through a 9,645-word round with
+# nothing persisted). _CACHE_COLUMNS order is the on-disk CSV column order -
+# do not reorder without a migration, per CLAUDE.md 12 (don't silently change
+# output contracts).
+# ---------------------------------------------------------------------------
+
+_CACHE_COLUMNS = ("title", "avg_monthly_searches", "competition_index", "api_status", "gate_passed", "checked_at")
+
+
+def _metrics_cache_path(project_root: Path) -> Path:
+    return project_root / "output" / "history" / "keyword_metrics_cache.csv"
+
+
+def _metrics_passed_path(project_root: Path) -> Path:
+    return project_root / "output" / "history" / "keyword_metrics_passed.csv"
+
+
+def _load_metrics_cache(project_root: Path) -> dict[str, dict]:
+    """Returns {normalized_title: row} for every word ever recorded, keyed so
+    a later re-check of the same combo (if it ever happens) overwrites the
+    earlier row rather than duplicating it."""
+    path = _metrics_cache_path(project_root)
+    if not path.exists():
+        return {}
+    with path.open("r", encoding="utf-8", newline="") as f:
+        return {normalize_title(row["title"]): row for row in csv.DictReader(f)}
+
+
+def _record_to_cache_row(title: str, record, gate_passed: bool, checked_at: str) -> dict:
+    return {
+        "title": title,
+        "avg_monthly_searches": "" if record.avg_monthly_searches is None else record.avg_monthly_searches,
+        "competition_index": "" if record.competition_index is None else record.competition_index,
+        "api_status": record.api_status,
+        "gate_passed": str(gate_passed),
+        "checked_at": checked_at,
+    }
+
+
+def _append_metrics_cache_rows(project_root: Path, new_rows: list[dict]) -> None:
+    """Merges new_rows into the cumulative cache (by normalized title) and
+    atomically rewrites both the full table and the pass-only subset table
+    (user request: passed combos collected separately for easy reuse)."""
+    if not new_rows:
+        return
+    cache = _load_metrics_cache(project_root)
+    for row in new_rows:
+        cache[normalize_title(row["title"])] = row
+    ordered = sorted(cache.values(), key=lambda r: r["title"])
+
+    full_buffer = io.StringIO()
+    writer = csv.DictWriter(full_buffer, fieldnames=_CACHE_COLUMNS)
+    writer.writeheader()
+    writer.writerows(ordered)
+    atomic_write_text(_metrics_cache_path(project_root), full_buffer.getvalue())
+
+    passed_buffer = io.StringIO()
+    passed_writer = csv.DictWriter(passed_buffer, fieldnames=_CACHE_COLUMNS)
+    passed_writer.writeheader()
+    passed_writer.writerows([r for r in ordered if r["gate_passed"] == "True"])
+    atomic_write_text(_metrics_passed_path(project_root), passed_buffer.getvalue())
+
+
 def _build_keyword_metrics_client(project_root: Path) -> KeywordMetricsClient:
-    _, _, runtime, credentials_path = _keyword_metrics_settings(project_root)
+    searches_min, competition_exact, runtime, credentials_path = _keyword_metrics_settings(project_root)
     env = load_env_file(credentials_path)
     creds = credentials_from_env(env)
-    return KeywordMetricsClient(creds, runtime)
+
+    def _persist_batch(records: list) -> None:
+        checked_at = ids.now_kst().isoformat()
+        rows = []
+        for record in records:
+            gate_passed = (
+                record.avg_monthly_searches is not None
+                and record.competition_index is not None
+                and record.avg_monthly_searches >= searches_min
+                and record.competition_index == competition_exact
+            )
+            rows.append(_record_to_cache_row(record.word, record, gate_passed, checked_at))
+        _append_metrics_cache_rows(project_root, rows)
+
+    return KeywordMetricsClient(creds, runtime, on_batch_fn=_persist_batch)
 
 
 def _write_metrics_evidence(project_root: Path, state: run_state.RunState, evidence: list[dict]) -> None:
@@ -178,36 +272,67 @@ def _apply_keyword_metrics_filter(
     (NULL) competition_index means Keyword Planner has no data for that
     combination - "dead word" - and never passes, regardless of
     avg_monthly_searches. Every checked candidate (pass or fail) is logged to
-    the run's keyword_metrics_evidence.jsonl for traceability (CLAUDE.md §3.1).
+    the run's keyword_metrics_evidence.jsonl for traceability (CLAUDE.md §3.1)
+    and to the cumulative output/history/keyword_metrics_cache.csv table.
+
+    Candidates already present in the cache (previously checked, in this run
+    or any earlier one) reuse that recorded result instead of re-querying the
+    API - 2026-08-17 user request: never pay for the same lookup twice. Only
+    genuinely new titles are sent to the API.
     """
     if not candidates:
         return []
 
     searches_min, competition_exact, _, _ = _keyword_metrics_settings(project_root)
-    client = _build_keyword_metrics_client(project_root)
-    titles = [c["title"] for c in candidates]
-    records_by_title = {record.word: record for record in client.fetch_metrics(titles)}
+    cache = _load_metrics_cache(project_root)
+
+    cached_hits: dict[str, dict] = {}
+    uncached_titles: list[str] = []
+    for candidate in candidates:
+        row = cache.get(normalize_title(candidate["title"]))
+        if row is not None:
+            cached_hits[candidate["title"]] = row
+        else:
+            uncached_titles.append(candidate["title"])
+
+    fresh_records_by_title = {}
+    if uncached_titles:
+        client = _build_keyword_metrics_client(project_root)
+        fresh_records_by_title = {record.word: record for record in client.fetch_metrics(uncached_titles)}
+        # already persisted incrementally per-batch via on_batch_fn above
 
     checked_at = ids.now_kst().isoformat()
     passed: list[dict] = []
     evidence: list[dict] = []
     for candidate in candidates:
-        record = records_by_title.get(candidate["title"])
-        avg = record.avg_monthly_searches if record else None
-        competition_index = record.competition_index if record else None
-        gate_passed = (
-            avg is not None
-            and competition_index is not None
-            and avg >= searches_min
-            and competition_index == competition_exact
-        )
+        title = candidate["title"]
+        if title in cached_hits:
+            row = cached_hits[title]
+            avg = None if row["avg_monthly_searches"] == "" else float(row["avg_monthly_searches"])
+            competition_index = None if row["competition_index"] == "" else float(row["competition_index"])
+            api_status = row["api_status"]
+            gate_passed = row["gate_passed"] == "True"
+            source = "cache"
+        else:
+            record = fresh_records_by_title.get(title)
+            avg = record.avg_monthly_searches if record else None
+            competition_index = record.competition_index if record else None
+            api_status = record.api_status if record else "failed"
+            gate_passed = (
+                avg is not None
+                and competition_index is not None
+                and avg >= searches_min
+                and competition_index == competition_exact
+            )
+            source = "api"
         evidence.append(
             {
-                "title": candidate["title"],
+                "title": title,
                 "avg_monthly_searches": avg,
                 "competition_index": competition_index,
-                "api_status": record.api_status if record else "failed",
+                "api_status": api_status,
                 "passed": gate_passed,
+                "source": source,
                 "checked_at": checked_at,
             }
         )
@@ -260,11 +385,12 @@ def _stage_generate_and_review_titles(project_root: Path, options: RunOptions, s
             continue
 
         shortfall = target_count - len(approved)
-        candidate_count = (
-            title_generation.first_round_size(target_count)
-            if round_no == 1
-            else title_generation.next_round_size(shortfall)
-        )
+        if options.round_size:
+            candidate_count = options.round_size
+        elif round_no == 1:
+            candidate_count = title_generation.first_round_size(target_count)
+        else:
+            candidate_count = title_generation.next_round_size(shortfall)
         excluded = _excluded_normalized(project_root, state)
         candidates = word_generation.generate_combinations(candidate_count, exclude=excluded)
         if not candidates:

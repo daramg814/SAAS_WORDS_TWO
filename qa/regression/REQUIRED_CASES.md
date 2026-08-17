@@ -20,3 +20,5 @@
   아무리 높아도 항상 탈락(GKP-001)
 - Keyword Planner 게이트: avg_monthly_searches가 임계값 미만이면 탈락
 - Keyword Planner 게이트: 자격증명 누락/일일 예산 초과 시 가짜 통과 없이 RetryRequired
+- Keyword Planner 게이트: 이미 탈락으로 캐시된 단어는 재생성/재조회하지 않음(exclude 편입)
+- Keyword Planner 게이트: 이미 통과로 캐시된 단어는 API 재호출 없이 캐시값 재사용

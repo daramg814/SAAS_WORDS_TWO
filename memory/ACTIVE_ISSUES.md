@@ -103,6 +103,50 @@
   `output/history/words.txt`는 이 실행으로 전혀 변경되지 않음(QA는 스냅샷만
   사용).
 
+### 10,000개 대량 배치 실측 + 누적 캐시/`--round-size` 도입 (2026-08-17, 사용자 지시)
+
+- 사용자가 "target_count=100, 통과율 1% 가정, 한 번에 10,000개씩 시도"를
+  제안 → `RunOptions.round_size`/CLI `--round-size` 옵션을 신설해 라운드
+  후보 수를 target 기반 공식 대신 고정값으로 지정 가능하게 함.
+  (`title_generation.first_round_size`/`next_round_size` 자체는 원본
+  demand/supply 경로용으로 그대로 보존, 이 옵션은 word_pipeline에서만
+  우선 적용됨.)
+- `python run.py --mode qa --target-count 100 --round-size 10000`을 실제
+  자격증명으로 실행(run_id `QA-20260817-192736-KST`). **실측 3회 시도** 끝에
+  완주:
+  1차·2차 시도는 각각 진행률 49%(`RemoteDisconnected`), 91%(`503 Service
+  Unavailable`) 지점에서 예외 미처리로 전체가 죽어 아무것도 안 남음(당시
+  `KeywordMetricsClient`가 연결오류/5xx에 재시도 로직이 전혀 없었음 -
+  python.md "네트워크 경계는 명시적 재시도" 위반, 실측으로 발견해 즉시 수정:
+  연결오류/5xx는 최대 3회 재시도 후 그래도 실패하면 해당 배치만 "failed"로
+  기록하고 전체 라운드는 계속 진행하도록 고침, 4xx는 재시도 없이 즉시 실패
+  전파).
+- 10,000개 1라운드 결과: **86개 통과**(0.89%) - 앞선 20개 QA 실측(2.30%)과
+  같은 자릿수, 실행마다 표본이 달라 정확한 비율은 변동됨. 목표(100) 부족분
+  14를 메우려 기존 공식(`shortfall*2`)이 27개짜리 2라운드를 생성했는데
+  **0개 통과** - 통과율 ~1%에서 27개 배치가 0개를 뽑을 확률은 약 78%로,
+  버그가 아니라 통계적으로 정상. 사용자가 "목표 개수를 쫓지 말고 10,000개
+  고정 배치를 기준 단위로 삼으라"고 지시 → `round_size`가 라운드 1뿐 아니라
+  **모든 라운드**에 균일 적용되도록 수정(`word_pipeline.py`,
+  `tests/test_word_pipeline.py`의
+  `test_round_size_override_also_controls_round2_candidate_count`로 회귀
+  고정). 이 run(`QA-20260817-192736-KST`)은 round 3(28개) 판정 대기 상태로
+  방치 - 소규모 라운드 추가 요청 자체가 새 방침과 안 맞아 더 진행하지 않음,
+  86개 승인 실적은 유효한 실측 데이터로 보존.
+- **누적 raw 데이터 캐시 신설**(사용자 지시): `output/history/
+  keyword_metrics_cache.csv`(조회한 모든 단어, pass/fail 전부, 20개 배치
+  단위로 즉시 append - 위 크래시 2건처럼 중간에 죽어도 그 지점까지는
+  보존됨), `output/history/keyword_metrics_passed.csv`(그중 pass만 별도
+  추출). `word_pipeline._excluded_normalized`가 캐시에 fail로 기록된 단어를
+  제외 집합에 포함시켜 이후 어떤 실행에서도 재생성/재판정/재조회하지 않음
+  - pass 기록은 제외하지 않고(아직 안 쓴 유효 후보), 대신
+  `_apply_keyword_metrics_filter`가 캐시 적중 시 API 재호출 없이 재사용함.
+  상세 계약은 `docs/contracts/02-input-output-contracts.md` 참고.
+- **다음 세션 참고**: production(목표 500)을 이 게이트로 실제 달성하려면
+  `--round-size 10000` 기준 약 5~6라운드(500/86≈5.8)가 필요할 것으로
+  추정됨(실측 1회 표본 기준, 변동 가능) - 실행 전 사용자와 라운드 수/시간·
+  API 예산 소요를 다시 확인할 것.
+
 ## PROCESS-001 — SSH/원격 세션 push 정책이 원본 설계 §15 Git 원칙과 충돌
 - 상태: OPEN (사용자 확정 예외, 재논의 대상 아님 — 아래 참고)
 - 충돌 내용: 원본 설계서 `# 15. Git 원칙`은 "푸시 실패 시 `COMMIT_PENDING`으로 저장하고
