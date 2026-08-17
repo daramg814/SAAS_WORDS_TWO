@@ -17,11 +17,59 @@ from .contracts import normalize_title, reverse_normalized_title
 MAX_ROUNDS = title_generation.MAX_ROUNDS
 
 
+def _round_robin_domain_words() -> list[tuple[str, str]]:
+    """(industry, word) pairs in the same industry-interleaved order
+    `generate_combinations` has always used (industry0-word0, industry1-word0,
+    ..., industry0-word1, ...), but built generically (does not assume every
+    industry has the same number of domain words - an industry with fewer
+    words just drops out of later layers instead of wrapping/repeating)."""
+    industries = word_bank.all_industries()
+    max_len = max((len(word_bank.DOMAIN_WORDS[industry]) for industry in industries), default=0)
+    ordered: list[tuple[str, str]] = []
+    for layer in range(max_len):
+        for industry in industries:
+            words = word_bank.DOMAIN_WORDS[industry]
+            if layer < len(words):
+                ordered.append((industry, words[layer]))
+    return ordered
+
+
 def generate_combinations(count: int, *, exclude: set[str] = frozenset()) -> list[dict]:
     """Deterministic round-robin over industries and, within each industry,
-    over its domain words - paired with a rotating function word so neither
-    a single industry nor a single function word dominates a batch. Skips
-    any title whose normalized OR reverse-normalized form is already in
+    over its domain words - paired with a function word chosen so that every
+    (domain word, function word) pair is reachable, not just a subset.
+
+    2026-08-17 bugfix (GKP-001, discovered while validating the 42-industry/
+    74-function-word expansion): the original scheme picked the function word
+    via a single counter that incremented once per candidate regardless of
+    which domain word it landed on. Whether that counter's per-domain-word
+    step size (len(dw_pairs) mod len(FUNCTION_WORDS)) is coprime with
+    len(FUNCTION_WORDS) is pure modular-arithmetic luck - the pre-expansion
+    27x59 word bank happened to be coprime (full coverage), but 42
+    industries x 12 words = 504 against 74 function words has
+    gcd(504 mod 74, 74) = 2, so each domain word could only ever reach half
+    of the 74 function words, capping the reachable space at 14,903 unique
+    titles no matter how many attempts were made - a silent, permanent blind
+    spot the "word bank exhausted" check couldn't distinguish from real
+    exhaustion. (The true ceiling isn't 504 x 74 = 37,296: many domain words
+    like "Compliance"/"Maintenance"/"Permit" repeat verbatim across
+    industries, so distinct (industry, word) *entries* collapse to the same
+    title text once paired with the same function word. The real ceiling is
+    unique-domain-word-strings x function-words, minus same-word
+    self-collisions and cross-listed reverse-duplicates: 346 x 74 - 5 - 10 =
+    25,589, confirmed empirically after the fix below.) Fixed by, for
+    domain-word position `i`
+    (0-indexed in the fixed round-robin order) and generation pass `p`
+    (0-indexed, incremented once per full sweep over every domain word),
+    using `FUNCTION_WORDS[(i + p) % len(FUNCTION_WORDS)]`: for a fixed `i`,
+    as `p` ranges over 0..len(FUNCTION_WORDS)-1 this hits every function-word
+    index exactly once (a bijection, independent of len(dw_pairs)), so every
+    pair is reachable within len(dw_pairs) x len(FUNCTION_WORDS) attempts
+    regardless of the word bank's size. `tests/test_word_generation.py`'s
+    `test_generate_combinations_can_reach_every_pair_regardless_of_word_bank_size`
+    pins this with word-bank sizes chosen to be deliberately non-coprime.
+
+    Skips any title whose normalized OR reverse-normalized form is already in
     `exclude` (previously generated/approved/rejected this run, plus
     history/blocklist - callers pass the union) and any accidental
     domain==function collision.
@@ -38,45 +86,40 @@ def generate_combinations(count: int, *, exclude: set[str] = frozenset()) -> lis
 
     Returns fewer than `count` items only if the entire word bank is
     exhausted - callers should treat that as real exhaustion, not a bug.
-    (As of 2026-08-17: 504 (industry, domain word) entries across 42
-    industries x 74 function words - some words like Claim/Ledger/Permit
-    repeat across industries, so unique domain words are fewer than 504.)
     """
     if count <= 0:
         return []
 
-    industries = word_bank.all_industries()
-    domain_cursors = {industry: 0 for industry in industries}
-    function_cursor = 0
-    industry_index = 0
+    dw_pairs = _round_robin_domain_words()
+    if not dw_pairs:
+        return []
+    function_words = word_bank.FUNCTION_WORDS
+    n_func = len(function_words)
     seen = set(exclude) | {reverse_normalized_title(t) for t in exclude}
     results: list[dict] = []
 
-    total_combinations = sum(len(words) for words in word_bank.DOMAIN_WORDS.values()) * len(
-        word_bank.FUNCTION_WORDS
-    )
+    total_combinations = len(dw_pairs) * n_func
     max_attempts = total_combinations + 1
 
     attempts = 0
+    pass_no = 0
     while len(results) < count and attempts < max_attempts:
-        attempts += 1
-        industry = industries[industry_index % len(industries)]
-        industry_index += 1
-        domain_words = word_bank.DOMAIN_WORDS[industry]
-        domain_word = domain_words[domain_cursors[industry] % len(domain_words)]
-        domain_cursors[industry] += 1
-        function_word = word_bank.FUNCTION_WORDS[function_cursor % len(word_bank.FUNCTION_WORDS)]
-        function_cursor += 1
+        for i, (industry, domain_word) in enumerate(dw_pairs):
+            if len(results) >= count or attempts >= max_attempts:
+                break
+            attempts += 1
+            function_word = function_words[(i + pass_no) % n_func]
 
-        if domain_word == function_word:
-            continue
-        title = f"{domain_word} {function_word}"
-        norm = normalize_title(title)
-        rev = reverse_normalized_title(title)
-        if norm in seen or rev in seen:
-            continue
-        seen.add(norm)
-        seen.add(rev)
-        results.append({"title": title, "industry": industry})
+            if domain_word == function_word:
+                continue
+            title = f"{domain_word} {function_word}"
+            norm = normalize_title(title)
+            rev = reverse_normalized_title(title)
+            if norm in seen or rev in seen:
+                continue
+            seen.add(norm)
+            seen.add(rev)
+            results.append({"title": title, "industry": industry})
+        pass_no += 1
 
     return results

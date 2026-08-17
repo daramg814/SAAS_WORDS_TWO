@@ -172,11 +172,57 @@
   낡은 개수 주석도 갱신. 테스트 501개 전부 PASS,
   `verify_design_coverage.py` PASS(92 headings, 0 missing) 확인 —
   기존 구조·테스트는 정확한 개수를 하드코딩하지 않아 회귀 없음.
-- 이후 계획: `final-qa-runner`로 확장된 단어뱅크 기준 QA 재검증 →
-  production 라운드를 반복 실행하며 `KeywordMetricsBudgetExceeded`
-  (설정상 일일 1,000회 호출 자체 예산) 또는 실제 Google Ads API
-  서버측 한도(429/quota 오류)가 먼저 나타나는 시점까지 진행해 실제
-  호출 횟수를 기록할 것 — 결과는 이 항목에 추가할 것.
+- `final-qa-runner`로 확장된 단어뱅크 기준 QA 재검증 완료(PASS, 신규 업계/
+  기능어 정상 반영). QA 도중 QA 출력이 `output/deliverables/` 공유 캐시에도
+  기록되는 기존 설계가 CLAUDE.md §7 문구와 충돌함을 발견 → 사용자 확인 후
+  §7에 "keyword_metrics_cache/snapshot/final_words는 QA/production이
+  의도적으로 공유하는 부가 북키핑 테이블이며 §7의 'QA 출력'이 아니다"를
+  명확화(커밋 `bcba8a5`).
+- **사용자 우선순위 정정(2026-08-17)**: "API 사용량 한계를 찾는 것"은
+  목표가 아니고 부수 관찰일 뿐 — 진짜 목표는 승인된 SaaS 단어를 최대한
+  많이 확보하는 것. 이후 production을 round-size=10000으로 재실행.
+
+### 진짜 버그 발견 및 수정 — `generate_combinations`의 함수어 짝짓기 주기성 결함
+
+- production 재실행(`RUN-20260817-225950-KST`) round 1: 원시 후보 5,621개
+  생성 → AI 판정 승인 5,252(거절 369: Ring 188 전량, Terminal 193 중
+  transportation 외 180 — 단 이번 실측으로 maritime_shipping(7)·
+  logistics(6)는 물리적 터미널 개념이 자연스러운 업계로 판단해 승인 범위를
+  transportation에서 {transportation, maritime_shipping, aviation,
+  logistics}로 합리적으로 확장, `Fleet Engine`(Google Maps Platform 실제
+  제품명) 1건 상표충돌 재거절) → Keyword Planner 게이트 105개 통과.
+  **직후 round 2가 즉시 `word bank exhausted`로 종료** — 방금 37,296
+  조합공간으로 확장했는데 5,621+기존 사용분만으로 벌써 소진된다는 게
+  이상해서 직접 검증함.
+- **근본 원인(진짜 코드 결함, 확인됨)**: `word_generation.generate_combinations`가
+  후보마다 함수어를 고르는 카운터가 "도메인어당 진행 간격"
+  (`len(dw_pairs) mod len(FUNCTION_WORDS)`)과 `len(FUNCTION_WORDS)`가
+  서로소인지 여부에 순전히 우연으로 의존했다. 확장 전 27업계×59기능어는
+  우연히 서로소(gcd=1)라 전체 공간에 도달 가능했지만, 42업계×12도메인어
+  =504 대 74기능어는 `gcd(504 mod 74, 74) = 2` — 각 도메인어가 74개
+  기능어 중 정확히 절반만 영원히 만날 수 있는 구조적 사각지대가 있었다
+  (실측: 시도 횟수를 아무리 늘려도 37,296개 이론적 조합 중 14,903개까지만
+  도달, 나머지는 몇 번을 시도해도 절대 안 나옴 — `word bank exhausted`가
+  진짜 소진과 이 사각지대를 구분하지 못했다).
+- **수정**(`src/saas_words_two/word_generation.py`): 도메인어 순서를
+  고정한 뒤(`_round_robin_domain_words`, 업계 인터리브 순서 유지),
+  위치 `i`와 패스 번호 `p`에 대해 `FUNCTION_WORDS[(i+p) % len(FUNCTION_WORDS)]`로
+  함수어를 고르도록 변경 — 고정된 `i`에 대해 `p`가 0..len(FUNCTION_WORDS)-1을
+  돌면 모든 함수어 인덱스를 정확히 한 번씩 만나는 전단사(bijection)라,
+  단어뱅크 크기와 무관하게 항상 전체 공간에 도달 가능함을 수학적으로 보장.
+  회귀 테스트 신규 추가(`test_generate_combinations_can_reach_every_pair_regardless_of_word_bank_size`,
+  일부러 극단적으로 서로소가 아닌 크기로 monkeypatch해 전체 공간 도달을
+  직접 검증). 실측 재확인: 수정 후 실제 도달 가능 조합 25,589개(이론상
+  "504×74=37,296"이 아니라, Compliance/Maintenance/Permit 등 여러 업계에
+  중복 등장하는 도메인어가 텍스트로는 같은 제목이 되어 겹치는 걸 감안한
+  진짜 상한 "고유 도메인어 문자열 346개×74기능어-자기충돌5-역순중복10=
+  25,589"과 정확히 일치 — 사각지대 없이 전체 도달 가능 공간을 정확히
+  다 쓰고 있음을 확인).
+- pytest 502개 전부 PASS(신규 1개 포함), `verify_design_coverage.py` PASS.
+- **다음 production 재실행 시 기대**: 25,589 도달가능 조합 중 기존
+  누적 사용분(히스토리 1000 + 캐시 fail 19,407 + 이번 round1의 5,621,
+  단 상당 부분이 옛 27업계 공간과 겹침)을 뺀 나머지가 실제 신규 후보
+  풀이 됨 — 정확한 잔여량은 다음 실행에서 실측할 것.
 
 ## PROCESS-001 — SSH/원격 세션 push 정책이 원본 설계 §15 Git 원칙과 충돌
 - 상태: OPEN (사용자 확정 예외, 재논의 대상 아님 — 아래 참고)
