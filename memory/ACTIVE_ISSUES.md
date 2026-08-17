@@ -147,6 +147,37 @@
   추정됨(실측 1회 표본 기준, 변동 가능) - 실행 전 사용자와 라운드 수/시간·
   API 예산 소요를 다시 확인할 것.
 
+### 단어뱅크 확장 + API 사용량 한계 탐색 (2026-08-17, 사용자 지시)
+
+- `--round-size 10000` production 실행(run_id `RUN-20260817-212701-KST`,
+  커밋 `12fb53d`) 결과: 원시 후보 5,152개 → AI 판정 승인 4,639 → Keyword
+  Planner 게이트 통과 **128개**(2.8%). Round 2에서 **단어뱅크 조합공간
+  (당시 약 19,116개: 27업계×12도메인어×59기능어) 전체가 소진**되어
+  `word bank exhausted - no new combinations available`로 즉시 종료
+  (히스토리 1,000 + 누적 캐시의 fail 기록이 사실상 전체 공간을 덮음).
+  운영 이력 불변, production 미발행(정상 동작).
+- 사용자 확정: 128개를 이번 배치 최대치로 수용하고 종료하지 않고,
+  **word_bank.py를 확장해 신규 후보를 계속 만들어내며, 이를 통해 Google
+  Ads API 사용량 한계(몇 회 호출에서 막히는지)를 실측으로 찾아내라**고
+  추가 지시.
+- `src/saas_words_two/word_bank.py` 확장(§5 세션 큐레이션 역할): 신규
+  업계 15개(veterinary/dental/fitness_wellness/childcare/senior_care/
+  pest_control/landscaping/cleaning_services/laundry_dry_cleaning/
+  funeral_services/salon_spa/pharmacy/maritime_shipping/aviation/mining)
+  ×12 도메인어, 신규 기능어 15개(Suite/Engine/Assistant/Planner/
+  Scheduler/Organizer/Monitor/Insight/Metrics/Cockpit/Dashboard/
+  Navigator/Companion/Register/Ops — Terminal/Ring처럼 업계 맥락에
+  좌우되지 않는 범용어 위주로 선정). 총 42업계×504도메인어×74기능어=
+  37,296개 조합공간으로 확장(기존 대비 약 2배). `word_generation.py`의
+  낡은 개수 주석도 갱신. 테스트 501개 전부 PASS,
+  `verify_design_coverage.py` PASS(92 headings, 0 missing) 확인 —
+  기존 구조·테스트는 정확한 개수를 하드코딩하지 않아 회귀 없음.
+- 이후 계획: `final-qa-runner`로 확장된 단어뱅크 기준 QA 재검증 →
+  production 라운드를 반복 실행하며 `KeywordMetricsBudgetExceeded`
+  (설정상 일일 1,000회 호출 자체 예산) 또는 실제 Google Ads API
+  서버측 한도(429/quota 오류)가 먼저 나타나는 시점까지 진행해 실제
+  호출 횟수를 기록할 것 — 결과는 이 항목에 추가할 것.
+
 ## PROCESS-001 — SSH/원격 세션 push 정책이 원본 설계 §15 Git 원칙과 충돌
 - 상태: OPEN (사용자 확정 예외, 재논의 대상 아님 — 아래 참고)
 - 충돌 내용: 원본 설계서 `# 15. Git 원칙`은 "푸시 실패 시 `COMMIT_PENDING`으로 저장하고

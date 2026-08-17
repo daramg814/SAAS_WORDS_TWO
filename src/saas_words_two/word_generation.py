@@ -38,9 +38,9 @@ def generate_combinations(count: int, *, exclude: set[str] = frozenset()) -> lis
 
     Returns fewer than `count` items only if the entire word bank is
     exhausted - callers should treat that as real exhaustion, not a bug.
-    (As of 2026-08-11: 324 (industry, domain word) entries - some words like
-    Claim/Ledger/Permit repeat across industries, so this exceeds the 267
-    *unique* domain words - x 59 function words.)
+    (As of 2026-08-17: 504 (industry, domain word) entries across 42
+    industries x 74 function words - some words like Claim/Ledger/Permit
+    repeat across industries, so unique domain words are fewer than 504.)
     """
     if count <= 0:
         return []

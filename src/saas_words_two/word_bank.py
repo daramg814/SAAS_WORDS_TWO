@@ -127,6 +127,70 @@ DOMAIN_WORDS: dict[str, tuple[str, ...]] = {
         "Inventory", "Recipe", "Supplier", "Reservation", "Delivery", "Compliance",
         "Waste", "Menu", "Catering", "Staffing", "Allergen", "Franchise",
     ),
+    # 2026-08-17 추가 배치(사용자 지시, GKP-001): 단어뱅크 조합공간 소진으로
+    # word_generation.generate_combinations가 신규 후보를 뽑을 수 없어졌음을
+    # 실측으로 확인 후, "전세계 다양한 업계" 커버리지를 넓히는 §5 큐레이션
+    # 작업으로 15개 업계를 신규 추가.
+    "veterinary": (
+        "Patient", "Vaccination", "Boarding", "Grooming", "Prescription", "Appointment",
+        "Breed", "Microchip", "Wellness", "Referral", "Intake", "Discharge",
+    ),
+    "dental": (
+        "Patient", "Appointment", "Claim", "Hygiene", "Treatment", "Recall",
+        "Chart", "Insurance", "Referral", "Sterilization", "Consent", "Xray",
+    ),
+    "fitness_wellness": (
+        "Membership", "Class", "Trainer", "Attendance", "Billing", "Waiver",
+        "Schedule", "Retention", "Checkin", "Program", "Nutrition", "Session",
+    ),
+    "childcare": (
+        "Enrollment", "Attendance", "Ratio", "Curriculum", "Billing", "Immunization",
+        "Pickup", "Incident", "Staffing", "Meal", "Naptime", "Milestone",
+    ),
+    "senior_care": (
+        "Resident", "Medication", "Shift", "Incident", "Care", "Family",
+        "Vitals", "Admission", "Discharge", "Compliance", "Staffing", "Wellness",
+    ),
+    "pest_control": (
+        "Route", "Technician", "Treatment", "Inspection", "Contract", "Chemical",
+        "Recurring", "Dispatch", "Warranty", "Compliance", "Termite", "Scheduling",
+    ),
+    "landscaping": (
+        "Route", "Crew", "Estimate", "Season", "Irrigation", "Maintenance",
+        "Property", "Equipment", "Scheduling", "Contract", "Mowing", "Snow",
+    ),
+    "cleaning_services": (
+        "Route", "Crew", "Checklist", "Contract", "Supply", "Inspection",
+        "Schedule", "Client", "Quality", "Billing", "Turnover", "Inventory",
+    ),
+    "laundry_dry_cleaning": (
+        "Order", "Ticket", "Route", "Garment", "Delivery", "Pricing",
+        "Rack", "Turnaround", "Membership", "Loyalty", "Intake", "Alteration",
+    ),
+    "funeral_services": (
+        "Arrangement", "Casket", "Obituary", "Family", "Service", "Cemetery",
+        "Permit", "Payment", "Vendor", "Scheduling", "Preplanning", "Memorial",
+    ),
+    "salon_spa": (
+        "Appointment", "Stylist", "Booking", "Membership", "Retail", "Commission",
+        "Waitlist", "Service", "Loyalty", "Inventory", "Schedule", "Checkout",
+    ),
+    "pharmacy": (
+        "Prescription", "Refill", "Inventory", "Insurance", "Adherence", "Dispensing",
+        "Formulary", "Interaction", "Copay", "Compliance", "Consultation", "Recall",
+    ),
+    "maritime_shipping": (
+        "Vessel", "Manifest", "Cargo", "Customs", "Berth", "Charter",
+        "Crew", "Voyage", "Bunker", "Inspection", "Container", "Port",
+    ),
+    "aviation": (
+        "Flight", "Maintenance", "Crew", "Dispatch", "Inspection", "Fuel",
+        "Charter", "Compliance", "Schedule", "Fleet", "Certification", "Logbook",
+    ),
+    "mining": (
+        "Extraction", "Yield", "Equipment", "Safety", "Inspection", "Shift",
+        "Maintenance", "Compliance", "Haulage", "Blast", "Reserve", "Tailings",
+    ),
 }
 
 FUNCTION_WORDS: tuple[str, ...] = (
@@ -138,6 +202,11 @@ FUNCTION_WORDS: tuple[str, ...] = (
     "Center", "Zone", "Portal", "Console", "Panel", "Dial", "Meter",
     "Scale", "Route", "Dock", "Rail", "Trail", "Chain", "Ring", "Node",
     "Gate", "Nexus", "Atlas", "Sentry", "Keeper", "Manager",
+    # 2026-08-17 추가(업계 한정적이지 않고 범용적으로 "이 도구가 무엇을
+    # 하는지"를 연상시켜 Terminal/Ring류의 맥락 의존성 문제를 피하려 선정):
+    "Suite", "Engine", "Assistant", "Planner", "Scheduler", "Organizer",
+    "Monitor", "Insight", "Metrics", "Cockpit", "Dashboard", "Navigator",
+    "Companion", "Register", "Ops",
 )
 
 
