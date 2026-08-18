@@ -420,7 +420,7 @@ def _apply_keyword_metrics_filter(
             passed.append(candidate)
 
     _write_metrics_evidence(project_root, state, evidence)
-    _export_final_words_and_history_snapshots(project_root, ids.now_kst())
+    # 스냅샷 생성은 호출자에게 위임(finally 블록에서 처리) - 예외 안전성 확보
     return passed
 
 
@@ -612,6 +612,9 @@ def _stage_generate_and_review_titles(project_root: Path, options: RunOptions, s
             state.status = "RETRYING"
             run_state.save(project_root, state)
             raise RetryRequired(f"keyword metrics filter unavailable: {exc}", status="RETRYING")
+        finally:
+            # 판정/API 조회 후 모든 스냅샷 생성 - 명시적 호출로 누락 방지
+            _export_final_words_and_history_snapshots(project_root, ids.now_kst())
         state.context["approved"] = approved
         state.context["round_stats"] = {
             "generated": len(ledger_rows),

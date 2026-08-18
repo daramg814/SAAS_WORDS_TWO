@@ -625,18 +625,23 @@ def test_export_history_snapshots_copies_live_cache_files_with_timestamped_names
     assert not (snap_dir / "words_20260818_213000_KST.txt").exists()  # words.txt no longer exists at all
 
 
-def test_apply_keyword_metrics_filter_triggers_export_and_snapshots(tmp_path, monkeypatch):
+def test_apply_keyword_metrics_filter_uses_cache_and_api(tmp_path, monkeypatch):
+    # 스냅샷 생성은 호출자의 책임(finally 블록) - 함수는 캐시와 evidence만 담당
     write_cache_row(tmp_path, title="Ledger Pilot", avg=2000, competition_index=0, api_status="success", gate_passed=True)
     stub = StubKeywordMetricsClient()
     monkeypatch.setattr(word_pipeline, "_build_keyword_metrics_client", lambda project_root: stub)
     state = word_pipeline._load_or_create_state(make_options(tmp_path, run_id="QA-20260818-000000-KST"))
 
-    word_pipeline._apply_keyword_metrics_filter(tmp_path, state, [{"title": "Claim Sentry", "industry": "insurance"}])
+    # 캐시에 있는 것과 없는 것 함께 테스트
+    passed = word_pipeline._apply_keyword_metrics_filter(tmp_path, state, [
+        {"title": "Ledger Pilot", "industry": "finance"},  # 캐시 hit
+        {"title": "Claim Sentry", "industry": "insurance"}  # API 호출
+    ])
 
-    final_words_files = list(word_pipeline._final_words_dir(tmp_path).glob("passed_words_*.txt"))
-    latest = word_pipeline._final_words_dir(tmp_path) / "passed_words_latest.txt"
-    assert latest in final_words_files
-    assert "Ledger Pilot" in latest.read_text(encoding="utf-8")
+    # 둘 다 통과 기준 만족
+    assert len(passed) == 2
+    titles = {p["title"] for p in passed}
+    assert titles == {"Ledger Pilot", "Claim Sentry"}
 
 
 # ---------------------------------------------------------------------------

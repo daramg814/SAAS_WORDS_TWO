@@ -35,7 +35,7 @@
   "created_at": "2026-08-18T21:10:17.090233+09:00",
   "mode": "qa",
   "run_id": "QA-20260818-211017-KST",
-  "stage": "generate_and_review_titles",
-  "status": "RUNNING",
-  "updated_at": "2026-08-18T21:11:26.228885+09:00"
+  "stage": "update_memory_and_git_checkpoint",
+  "status": "DONE",
+  "updated_at": "2026-08-18T21:11:27.610551+09:00"
 }
