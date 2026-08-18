@@ -1,0 +1,4524 @@
+{
+  "awaiting_judgment": null,
+  "context": {
+    "approved": [
+      {
+        "industry": "funeral_services",
+        "title": "Family Registry"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Safe Route"
+      }
+    ],
+    "backlog": [
+      {
+        "industry": "finance",
+        "title": "Accrual Codex"
+      },
+      {
+        "industry": "finance",
+        "title": "Accrual Roadmap"
+      },
+      {
+        "industry": "insurance",
+        "title": "Adjuster Almanac"
+      },
+      {
+        "industry": "insurance",
+        "title": "Adjuster Blueprint"
+      },
+      {
+        "industry": "insurance",
+        "title": "Adjuster Codex"
+      },
+      {
+        "industry": "insurance",
+        "title": "Adjuster Compendium"
+      },
+      {
+        "industry": "insurance",
+        "title": "Adjuster Roadmap"
+      },
+      {
+        "industry": "senior_care",
+        "title": "Admission Almanac"
+      },
+      {
+        "industry": "senior_care",
+        "title": "Admission Blueprint"
+      },
+      {
+        "industry": "senior_care",
+        "title": "Admission Codex"
+      },
+      {
+        "industry": "senior_care",
+        "title": "Admission Compendium"
+      },
+      {
+        "industry": "senior_care",
+        "title": "Admission Guidebook"
+      },
+      {
+        "industry": "senior_care",
+        "title": "Admission Journal"
+      },
+      {
+        "industry": "senior_care",
+        "title": "Admission Playbook"
+      },
+      {
+        "industry": "senior_care",
+        "title": "Admission Registry"
+      },
+      {
+        "industry": "senior_care",
+        "title": "Admission Roadmap"
+      },
+      {
+        "industry": "senior_care",
+        "title": "Admission Snapshot"
+      },
+      {
+        "industry": "senior_care",
+        "title": "Admission Toolkit"
+      },
+      {
+        "industry": "senior_care",
+        "title": "Admission Workbench"
+      },
+      {
+        "industry": "events",
+        "title": "Agenda Playbook"
+      },
+      {
+        "industry": "events",
+        "title": "Agenda Toolkit"
+      },
+      {
+        "industry": "events",
+        "title": "Agenda Workbench"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Airflow Almanac"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Airflow Beacon"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Airflow Blueprint"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Airflow Codex"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Airflow Compass"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Airflow Compendium"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Airflow Desk"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Airflow Flow"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Airflow Forge"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Airflow Guard"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Airflow Hub"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Airflow Pilot"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Airflow Radar"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Airflow Registry"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Airflow Relay"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Airflow Roadmap"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Airflow Sync"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Airflow Tracker"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Airflow Vault"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Alteration Almanac"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Alteration Blueprint"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Alteration Codex"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Alteration Compendium"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Alteration Guidebook"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Alteration Registry"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Alteration Roadmap"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Alteration Snapshot"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Amenity Roadmap"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Assessment Almanac"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Assessment Blueprint"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Assessment Compendium"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Assessment Guidebook"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Assessment Journal"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Assessment Playbook"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Assessment Registry"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Assessment Snapshot"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Assessment Toolkit"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Assessment Workbench"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Assignment Atlas"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Assignment Center"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Assignment Chain"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Assignment Console"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Assignment Dial"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Assignment Dock"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Assignment Gate"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Assignment Meter"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Assignment Nexus"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Assignment Node"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Assignment Panel"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Assignment Portal"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Assignment Rail"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Assignment Ring"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Assignment Route"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Assignment Scale"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Assignment Terminal"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Assignment Trail"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Assignment Zone"
+      },
+      {
+        "industry": "government",
+        "title": "Ballot Playbook"
+      },
+      {
+        "industry": "government",
+        "title": "Ballot Toolkit"
+      },
+      {
+        "industry": "government",
+        "title": "Ballot Workbench"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Benefits Almanac"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Benefits Blueprint"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Benefits Codex"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Benefits Compendium"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Benefits Guidebook"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Benefits Registry"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Benefits Roadmap"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Benefits Snapshot"
+      },
+      {
+        "industry": "construction",
+        "title": "Bid Codex"
+      },
+      {
+        "industry": "construction",
+        "title": "Bid Compendium"
+      },
+      {
+        "industry": "construction",
+        "title": "Bid Roadmap"
+      },
+      {
+        "industry": "mining",
+        "title": "Blast Codex"
+      },
+      {
+        "industry": "mining",
+        "title": "Blast Compendium"
+      },
+      {
+        "industry": "mining",
+        "title": "Blast Roadmap"
+      },
+      {
+        "industry": "finance",
+        "title": "Budget Almanac"
+      },
+      {
+        "industry": "finance",
+        "title": "Budget Blueprint"
+      },
+      {
+        "industry": "finance",
+        "title": "Budget Codex"
+      },
+      {
+        "industry": "finance",
+        "title": "Budget Compendium"
+      },
+      {
+        "industry": "finance",
+        "title": "Budget Guidebook"
+      },
+      {
+        "industry": "finance",
+        "title": "Budget Journal"
+      },
+      {
+        "industry": "finance",
+        "title": "Budget Registry"
+      },
+      {
+        "industry": "finance",
+        "title": "Budget Roadmap"
+      },
+      {
+        "industry": "finance",
+        "title": "Budget Snapshot"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Bypass Atlas"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Bypass Chain"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Bypass Console"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Bypass Dial"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Bypass Dock"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Bypass Gate"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Bypass Keeper"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Bypass Manager"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Bypass Meter"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Bypass Nexus"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Bypass Node"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Bypass Panel"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Bypass Portal"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Bypass Rail"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Bypass Ring"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Bypass Route"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Bypass Scale"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Bypass Sentry"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Bypass Trail"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Callback Almanac"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Callback Blueprint"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Callback Compendium"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Callback Guidebook"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Callback Journal"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Callback Playbook"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Callback Registry"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Callback Snapshot"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Callback Toolkit"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Callback Workbench"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Callout Center"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Callout Chain"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Callout Console"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Callout Dial"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Callout Dock"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Callout Gate"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Callout Meter"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Callout Node"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Callout Panel"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Callout Portal"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Callout Rail"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Callout Ring"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Callout Route"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Callout Scale"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Callout Station"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Callout Terminal"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Callout Trail"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Callout Zone"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Casket Guidebook"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Casket Journal"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Casket Playbook"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Casket Registry"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Casket Snapshot"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Casket Toolkit"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Casket Workbench"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Cemetery Almanac"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Cemetery Blueprint"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Cemetery Codex"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Cemetery Compendium"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Cemetery Guidebook"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Cemetery Journal"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Cemetery Playbook"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Cemetery Registry"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Cemetery Roadmap"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Cemetery Snapshot"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Cemetery Toolkit"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Cemetery Workbench"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Checkout Almanac"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Checkout Blueprint"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Checkout Codex"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Checkout Compendium"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Checkout Registry"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Checkout Roadmap"
+      },
+      {
+        "industry": "pest_control",
+        "title": "Chemical Almanac"
+      },
+      {
+        "industry": "pest_control",
+        "title": "Chemical Blueprint"
+      },
+      {
+        "industry": "pest_control",
+        "title": "Chemical Codex"
+      },
+      {
+        "industry": "pest_control",
+        "title": "Chemical Compendium"
+      },
+      {
+        "industry": "pest_control",
+        "title": "Chemical Guidebook"
+      },
+      {
+        "industry": "pest_control",
+        "title": "Chemical Journal"
+      },
+      {
+        "industry": "pest_control",
+        "title": "Chemical Playbook"
+      },
+      {
+        "industry": "pest_control",
+        "title": "Chemical Registry"
+      },
+      {
+        "industry": "pest_control",
+        "title": "Chemical Snapshot"
+      },
+      {
+        "industry": "pest_control",
+        "title": "Chemical Toolkit"
+      },
+      {
+        "industry": "pest_control",
+        "title": "Chemical Workbench"
+      },
+      {
+        "industry": "telecom",
+        "title": "Churn Guidebook"
+      },
+      {
+        "industry": "telecom",
+        "title": "Churn Journal"
+      },
+      {
+        "industry": "telecom",
+        "title": "Churn Playbook"
+      },
+      {
+        "industry": "telecom",
+        "title": "Churn Snapshot"
+      },
+      {
+        "industry": "telecom",
+        "title": "Churn Toolkit"
+      },
+      {
+        "industry": "telecom",
+        "title": "Churn Workbench"
+      },
+      {
+        "industry": "cleaning_services",
+        "title": "Client Almanac"
+      },
+      {
+        "industry": "cleaning_services",
+        "title": "Client Blueprint"
+      },
+      {
+        "industry": "cleaning_services",
+        "title": "Client Codex"
+      },
+      {
+        "industry": "cleaning_services",
+        "title": "Client Compendium"
+      },
+      {
+        "industry": "cleaning_services",
+        "title": "Client Guidebook"
+      },
+      {
+        "industry": "cleaning_services",
+        "title": "Client Journal"
+      },
+      {
+        "industry": "cleaning_services",
+        "title": "Client Playbook"
+      },
+      {
+        "industry": "cleaning_services",
+        "title": "Client Registry"
+      },
+      {
+        "industry": "cleaning_services",
+        "title": "Client Roadmap"
+      },
+      {
+        "industry": "cleaning_services",
+        "title": "Client Snapshot"
+      },
+      {
+        "industry": "cleaning_services",
+        "title": "Client Toolkit"
+      },
+      {
+        "industry": "cleaning_services",
+        "title": "Client Workbench"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Commission Almanac"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Commission Blueprint"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Commission Codex"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Commission Compendium"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Commission Guidebook"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Commission Journal"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Commission Playbook"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Commission Registry"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Commission Roadmap"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Commission Snapshot"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Commission Toolkit"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Commission Workbench"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Compressor Board"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Compressor Center"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Compressor Console"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Compressor Deck"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Compressor Dial"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Compressor Dock"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Compressor Lab"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Compressor Meter"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Compressor Panel"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Compressor Portal"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Compressor Rail"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Compressor Route"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Compressor Scale"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Compressor Station"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Compressor Studio"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Compressor Terminal"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Compressor Trail"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Compressor Zone"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Cylinder Center"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Cylinder Chain"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Cylinder Console"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Cylinder Deck"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Cylinder Dial"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Cylinder Dock"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Cylinder Lab"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Cylinder Meter"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Cylinder Panel"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Cylinder Portal"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Cylinder Rail"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Cylinder Route"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Cylinder Scale"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Cylinder Station"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Cylinder Studio"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Cylinder Terminal"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Cylinder Trail"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Cylinder Zone"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Deadbolt Base"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Deadbolt Board"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Deadbolt Center"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Deadbolt Console"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Deadbolt Core"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Deadbolt Deck"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Deadbolt Dial"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Deadbolt Lab"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Deadbolt Ledger"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Deadbolt Meter"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Deadbolt Panel"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Deadbolt Portal"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Deadbolt Route"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Deadbolt Scale"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Deadbolt Station"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Deadbolt Studio"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Deadbolt Terminal"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Deadbolt Zone"
+      },
+      {
+        "industry": "insurance",
+        "title": "Deductible Roadmap"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Diagnosis Codex"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Diagnosis Compendium"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Diagnosis Roadmap"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Dialect Board"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Dialect Center"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Dialect Console"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Dialect Core"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Dialect Deck"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Dialect Dial"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Dialect Dock"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Dialect Lab"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Dialect Ledger"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Dialect Meter"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Dialect Panel"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Dialect Portal"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Dialect Route"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Dialect Scale"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Dialect Station"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Dialect Studio"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Dialect Terminal"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Dialect Zone"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Dispensing Almanac"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Dispensing Blueprint"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Dispensing Codex"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Dispensing Compendium"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Dispensing Guidebook"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Dispensing Journal"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Dispensing Playbook"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Dispensing Registry"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Dispensing Roadmap"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Dispensing Snapshot"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Dispensing Toolkit"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Dispensing Workbench"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Donor Almanac"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Donor Codex"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Donor Compendium"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Donor Roadmap"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Ductwork Almanac"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Ductwork Blueprint"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Ductwork Codex"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Ductwork Compendium"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Ductwork Flow"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Ductwork Guard"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Ductwork Guidebook"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Ductwork Hub"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Ductwork Journal"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Ductwork Ops"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Ductwork Playbook"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Ductwork Registry"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Ductwork Roadmap"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Ductwork Snapshot"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Ductwork Sync"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Ductwork Toolkit"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Ductwork Tracker"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Ductwork Workbench"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Duplication Almanac"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Duplication Beacon"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Duplication Blueprint"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Duplication Cascade"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Duplication Codex"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Duplication Compass"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Duplication Compendium"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Duplication Desk"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Duplication Flow"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Duplication Forge"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Duplication Guard"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Duplication Hub"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Duplication Pilot"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Duplication Radar"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Duplication Relay"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Duplication Roadmap"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Duplication Sync"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Duplication Tracker"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Duplication Vault"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Editorial Roadmap"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Endpoint Playbook"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Endpoint Toolkit"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Endpoint Workbench"
+      },
+      {
+        "industry": "events",
+        "title": "Exhibitor Guidebook"
+      },
+      {
+        "industry": "events",
+        "title": "Exhibitor Journal"
+      },
+      {
+        "industry": "events",
+        "title": "Exhibitor Playbook"
+      },
+      {
+        "industry": "events",
+        "title": "Exhibitor Registry"
+      },
+      {
+        "industry": "events",
+        "title": "Exhibitor Snapshot"
+      },
+      {
+        "industry": "events",
+        "title": "Exhibitor Toolkit"
+      },
+      {
+        "industry": "events",
+        "title": "Exhibitor Workbench"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Family Almanac"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Family Blueprint"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Family Compendium"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Family Guidebook"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Family Journal"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Family Playbook"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Family Registry"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Family Snapshot"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Family Toolkit"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Family Workbench"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Feed Journal"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Feed Playbook"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Feed Snapshot"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Feed Toolkit"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Feed Workbench"
+      },
+      {
+        "industry": "legal",
+        "title": "Filing Almanac"
+      },
+      {
+        "industry": "legal",
+        "title": "Filing Blueprint"
+      },
+      {
+        "industry": "legal",
+        "title": "Filing Codex"
+      },
+      {
+        "industry": "legal",
+        "title": "Filing Compendium"
+      },
+      {
+        "industry": "legal",
+        "title": "Filing Guidebook"
+      },
+      {
+        "industry": "legal",
+        "title": "Filing Journal"
+      },
+      {
+        "industry": "legal",
+        "title": "Filing Playbook"
+      },
+      {
+        "industry": "legal",
+        "title": "Filing Registry"
+      },
+      {
+        "industry": "legal",
+        "title": "Filing Roadmap"
+      },
+      {
+        "industry": "legal",
+        "title": "Filing Snapshot"
+      },
+      {
+        "industry": "legal",
+        "title": "Filing Toolkit"
+      },
+      {
+        "industry": "legal",
+        "title": "Filing Workbench"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Filtration Almanac"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Filtration Blueprint"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Filtration Codex"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Filtration Compendium"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Filtration Desk"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Filtration Flow"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Filtration Guard"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Filtration Guidebook"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Filtration Hub"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Filtration Journal"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Filtration Pilot"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Filtration Radar"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Filtration Registry"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Filtration Relay"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Filtration Roadmap"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Filtration Snapshot"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Filtration Sync"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Filtration Tracker"
+      },
+      {
+        "industry": "automotive",
+        "title": "Financing Journal"
+      },
+      {
+        "industry": "automotive",
+        "title": "Financing Playbook"
+      },
+      {
+        "industry": "automotive",
+        "title": "Financing Toolkit"
+      },
+      {
+        "industry": "automotive",
+        "title": "Financing Workbench"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Firewall Guidebook"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Firewall Journal"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Firewall Playbook"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Firewall Registry"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Firewall Snapshot"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Firewall Toolkit"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Firewall Workbench"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Fluency Almanac"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Fluency Beacon"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Fluency Bridge"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Fluency Cascade"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Fluency Codex"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Fluency Compass"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Fluency Compendium"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Fluency Desk"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Fluency Flow"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Fluency Forge"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Fluency Guard"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Fluency Hub"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Fluency Pilot"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Fluency Radar"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Fluency Relay"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Fluency Roadmap"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Fluency Sync"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Fluency Tracker"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Fluency Vault"
+      },
+      {
+        "industry": "logistics",
+        "title": "Freight Almanac"
+      },
+      {
+        "industry": "logistics",
+        "title": "Freight Blueprint"
+      },
+      {
+        "industry": "logistics",
+        "title": "Freight Codex"
+      },
+      {
+        "industry": "logistics",
+        "title": "Freight Compendium"
+      },
+      {
+        "industry": "logistics",
+        "title": "Freight Guidebook"
+      },
+      {
+        "industry": "logistics",
+        "title": "Freight Journal"
+      },
+      {
+        "industry": "logistics",
+        "title": "Freight Playbook"
+      },
+      {
+        "industry": "logistics",
+        "title": "Freight Registry"
+      },
+      {
+        "industry": "logistics",
+        "title": "Freight Roadmap"
+      },
+      {
+        "industry": "logistics",
+        "title": "Freight Snapshot"
+      },
+      {
+        "industry": "logistics",
+        "title": "Freight Toolkit"
+      },
+      {
+        "industry": "logistics",
+        "title": "Freight Workbench"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Fulfillment Codex"
+      },
+      {
+        "industry": "retail_ecommerce",
+        "title": "Fulfillment Roadmap"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Furnace Almanac"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Furnace Blueprint"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Furnace Codex"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Furnace Companion"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Furnace Compendium"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Furnace Dashboard"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Furnace Guard"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Furnace Guidebook"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Furnace Journal"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Furnace Navigator"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Furnace Ops"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Furnace Playbook"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Furnace Register"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Furnace Registry"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Furnace Roadmap"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Furnace Snapshot"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Furnace Toolkit"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Furnace Workbench"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Garment Almanac"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Garment Blueprint"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Garment Compendium"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Garment Guidebook"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Garment Journal"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Garment Playbook"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Garment Registry"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Garment Snapshot"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Garment Toolkit"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Garment Workbench"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Glossary Base"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Glossary Board"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Glossary Center"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Glossary Console"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Glossary Core"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Glossary Deck"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Glossary Dial"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Glossary Frame"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Glossary Lab"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Glossary Ledger"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Glossary Lens"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Glossary Map"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Glossary Panel"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Glossary Portal"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Glossary Station"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Glossary Studio"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Glossary Terminal"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Glossary Zone"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Grid Roadmap"
+      },
+      {
+        "industry": "veterinary",
+        "title": "Grooming Toolkit"
+      },
+      {
+        "industry": "veterinary",
+        "title": "Grooming Workbench"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Harvest Almanac"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Harvest Blueprint"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Harvest Codex"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Harvest Compendium"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Harvest Registry"
+      },
+      {
+        "industry": "agriculture",
+        "title": "Harvest Roadmap"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Housekeeping Almanac"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Housekeeping Blueprint"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Housekeeping Codex"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Housekeeping Compendium"
+      },
+      {
+        "industry": "hospitality",
+        "title": "Housekeeping Roadmap"
+      },
+      {
+        "industry": "dental",
+        "title": "Hygiene Playbook"
+      },
+      {
+        "industry": "dental",
+        "title": "Hygiene Toolkit"
+      },
+      {
+        "industry": "dental",
+        "title": "Hygiene Workbench"
+      },
+      {
+        "industry": "childcare",
+        "title": "Immunization Almanac"
+      },
+      {
+        "industry": "childcare",
+        "title": "Immunization Blueprint"
+      },
+      {
+        "industry": "childcare",
+        "title": "Immunization Guidebook"
+      },
+      {
+        "industry": "childcare",
+        "title": "Immunization Journal"
+      },
+      {
+        "industry": "childcare",
+        "title": "Immunization Playbook"
+      },
+      {
+        "industry": "childcare",
+        "title": "Immunization Registry"
+      },
+      {
+        "industry": "childcare",
+        "title": "Immunization Snapshot"
+      },
+      {
+        "industry": "childcare",
+        "title": "Immunization Toolkit"
+      },
+      {
+        "industry": "childcare",
+        "title": "Immunization Workbench"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Insulation Atlas"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Insulation Chain"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Insulation Console"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Insulation Dial"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Insulation Dock"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Insulation Gate"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Insulation Keeper"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Insulation Meter"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Insulation Nexus"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Insulation Node"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Insulation Panel"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Insulation Portal"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Insulation Rail"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Insulation Ring"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Insulation Route"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Insulation Scale"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Insulation Sentry"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Insulation Trail"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Insulation Zone"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Interaction Almanac"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Interaction Blueprint"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Interaction Codex"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Interaction Compendium"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Interaction Guidebook"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Interaction Journal"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Interaction Playbook"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Interaction Registry"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Interaction Roadmap"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Interaction Snapshot"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Keyway Base"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Keyway Board"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Keyway Center"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Keyway Console"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Keyway Core"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Keyway Deck"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Keyway Frame"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Keyway Lab"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Keyway Ledger"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Keyway Lens"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Keyway Lock"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Keyway Map"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Keyway Panel"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Keyway Portal"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Keyway Station"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Keyway Studio"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Keyway Terminal"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Keyway Zone"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Knowledge Almanac"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Knowledge Blueprint"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Knowledge Guidebook"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Knowledge Journal"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Knowledge Playbook"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Knowledge Registry"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Knowledge Snapshot"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Knowledge Toolkit"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Knowledge Workbench"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Lease Almanac"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Lease Blueprint"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Lease Codex"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Lease Compendium"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Lease Guidebook"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Lease Journal"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Lease Playbook"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Lease Registry"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Lease Roadmap"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Lease Snapshot"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Lease Toolkit"
+      },
+      {
+        "industry": "real_estate",
+        "title": "Lease Workbench"
+      },
+      {
+        "industry": "finance",
+        "title": "Ledger Toolkit"
+      },
+      {
+        "industry": "finance",
+        "title": "Ledger Workbench"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Localization Almanac"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Localization Blueprint"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Localization Codex"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Localization Companion"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Localization Compendium"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Localization Guard"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Localization Guidebook"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Localization Journal"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Localization Ops"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Localization Playbook"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Localization Register"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Localization Registry"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Localization Roadmap"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Localization Snapshot"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Localization Sync"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Localization Toolkit"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Localization Tracker"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Localization Workbench"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Lockout Almanac"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Lockout Blueprint"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Lockout Codex"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Lockout Compendium"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Lockout Flow"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Lockout Guard"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Lockout Guidebook"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Lockout Hub"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Lockout Journal"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Lockout Pilot"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Lockout Playbook"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Lockout Registry"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Lockout Roadmap"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Lockout Snapshot"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Lockout Sync"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Lockout Toolkit"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Lockout Tracker"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Lockout Workbench"
+      },
+      {
+        "industry": "aviation",
+        "title": "Logbook Codex"
+      },
+      {
+        "industry": "aviation",
+        "title": "Logbook Compendium"
+      },
+      {
+        "industry": "aviation",
+        "title": "Logbook Roadmap"
+      },
+      {
+        "industry": "logistics",
+        "title": "Manifest Almanac"
+      },
+      {
+        "industry": "logistics",
+        "title": "Manifest Blueprint"
+      },
+      {
+        "industry": "logistics",
+        "title": "Manifest Compendium"
+      },
+      {
+        "industry": "logistics",
+        "title": "Manifest Guidebook"
+      },
+      {
+        "industry": "logistics",
+        "title": "Manifest Journal"
+      },
+      {
+        "industry": "logistics",
+        "title": "Manifest Playbook"
+      },
+      {
+        "industry": "logistics",
+        "title": "Manifest Registry"
+      },
+      {
+        "industry": "logistics",
+        "title": "Manifest Snapshot"
+      },
+      {
+        "industry": "logistics",
+        "title": "Manifest Toolkit"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Masterkey Almanac"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Masterkey Blueprint"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Masterkey Codex"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Masterkey Compendium"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Masterkey Desk"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Masterkey Flow"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Masterkey Guard"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Masterkey Guidebook"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Masterkey Hub"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Masterkey Pilot"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Masterkey Radar"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Masterkey Registry"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Masterkey Relay"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Masterkey Roadmap"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Masterkey Snapshot"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Masterkey Sync"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Masterkey Tracker"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Masterkey Vault"
+      },
+      {
+        "industry": "legal",
+        "title": "Matter Almanac"
+      },
+      {
+        "industry": "legal",
+        "title": "Matter Codex"
+      },
+      {
+        "industry": "legal",
+        "title": "Matter Compendium"
+      },
+      {
+        "industry": "legal",
+        "title": "Matter Roadmap"
+      },
+      {
+        "industry": "childcare",
+        "title": "Meal Almanac"
+      },
+      {
+        "industry": "childcare",
+        "title": "Meal Blueprint"
+      },
+      {
+        "industry": "childcare",
+        "title": "Meal Codex"
+      },
+      {
+        "industry": "childcare",
+        "title": "Meal Compendium"
+      },
+      {
+        "industry": "childcare",
+        "title": "Meal Guidebook"
+      },
+      {
+        "industry": "childcare",
+        "title": "Meal Journal"
+      },
+      {
+        "industry": "childcare",
+        "title": "Meal Playbook"
+      },
+      {
+        "industry": "childcare",
+        "title": "Meal Registry"
+      },
+      {
+        "industry": "childcare",
+        "title": "Meal Roadmap"
+      },
+      {
+        "industry": "childcare",
+        "title": "Meal Snapshot"
+      },
+      {
+        "industry": "childcare",
+        "title": "Meal Toolkit"
+      },
+      {
+        "industry": "childcare",
+        "title": "Meal Workbench"
+      },
+      {
+        "industry": "senior_care",
+        "title": "Medication Toolkit"
+      },
+      {
+        "industry": "senior_care",
+        "title": "Medication Workbench"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Memorial Almanac"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Memorial Blueprint"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Memorial Codex"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Memorial Compendium"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Memorial Guidebook"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Memorial Registry"
+      },
+      {
+        "industry": "funeral_services",
+        "title": "Memorial Roadmap"
+      },
+      {
+        "industry": "food_service",
+        "title": "Menu Almanac"
+      },
+      {
+        "industry": "food_service",
+        "title": "Menu Blueprint"
+      },
+      {
+        "industry": "food_service",
+        "title": "Menu Guidebook"
+      },
+      {
+        "industry": "food_service",
+        "title": "Menu Journal"
+      },
+      {
+        "industry": "food_service",
+        "title": "Menu Playbook"
+      },
+      {
+        "industry": "food_service",
+        "title": "Menu Registry"
+      },
+      {
+        "industry": "food_service",
+        "title": "Menu Snapshot"
+      },
+      {
+        "industry": "food_service",
+        "title": "Menu Toolkit"
+      },
+      {
+        "industry": "food_service",
+        "title": "Menu Workbench"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Meter Almanac"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Meter Codex"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Meter Compendium"
+      },
+      {
+        "industry": "energy_utilities",
+        "title": "Meter Roadmap"
+      },
+      {
+        "industry": "veterinary",
+        "title": "Microchip Almanac"
+      },
+      {
+        "industry": "veterinary",
+        "title": "Microchip Blueprint"
+      },
+      {
+        "industry": "veterinary",
+        "title": "Microchip Compendium"
+      },
+      {
+        "industry": "veterinary",
+        "title": "Microchip Guidebook"
+      },
+      {
+        "industry": "veterinary",
+        "title": "Microchip Journal"
+      },
+      {
+        "industry": "veterinary",
+        "title": "Microchip Playbook"
+      },
+      {
+        "industry": "veterinary",
+        "title": "Microchip Registry"
+      },
+      {
+        "industry": "veterinary",
+        "title": "Microchip Snapshot"
+      },
+      {
+        "industry": "veterinary",
+        "title": "Microchip Toolkit"
+      },
+      {
+        "industry": "veterinary",
+        "title": "Microchip Workbench"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Migration Blueprint"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Migration Guidebook"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Migration Journal"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Migration Playbook"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Migration Registry"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Migration Snapshot"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Migration Toolkit"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Migration Workbench"
+      },
+      {
+        "industry": "childcare",
+        "title": "Milestone Almanac"
+      },
+      {
+        "industry": "childcare",
+        "title": "Milestone Blueprint"
+      },
+      {
+        "industry": "childcare",
+        "title": "Milestone Codex"
+      },
+      {
+        "industry": "childcare",
+        "title": "Milestone Compendium"
+      },
+      {
+        "industry": "childcare",
+        "title": "Milestone Guidebook"
+      },
+      {
+        "industry": "childcare",
+        "title": "Milestone Journal"
+      },
+      {
+        "industry": "childcare",
+        "title": "Milestone Playbook"
+      },
+      {
+        "industry": "childcare",
+        "title": "Milestone Registry"
+      },
+      {
+        "industry": "childcare",
+        "title": "Milestone Roadmap"
+      },
+      {
+        "industry": "childcare",
+        "title": "Milestone Snapshot"
+      },
+      {
+        "industry": "childcare",
+        "title": "Milestone Toolkit"
+      },
+      {
+        "industry": "childcare",
+        "title": "Milestone Workbench"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Monitoring Journal"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Monitoring Playbook"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Monitoring Toolkit"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Monitoring Workbench"
+      },
+      {
+        "industry": "telecom",
+        "title": "Network Guidebook"
+      },
+      {
+        "industry": "telecom",
+        "title": "Network Journal"
+      },
+      {
+        "industry": "telecom",
+        "title": "Network Playbook"
+      },
+      {
+        "industry": "telecom",
+        "title": "Network Registry"
+      },
+      {
+        "industry": "telecom",
+        "title": "Network Snapshot"
+      },
+      {
+        "industry": "telecom",
+        "title": "Network Toolkit"
+      },
+      {
+        "industry": "telecom",
+        "title": "Network Workbench"
+      },
+      {
+        "industry": "nonprofit",
+        "title": "Outreach Workbench"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Perimeter Blueprint"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Perimeter Guidebook"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Perimeter Journal"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Perimeter Playbook"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Perimeter Registry"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Perimeter Snapshot"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Perimeter Toolkit"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Perimeter Workbench"
+      },
+      {
+        "industry": "insurance",
+        "title": "Policy Almanac"
+      },
+      {
+        "industry": "insurance",
+        "title": "Policy Blueprint"
+      },
+      {
+        "industry": "insurance",
+        "title": "Policy Codex"
+      },
+      {
+        "industry": "insurance",
+        "title": "Policy Compendium"
+      },
+      {
+        "industry": "insurance",
+        "title": "Policy Guidebook"
+      },
+      {
+        "industry": "insurance",
+        "title": "Policy Journal"
+      },
+      {
+        "industry": "insurance",
+        "title": "Policy Playbook"
+      },
+      {
+        "industry": "insurance",
+        "title": "Policy Registry"
+      },
+      {
+        "industry": "insurance",
+        "title": "Policy Roadmap"
+      },
+      {
+        "industry": "insurance",
+        "title": "Policy Snapshot"
+      },
+      {
+        "industry": "insurance",
+        "title": "Policy Toolkit"
+      },
+      {
+        "industry": "insurance",
+        "title": "Policy Workbench"
+      },
+      {
+        "industry": "maritime_shipping",
+        "title": "Port Almanac"
+      },
+      {
+        "industry": "maritime_shipping",
+        "title": "Port Codex"
+      },
+      {
+        "industry": "maritime_shipping",
+        "title": "Port Compendium"
+      },
+      {
+        "industry": "maritime_shipping",
+        "title": "Port Roadmap"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Pricing Almanac"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Pricing Blueprint"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Pricing Codex"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Pricing Compendium"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Pricing Guidebook"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Pricing Journal"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Pricing Playbook"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Pricing Registry"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Pricing Roadmap"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Pricing Snapshot"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Pricing Toolkit"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Pricing Workbench"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Prior Almanac"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Prior Blueprint"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Prior Codex"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Prior Compendium"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Prior Guidebook"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Prior Journal"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Prior Playbook"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Prior Registry"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Prior Roadmap"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Prior Snapshot"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Prior Toolkit"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Prior Workbench"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Production Almanac"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Production Blueprint"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Production Codex"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Production Compendium"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Production Guidebook"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Production Registry"
+      },
+      {
+        "industry": "manufacturing",
+        "title": "Production Roadmap"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Program Almanac"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Program Blueprint"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Program Codex"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Program Compendium"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Program Guidebook"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Program Journal"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Program Playbook"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Program Registry"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Program Roadmap"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Program Snapshot"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Program Toolkit"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Program Workbench"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Proofing Center"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Proofing Chain"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Proofing Console"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Proofing Dial"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Proofing Dock"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Proofing Lab"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Proofing Meter"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Proofing Panel"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Proofing Portal"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Proofing Rail"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Proofing Ring"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Proofing Route"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Proofing Scale"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Proofing Station"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Proofing Studio"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Proofing Terminal"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Proofing Trail"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Proofing Zone"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Provider Almanac"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Provider Blueprint"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Provider Codex"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Provider Compendium"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Provider Guidebook"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Provider Journal"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Provider Playbook"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Provider Registry"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Provider Roadmap"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Provider Snapshot"
+      },
+      {
+        "industry": "construction",
+        "title": "Punchlist Almanac"
+      },
+      {
+        "industry": "construction",
+        "title": "Punchlist Blueprint"
+      },
+      {
+        "industry": "construction",
+        "title": "Punchlist Codex"
+      },
+      {
+        "industry": "construction",
+        "title": "Punchlist Compendium"
+      },
+      {
+        "industry": "construction",
+        "title": "Punchlist Guidebook"
+      },
+      {
+        "industry": "construction",
+        "title": "Punchlist Registry"
+      },
+      {
+        "industry": "construction",
+        "title": "Punchlist Roadmap"
+      },
+      {
+        "industry": "finance",
+        "title": "Reconciliation Almanac"
+      },
+      {
+        "industry": "finance",
+        "title": "Reconciliation Blueprint"
+      },
+      {
+        "industry": "finance",
+        "title": "Reconciliation Codex"
+      },
+      {
+        "industry": "finance",
+        "title": "Reconciliation Compendium"
+      },
+      {
+        "industry": "finance",
+        "title": "Reconciliation Roadmap"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Reference Toolkit"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Reference Workbench"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Refill Almanac"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Refill Blueprint"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Refill Guidebook"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Refill Journal"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Refill Playbook"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Refill Registry"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Refill Snapshot"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Refill Toolkit"
+      },
+      {
+        "industry": "pharmacy",
+        "title": "Refill Workbench"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Refrigerant Base"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Refrigerant Board"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Refrigerant Center"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Refrigerant Console"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Refrigerant Core"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Refrigerant Deck"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Refrigerant Dial"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Refrigerant Frame"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Refrigerant Lab"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Refrigerant Ledger"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Refrigerant Meter"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Refrigerant Panel"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Refrigerant Portal"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Refrigerant Scale"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Refrigerant Station"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Refrigerant Studio"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Refrigerant Terminal"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Refrigerant Zone"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekey Almanac"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekey Blueprint"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekey Codex"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekey Companion"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekey Compendium"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekey Guard"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekey Guidebook"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekey Journal"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekey Navigator"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekey Ops"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekey Playbook"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekey Register"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekey Registry"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekey Roadmap"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekey Snapshot"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekey Toolkit"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekey Tracker"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekey Workbench"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekeying Anchor"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekeying Beacon"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekeying Bridge"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekeying Cascade"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekeying Compass"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekeying Desk"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekeying Flow"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekeying Forge"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekeying Guard"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekeying Hub"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekeying Pilot"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekeying Radar"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekeying Relay"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekeying Roadmap"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekeying Signal"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekeying Sync"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekeying Tracker"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekeying Vault"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Rekeying Watch"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Requisition Guidebook"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Requisition Journal"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Requisition Playbook"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Requisition Snapshot"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Requisition Toolkit"
+      },
+      {
+        "industry": "recruiting",
+        "title": "Requisition Workbench"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Retention Almanac"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Retention Blueprint"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Retention Codex"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Retention Compendium"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Retention Guidebook"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Retention Journal"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Retention Playbook"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Retention Registry"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Retention Roadmap"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Retention Snapshot"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Retention Toolkit"
+      },
+      {
+        "industry": "fitness_wellness",
+        "title": "Retention Workbench"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Rights Journal"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Rights Playbook"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Rights Toolkit"
+      },
+      {
+        "industry": "media_publishing",
+        "title": "Rights Workbench"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Runbook Almanac"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Runbook Blueprint"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Runbook Guidebook"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Runbook Journal"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Runbook Playbook"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Runbook Registry"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Runbook Snapshot"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Runbook Toolkit"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Runbook Workbench"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Safe Center"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Safe Chain"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Safe Console"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Safe Dial"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Safe Dock"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Safe Gate"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Safe Meter"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Safe Nexus"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Safe Node"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Safe Panel"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Safe Portal"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Safe Rail"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Safe Ring"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Safe Route"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Safe Scale"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Safe Terminal"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Safe Trail"
+      },
+      {
+        "industry": "locksmith_security_services",
+        "title": "Safe Zone"
+      },
+      {
+        "industry": "mining",
+        "title": "Safety Almanac"
+      },
+      {
+        "industry": "mining",
+        "title": "Safety Blueprint"
+      },
+      {
+        "industry": "mining",
+        "title": "Safety Codex"
+      },
+      {
+        "industry": "mining",
+        "title": "Safety Compendium"
+      },
+      {
+        "industry": "mining",
+        "title": "Safety Guidebook"
+      },
+      {
+        "industry": "mining",
+        "title": "Safety Journal"
+      },
+      {
+        "industry": "mining",
+        "title": "Safety Playbook"
+      },
+      {
+        "industry": "mining",
+        "title": "Safety Registry"
+      },
+      {
+        "industry": "mining",
+        "title": "Safety Roadmap"
+      },
+      {
+        "industry": "mining",
+        "title": "Safety Snapshot"
+      },
+      {
+        "industry": "mining",
+        "title": "Safety Toolkit"
+      },
+      {
+        "industry": "mining",
+        "title": "Safety Workbench"
+      },
+      {
+        "industry": "landscaping",
+        "title": "Season Blueprint"
+      },
+      {
+        "industry": "landscaping",
+        "title": "Season Guidebook"
+      },
+      {
+        "industry": "landscaping",
+        "title": "Season Journal"
+      },
+      {
+        "industry": "landscaping",
+        "title": "Season Playbook"
+      },
+      {
+        "industry": "landscaping",
+        "title": "Season Registry"
+      },
+      {
+        "industry": "landscaping",
+        "title": "Season Snapshot"
+      },
+      {
+        "industry": "landscaping",
+        "title": "Season Toolkit"
+      },
+      {
+        "industry": "landscaping",
+        "title": "Season Workbench"
+      },
+      {
+        "industry": "marketing",
+        "title": "Segment Playbook"
+      },
+      {
+        "industry": "marketing",
+        "title": "Segment Toolkit"
+      },
+      {
+        "industry": "marketing",
+        "title": "Segment Workbench"
+      },
+      {
+        "industry": "landscaping",
+        "title": "Snow Almanac"
+      },
+      {
+        "industry": "landscaping",
+        "title": "Snow Blueprint"
+      },
+      {
+        "industry": "landscaping",
+        "title": "Snow Codex"
+      },
+      {
+        "industry": "landscaping",
+        "title": "Snow Compendium"
+      },
+      {
+        "industry": "landscaping",
+        "title": "Snow Guidebook"
+      },
+      {
+        "industry": "landscaping",
+        "title": "Snow Journal"
+      },
+      {
+        "industry": "landscaping",
+        "title": "Snow Playbook"
+      },
+      {
+        "industry": "landscaping",
+        "title": "Snow Registry"
+      },
+      {
+        "industry": "landscaping",
+        "title": "Snow Roadmap"
+      },
+      {
+        "industry": "landscaping",
+        "title": "Snow Snapshot"
+      },
+      {
+        "industry": "dental",
+        "title": "Sterilization Almanac"
+      },
+      {
+        "industry": "dental",
+        "title": "Sterilization Blueprint"
+      },
+      {
+        "industry": "dental",
+        "title": "Sterilization Codex"
+      },
+      {
+        "industry": "dental",
+        "title": "Sterilization Compendium"
+      },
+      {
+        "industry": "dental",
+        "title": "Sterilization Guidebook"
+      },
+      {
+        "industry": "dental",
+        "title": "Sterilization Journal"
+      },
+      {
+        "industry": "dental",
+        "title": "Sterilization Playbook"
+      },
+      {
+        "industry": "dental",
+        "title": "Sterilization Registry"
+      },
+      {
+        "industry": "dental",
+        "title": "Sterilization Roadmap"
+      },
+      {
+        "industry": "dental",
+        "title": "Sterilization Snapshot"
+      },
+      {
+        "industry": "dental",
+        "title": "Sterilization Toolkit"
+      },
+      {
+        "industry": "dental",
+        "title": "Sterilization Workbench"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Stylist Blueprint"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Stylist Guidebook"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Stylist Journal"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Stylist Playbook"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Stylist Registry"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Stylist Snapshot"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Stylist Toolkit"
+      },
+      {
+        "industry": "salon_spa",
+        "title": "Stylist Workbench"
+      },
+      {
+        "industry": "mining",
+        "title": "Tailings Codex"
+      },
+      {
+        "industry": "mining",
+        "title": "Tailings Roadmap"
+      },
+      {
+        "industry": "pest_control",
+        "title": "Technician Playbook"
+      },
+      {
+        "industry": "pest_control",
+        "title": "Technician Toolkit"
+      },
+      {
+        "industry": "pest_control",
+        "title": "Technician Workbench"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Terminology Almanac"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Terminology Blueprint"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Terminology Codex"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Terminology Compass"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Terminology Compendium"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Terminology Desk"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Terminology Flow"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Terminology Guard"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Terminology Guidebook"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Terminology Hub"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Terminology Pilot"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Terminology Radar"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Terminology Registry"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Terminology Relay"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Terminology Roadmap"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Terminology Sync"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Terminology Tracker"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Terminology Vault"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Thermostat Base"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Thermostat Board"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Thermostat Center"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Thermostat Console"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Thermostat Core"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Thermostat Deck"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Thermostat Frame"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Thermostat Lab"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Thermostat Ledger"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Thermostat Lens"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Thermostat Lock"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Thermostat Map"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Thermostat Point"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Thermostat Portal"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Thermostat Station"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Thermostat Studio"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Thermostat Terminal"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Thermostat Zone"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Turnaround Almanac"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Turnaround Blueprint"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Turnaround Codex"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Turnaround Compendium"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Turnaround Guidebook"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Turnaround Journal"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Turnaround Playbook"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Turnaround Registry"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Turnaround Roadmap"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Turnaround Snapshot"
+      },
+      {
+        "industry": "interpreter_translation_services",
+        "title": "Turnaround Toolkit"
+      },
+      {
+        "industry": "insurance",
+        "title": "Underwriting Almanac"
+      },
+      {
+        "industry": "insurance",
+        "title": "Underwriting Blueprint"
+      },
+      {
+        "industry": "insurance",
+        "title": "Underwriting Codex"
+      },
+      {
+        "industry": "insurance",
+        "title": "Underwriting Compendium"
+      },
+      {
+        "industry": "insurance",
+        "title": "Underwriting Guidebook"
+      },
+      {
+        "industry": "insurance",
+        "title": "Underwriting Journal"
+      },
+      {
+        "industry": "insurance",
+        "title": "Underwriting Registry"
+      },
+      {
+        "industry": "insurance",
+        "title": "Underwriting Roadmap"
+      },
+      {
+        "industry": "insurance",
+        "title": "Underwriting Snapshot"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Vent Anchor"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Vent Beacon"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Vent Bridge"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Vent Cascade"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Vent Codex"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Vent Compass"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Vent Desk"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Vent Flow"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Vent Forge"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Vent Guard"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Vent Hub"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Vent Pilot"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Vent Radar"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Vent Relay"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Vent Roadmap"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Vent Signal"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Vent Sync"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Vent Tracker"
+      },
+      {
+        "industry": "hvac_services",
+        "title": "Vent Vault"
+      },
+      {
+        "industry": "maritime_shipping",
+        "title": "Voyage Almanac"
+      },
+      {
+        "industry": "maritime_shipping",
+        "title": "Voyage Blueprint"
+      },
+      {
+        "industry": "maritime_shipping",
+        "title": "Voyage Codex"
+      },
+      {
+        "industry": "maritime_shipping",
+        "title": "Voyage Compendium"
+      },
+      {
+        "industry": "maritime_shipping",
+        "title": "Voyage Guidebook"
+      },
+      {
+        "industry": "maritime_shipping",
+        "title": "Voyage Journal"
+      },
+      {
+        "industry": "maritime_shipping",
+        "title": "Voyage Registry"
+      },
+      {
+        "industry": "maritime_shipping",
+        "title": "Voyage Roadmap"
+      },
+      {
+        "industry": "maritime_shipping",
+        "title": "Voyage Snapshot"
+      },
+      {
+        "industry": "logistics",
+        "title": "Warehouse Almanac"
+      },
+      {
+        "industry": "logistics",
+        "title": "Warehouse Blueprint"
+      },
+      {
+        "industry": "logistics",
+        "title": "Warehouse Codex"
+      },
+      {
+        "industry": "logistics",
+        "title": "Warehouse Compendium"
+      },
+      {
+        "industry": "logistics",
+        "title": "Warehouse Guidebook"
+      },
+      {
+        "industry": "logistics",
+        "title": "Warehouse Registry"
+      },
+      {
+        "industry": "logistics",
+        "title": "Warehouse Roadmap"
+      },
+      {
+        "industry": "dental",
+        "title": "Xray Almanac"
+      },
+      {
+        "industry": "dental",
+        "title": "Xray Blueprint"
+      },
+      {
+        "industry": "dental",
+        "title": "Xray Codex"
+      },
+      {
+        "industry": "dental",
+        "title": "Xray Compendium"
+      },
+      {
+        "industry": "dental",
+        "title": "Xray Guidebook"
+      },
+      {
+        "industry": "dental",
+        "title": "Xray Journal"
+      },
+      {
+        "industry": "dental",
+        "title": "Xray Playbook"
+      },
+      {
+        "industry": "dental",
+        "title": "Xray Registry"
+      },
+      {
+        "industry": "dental",
+        "title": "Xray Roadmap"
+      },
+      {
+        "industry": "dental",
+        "title": "Xray Snapshot"
+      },
+      {
+        "industry": "dental",
+        "title": "Xray Toolkit"
+      },
+      {
+        "industry": "dental",
+        "title": "Xray Workbench"
+      }
+    ],
+    "candidate_industry": {
+      "Amenity Directory": "hospitality",
+      "Audience Finder": "marketing",
+      "Billing Office": "energy_utilities",
+      "Booking Depot": "salon_spa",
+      "Cargo Counter": "maritime_shipping",
+      "Checklist Directory": "cleaning_services",
+      "Citation Locator": "government",
+      "Crop Depot": "agriculture",
+      "Downtime Finder": "manufacturing",
+      "Estimate Calendar": "landscaping",
+      "Fleet Office": "transportation",
+      "Fulfillment Calendar": "retail_ecommerce",
+      "Grant Directory": "nonprofit",
+      "Inventory Office": "pharmacy",
+      "Obituary Finder": "funeral_services",
+      "Outage Calendar": "energy_utilities",
+      "Provisioning Counter": "telecom",
+      "Route Locator": "laundry_dry_cleaning",
+      "Subscriber Depot": "media_publishing",
+      "Tuition Locator": "education"
+    },
+    "round_stats": {
+      "ai_approved": 16,
+      "backlog_carried": 1118,
+      "generated": 20,
+      "kp_passed": 2
+    },
+    "word_bank_expansion_attempted": true
+  },
+  "created_at": "2026-08-18T23:48:36.795560+09:00",
+  "mode": "qa",
+  "run_id": "QA-20260818-234836-KST",
+  "stage": "generate_and_review_titles",
+  "status": "RUNNING",
+  "updated_at": "2026-08-18T23:52:30.202360+09:00"
+}

@@ -149,6 +149,21 @@ run 재개든 새 run이든) 시작 시 `_stage_load_state`가 자동으로 쓸�
 그 결과가 이 파일에 append된다(`word_bank.py` 자체는 손대지 않음). 매 실행은
 `word_bank.py` + 이 파일을 병합한 풀로 후보를 생성한다.
 
+**학습 루프(2026-08-18, 같은 날 3차 개정 — 사용자 지시)**: 통과율을 실측으로
+끌어올리기 위한 피드백 구조(`src/saas_words_two/word_performance.py`,
+`docs/design/15-continuous-word-quality-improvement.md`). 실측 근거(누적 30,263건):
+기능어가 승부를 결정한다 — Portal 5.85%/Map 5.68% vs. Suite/Sync/Dashboard 등
+28개 기능어는 각 300회+ 시도에 통과 0건이었고 여기에 API 조회의 32%가 낭비됐다.
+세 가지 장치: ① 매 라운드 종료 시 성과 리포트
+(`output/_pipeline/analysis/word_performance_latest.md`) 자동 갱신, ②
+`config/retired_function_words.csv`(통과 0/시도 300+ 기능어 은퇴 목록, git 추적)
+— 병합 풀에서 자동 제외되고 `expand_word_bank`에서 재제안돼도 버려진다, 갱신은
+`python tools/analyze_word_performance.py --apply-retirement`, ③ `expand_word_bank`
+판정 요청에 기능어 실측 성과 요약이 직접 포함되며, 새 기능어 제안은 승자
+패턴(실제 검색되는 구체적 장소·사물 명사)을 따라야 하고 은퇴 패턴(SaaS
+전문용어풍 합성어)은 금지다. **Keyword Planner 게이트 임계값은 학습 루프의 조정
+대상이 아니다** — 게이트는 시장 신호이며 약화는 가짜 데이터만 늘린다.
+
 상세 계약은 `docs/contracts/02-input-output-contracts.md`를 따른다(전환 반영됨).
 
 ## 5. 판단과 코드 역할 분리 — 반드시 유지
@@ -158,7 +173,8 @@ run 재개든 새 run이든) 시작 시 `_stage_load_state`가 자동으로 쓸�
 | 2단어 조합 생성 | 전담(도메인어+기능어 조합, exclude 기반 중복 방지) | — |
 | 정확·역순 중복 제거 | 전담 | — |
 | 제목 검토 | 형식 검사 | 명확성·의미 중복·유명 상표 유사 검토 |
-| 단어뱅크 소진 시 새 도메인어/기능어 제안 | 병합·저장(`config/word_bank_expansions.csv`) | 신규 단어 제안(`expand_word_bank` 판정) |
+| 단어뱅크 소진 시 새 도메인어/기능어 제안 | 병합·저장(`config/word_bank_expansions.csv`) | 신규 단어 제안(`expand_word_bank` 판정, 실측 성과 요약 준수) |
+| 단어 성과 분석·은퇴 목록 | 전담(순수 통계, `word_performance.py`) | 리포트 해석·확장 제안에 반영 |
 | Keyword Planner 게이트 | 전담(순수 수치 비교) | — |
 | ledger/캐시 병합·문서 export | 전담(원자적 쓰기) | — |
 | QA | 동일 파이프라인 실행 | `final-qa-runner`가 실행 결과 판정 |

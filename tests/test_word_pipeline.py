@@ -209,6 +209,34 @@ def test_append_word_bank_expansion_rows_dedupes_exact_and_across_calls(tmp_path
     assert rows[0]["added_by_run_id"] == "r0"  # first-seen wins, not overwritten
 
 
+def test_merged_word_bank_excludes_retired_function_words(tmp_path, monkeypatch):
+    from saas_words_two import word_performance
+
+    monkeypatch.setattr(word_pipeline.word_bank, "DOMAIN_WORDS", {"finance": ("Ledger",)})
+    monkeypatch.setattr(word_pipeline.word_bank, "FUNCTION_WORDS", ("Guard", "Sync"))
+    word_pipeline._append_word_bank_expansion_rows(
+        tmp_path,
+        [{"type": "function", "word": "Toolkit", "industry": "", "added_at": "t0", "added_by_run_id": "r0"}],
+    )
+    word_performance.merge_retired_function_words(tmp_path, [("Sync", 0, 300), ("Toolkit", 0, 305)], "t0")
+
+    _, function_words = word_pipeline._merged_word_bank(tmp_path)
+    # 정적 원본(Sync)이든 동적 확장분(Toolkit)이든 은퇴 목록에 있으면 제외
+    assert function_words == ("Guard",)
+
+
+def test_consume_word_bank_expansion_drops_retired_function_words():
+    response = {
+        "decisions": [
+            {"type": "function", "word": "Portal"},
+            {"type": "function", "word": "Sync"},  # 은퇴 확정 단어 재제안 -> 버림
+            {"type": "domain", "word": "Sync", "industry": "it_devops"},  # 도메인어로는 허용
+        ]
+    }
+    rows = word_pipeline._consume_word_bank_expansion(response, "RUN-1", "t0", retired={"Sync"})
+    assert [(r["type"], r["word"]) for r in rows] == [("function", "Portal"), ("domain", "Sync")]
+
+
 def test_consume_word_bank_expansion_drops_invalid_and_keeps_valid():
     response = {
         "decisions": [

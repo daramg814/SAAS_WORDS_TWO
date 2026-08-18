@@ -19,7 +19,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from . import config, ids, judgment, run_state, word_bank, word_generation
+from . import config, ids, judgment, run_state, word_bank, word_generation, word_performance
 from .contracts import atomic_write_text, normalize_title
 from .judgment import JudgmentRequired
 from .keyword_metrics_client import (
@@ -460,7 +460,13 @@ def _merged_word_bank(project_root: Path) -> tuple[dict[str, tuple[str, ...]], t
     """`word_bank.py`(정적 원본) + `config/word_bank_expansions.csv`(세션이
     누적 제안한 것) 병합, 중복 제거. 반환 형태는 `word_bank.DOMAIN_WORDS`/
     `FUNCTION_WORDS`와 동일해서 `word_generation.generate_combinations`에
-    그대로 넘길 수 있다."""
+    그대로 넘길 수 있다.
+
+    2026-08-18 학습 루프: `config/retired_function_words.csv`(실측으로 통과
+    0건이 확정된 기능어, word_performance 참고)에 오른 기능어는 병합 풀에서
+    제외한다 - 이미 시도된 조합은 ledger가 재생성을 막지만, 이 필터가 없으면
+    앞으로 추가될 새 도메인어가 죽은 기능어와 계속 짝지어져 API 예산을
+    낭비한다(실측: 전체 조회의 32%가 통과 0건 기능어에 소모됨)."""
     dyn_domain, dyn_function = _load_dynamic_word_bank(project_root)
     merged_domain: dict[str, list[str]] = {
         industry: list(words) for industry, words in word_bank.DOMAIN_WORDS.items()
@@ -474,6 +480,9 @@ def _merged_word_bank(project_root: Path) -> tuple[dict[str, tuple[str, ...]], t
     for w in dyn_function:
         if w not in merged_function:
             merged_function.append(w)
+    retired = word_performance.load_retired_function_words(project_root)
+    if retired:
+        merged_function = [w for w in merged_function if w not in retired]
     return {industry: tuple(words) for industry, words in merged_domain.items()}, tuple(merged_function)
 
 
@@ -508,11 +517,16 @@ def _append_word_bank_expansion_rows(project_root: Path, new_rows: list[dict]) -
     atomic_write_text(path, buffer.getvalue())
 
 
-def _consume_word_bank_expansion(response: dict, run_id: str, when: str) -> list[dict]:
+def _consume_word_bank_expansion(
+    response: dict, run_id: str, when: str, *, retired: frozenset[str] | set[str] = frozenset()
+) -> list[dict]:
     """판정 응답의 decisions(각 {type, word, industry?})를 검증해 유효한
     것만 반환한다 - 단일 Title Case 영단어, type은 domain/function, domain이면
     industry 필수. 형식이 안 맞는 제안은 조용히 버린다(예산 낭비 방지 목적의
-    관대한 검증 - 나머지 review_titles 판정이 최종 필터 역할을 한다)."""
+    관대한 검증 - 나머지 review_titles 판정이 최종 필터 역할을 한다).
+
+    2026-08-18 학습 루프: 은퇴 목록(`retired`)에 있는 기능어를 다시 제안하면
+    버린다 - 실측 통과 0건이 확정된 단어의 재유입 방지."""
     rows = []
     for decision in response.get("decisions", []):
         word = str(decision.get("word", "")).strip()
@@ -521,6 +535,8 @@ def _consume_word_bank_expansion(response: dict, run_id: str, when: str) -> list
         if word_type not in ("domain", "function"):
             continue
         if not word.isalpha() or word != word.capitalize():
+            continue
+        if word_type == "function" and word in retired:
             continue
         if word_type == "domain" and not industry:
             continue
@@ -542,8 +558,13 @@ _EXPAND_WORD_BANK_INSTRUCTIONS = (
     "대상·문서·프로세스를 연상시키는 명사, 특정 업계 최소 20개 이상)와 새 기능어(업계에 "
     "무관하게 '이 도구가 무엇을 하는지' 연상시키는 동작·역할 명사, 최소 10개 이상)를 "
     "제안하라. 완전히 새로운 업계를 제안해도 좋다. Terminal/Ring처럼 특정 업계에서만 "
-    "말이 되는 단어는 기능어로 제안하지 말 것(과거 실측으로 문제였음). 기존 word_bank.py와 "
-    "이미 제안된 확장분(입력으로 함께 제공됨)과 겹치지 않게. 각 항목을 "
+    "말이 되는 단어는 기능어로 제안하지 말 것(과거 실측으로 문제였음). "
+    "[학습 루프 - 반드시 준수] 입력에 포함된 function_word_performance(누적 Keyword "
+    "Planner 실측)를 먼저 읽어라: 새 기능어는 top_function_words의 패턴(Portal/Map/Hub처럼 "
+    "사람들이 실제로 검색하는 구체적 장소·사물 명사)을 닮게 제안하고, "
+    "retired_function_words(각 300회 이상 시도에 통과 0건으로 확정된 죽은 단어)와 그 "
+    "패턴(Suite/Sync/Dashboard류 SaaS 전문용어풍 합성어)은 절대 제안하지 마라. "
+    "기존 word_bank.py와 이미 제안된 확장분(입력으로 함께 제공됨)과 겹치지 않게. 각 항목을 "
     '{"type": "domain"|"function", "word": "Title Case 단일 영단어", "industry": '
     '"domain일 때만 필수, function이면 생략"} 형태로 응답하라.'
 )
@@ -554,7 +575,10 @@ def _write_expand_word_bank_request(project_root: Path, run_dir: Path, state: ru
     items = [
         {"industry": industry, "existing_domain_words": list(words)}
         for industry, words in existing_domain.items()
-    ] + [{"existing_function_words": list(existing_function)}]
+    ] + [
+        {"existing_function_words": list(existing_function)},
+        {"function_word_performance": word_performance.performance_summary_for_expansion(project_root)},
+    ]
     return judgment.write_request(
         run_dir,
         "expand_word_bank",
@@ -615,6 +639,8 @@ def _stage_generate_and_review_titles(project_root: Path, options: RunOptions, s
         finally:
             # 판정/API 조회 후 모든 스냅샷 생성 - 명시적 호출로 누락 방지
             _export_final_words_and_history_snapshots(project_root, ids.now_kst())
+            # 학습 루프: 매 라운드 성과 리포트 자동 갱신(캐시 없으면 no-op)
+            word_performance.write_report(project_root, ids.now_kst())
         state.context["approved"] = approved
         state.context["round_stats"] = {
             "generated": len(ledger_rows),
@@ -638,7 +664,10 @@ def _stage_generate_and_review_titles(project_root: Path, options: RunOptions, s
         if judgment.has_response(run_dir, expand_stage, round_no):
             expand_response = judgment.read_response(run_dir, expand_stage, round_no)
             new_rows = _consume_word_bank_expansion(
-                expand_response, state.run_id, ids.now_kst().isoformat()
+                expand_response,
+                state.run_id,
+                ids.now_kst().isoformat(),
+                retired=word_performance.load_retired_function_words(project_root),
             )
             _append_word_bank_expansion_rows(project_root, new_rows)
             domain_words, function_words = _merged_word_bank(project_root)
