@@ -564,6 +564,12 @@ _EXPAND_WORD_BANK_INSTRUCTIONS = (
     "사람들이 실제로 검색하는 구체적 장소·사물 명사)을 닮게 제안하고, "
     "retired_function_words(각 300회 이상 시도에 통과 0건으로 확정된 죽은 단어)와 그 "
     "패턴(Suite/Sync/Dashboard류 SaaS 전문용어풍 합성어)은 절대 제안하지 마라. "
+    "[동의어 다양성 - 반드시 준수] 이번에 제안하는 기능어 목록 안에서 서로 뜻이 겹치는 "
+    "동의어를 피하라(2026-08-19 실측 문제: Yard/Bay/Post/Outpost/Plaza/Harbor/Tower/"
+    "Shelf/Locker/Booth/Kiosk를 한 번에 제안했더니 전부 '보관 장소'라는 같은 뜻이라 "
+    "도메인어와 조합할 때마다 사실상 같은 문구가 11번 반복돼 AI 승인률이 21%로 급락함). "
+    "제안하는 기능어들은 서로 다른 기능(추적/일정관리/문서보관/소통/분석 등)을 각각 "
+    "대표해야 한다 - 한 기능당 비슷한 단어를 여러 개 넣지 말 것. "
     "기존 word_bank.py와 이미 제안된 확장분(입력으로 함께 제공됨)과 겹치지 않게. 각 항목을 "
     '{"type": "domain"|"function", "word": "Title Case 단일 영단어", "industry": '
     '"domain일 때만 필수, function이면 생략"} 형태로 응답하라.'
