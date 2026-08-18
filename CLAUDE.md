@@ -214,7 +214,9 @@ python tools/verify_design_coverage.py
 ## 10. Git·완료 규칙
 원자 배치마다 작업 → 검증 → ACTIVITY_LOG/HANDOFF → 필요 시 이슈·노하우 → 민감정보 검사 → commit → `push origin main` → 원격 SHA 확인 순서를 지킨다. 푸시 실패 시 `COMMIT_PENDING`으로 저장하고 다음 배치를 시작하지 않는다. 세션 한계는 `DONE`이 아니며 검증·인수인계 후 `PAUSED`다.
 
-Git과 실패 복구는 `docs/operations/12-git-and-recovery.md`, QA와 최종 완료 판정은 `docs/qa/13-qa-and-acceptance.md`를 따른다.
+**(2026-08-18 개정)** SSH를 통한 원격 GitHub 인증이 설정되어 있으므로, 휴대폰 Termius SSH 세션에서도 `git push`가 자동으로 작동한다. 새로운 세션에서 동일하게 SSH Push를 설정하려면 `docs/operations/14-remote-ssh-github-authentication.md`를 따른다.
+
+Git과 실패 복구는 `docs/operations/12-git-and-recovery.md`, QA와 최종 완료 판정은 `docs/qa/13-qa-and-acceptance.md`, 원격 SSH 환경의 GitHub 인증은 `docs/operations/14-remote-ssh-github-authentication.md`를 따른다.
 
 ## 11. 완료 정의
 다음이 모두 참일 때만 작업을 완료한다.
