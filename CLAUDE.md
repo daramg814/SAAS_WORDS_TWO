@@ -164,6 +164,20 @@ run 재개든 새 run이든) 시작 시 `_stage_load_state`가 자동으로 쓸�
 전문용어풍 합성어)은 금지다. **Keyword Planner 게이트 임계값은 학습 루프의 조정
 대상이 아니다** — 게이트는 시장 신호이며 약화는 가짜 데이터만 늘린다.
 
+**라운드별 정체 점검(2026-08-19, 사용자 지시)**: "라운드가 반복될 때마다 단어 생성
+능력이 정말 향상됐는지, 정체되고 있는 건 아닌지"를 사람이 매번 수동으로 판단하지
+않아도 되도록, `_stage_update_memory_and_git_checkpoint`(라운드 완료가 확정되는
+유일한 지점)가 매 라운드 정확히 한 번 `output/_pipeline/analysis/round_history.csv`
+(누적, git 추적, run_id당 1행, 중복 방지 내장)에 이번 라운드의 신규생성·통과 수를
+append하고, 최근 구간(누적 생성 500개 이상 모일 때까지 최신 라운드부터 역순 합산)과
+그 직전 구간의 통과율을 비교해 `improving`/`stagnant`(상대변화 ±10% 이내)/
+`declining`을 판정한다(`word_performance.detect_stagnation`). 판정 결과는 콘솔에
+즉시 출력되고 `memory/HANDOFF.md`에도 한 줄로 남아 다음 세션 시작 시 바로 보인다.
+backlog만 처리한 라운드(신규 생성 0건)는 구간 계산에서 제외한다(이력에는 보존).
+이 절은 데이터를 만들 뿐 판단을 대신하지 않는다 — `stagnant`/`declining` 신호가
+나오면 현재 세션이 원인(단어뱅크 확장 방향, 은퇴 목록 적용 누락 등)을 해석해야
+한다.
+
 상세 계약은 `docs/contracts/02-input-output-contracts.md`를 따른다(전환 반영됨).
 
 ## 5. 판단과 코드 역할 분리 — 반드시 유지
@@ -175,6 +189,7 @@ run 재개든 새 run이든) 시작 시 `_stage_load_state`가 자동으로 쓸�
 | 제목 검토 | 형식 검사 | 명확성·의미 중복·유명 상표 유사 검토 |
 | 단어뱅크 소진 시 새 도메인어/기능어 제안 | 병합·저장(`config/word_bank_expansions.csv`) | 신규 단어 제안(`expand_word_bank` 판정, 실측 성과 요약 준수) |
 | 단어 성과 분석·은퇴 목록 | 전담(순수 통계, `word_performance.py`) | 리포트 해석·확장 제안에 반영 |
+| 라운드별 정체 점검(개선/정체/저하 판정) | 전담(순수 수치 비교, `detect_stagnation`) | 정체·저하 신호의 원인 해석·대응 |
 | Keyword Planner 게이트 | 전담(순수 수치 비교) | — |
 | ledger/캐시 병합·문서 export | 전담(원자적 쓰기) | — |
 | QA | 동일 파이프라인 실행 | `final-qa-runner`가 실행 결과 판정 |

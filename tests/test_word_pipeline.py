@@ -693,6 +693,28 @@ def test_stage_update_memory_and_git_checkpoint_writes_handoff_and_checkpoints(t
     handoff = (tmp_path / "memory" / "HANDOFF.md").read_text(encoding="utf-8")
     assert "DONE" in handoff
     assert "1개" in handoff  # kp_passed count appears somewhere in the summary
+    assert "[학습 정체 점검]" in handoff  # 매 라운드 정체 점검 결과가 HANDOFF에도 남는다
+
+
+def test_stage_update_memory_and_git_checkpoint_appends_round_history_once(tmp_path, monkeypatch):
+    from saas_words_two import word_performance
+
+    monkeypatch.setattr(word_pipeline, "_run_or_raise", lambda project_root, script_name, *extra: None)
+    options = make_options(tmp_path, run_id="QA-20260818-000000-KST")
+    state = word_pipeline._load_or_create_state(options)
+    state.context["approved"] = []
+    state.context["round_stats"] = {"generated": 10, "ai_approved": 2, "backlog_carried": 0, "kp_passed": 1}
+
+    word_pipeline._stage_update_memory_and_git_checkpoint(tmp_path, options, state)
+    # 같은 run_id로 실수로 다시 호출돼도(--resume 재실행 등) 중복 기록되지 않는다
+    word_pipeline._stage_update_memory_and_git_checkpoint(tmp_path, options, state)
+
+    history = word_performance.load_round_history(tmp_path)
+    assert len(history) == 1
+    assert history[0]["run_id"] == "QA-20260818-000000-KST"
+    assert history[0]["generated"] == "10"
+    assert history[0]["kp_passed"] == "1"
+    assert history[0]["round_pass_rate_pct"] == "10.0000"
 
 
 # ---------------------------------------------------------------------------

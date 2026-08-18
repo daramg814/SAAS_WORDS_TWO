@@ -88,6 +88,138 @@ def test_write_report_noop_when_cache_missing(tmp_path):
     assert word_performance.write_report(tmp_path, ids.now_kst()) is None
 
 
+def round_stats(generated, ai_approved, backlog_carried, kp_passed):
+    return {
+        "generated": generated,
+        "ai_approved": ai_approved,
+        "backlog_carried": backlog_carried,
+        "kp_passed": kp_passed,
+    }
+
+
+def test_append_round_history_writes_row_and_computes_pass_rate(tmp_path):
+    row = word_performance.append_round_history(
+        tmp_path, "RUN-1", "production", "t0", round_stats(1000, 50, 0, 7)
+    )
+    assert row["generated"] == "1000"
+    assert row["kp_passed"] == "7"
+    assert row["round_pass_rate_pct"] == "0.7000"
+    history = word_performance.load_round_history(tmp_path)
+    assert len(history) == 1
+
+
+def test_append_round_history_blank_pass_rate_when_generated_zero(tmp_path):
+    # backlog만 처리한 라운드는 신규 생성이 없어 라운드 통과율을 정의할 수 없다
+    row = word_performance.append_round_history(
+        tmp_path, "RUN-X", "production", "t0", round_stats(0, 0, 20, 3)
+    )
+    assert row["round_pass_rate_pct"] == ""
+
+
+def test_append_round_history_is_idempotent_per_run_id(tmp_path):
+    first = word_performance.append_round_history(tmp_path, "RUN-1", "qa", "t0", round_stats(10, 1, 0, 1))
+    second = word_performance.append_round_history(tmp_path, "RUN-1", "qa", "t1", round_stats(999, 999, 0, 999))
+    assert first == second
+    assert len(word_performance.load_round_history(tmp_path)) == 1
+
+
+def test_detect_stagnation_insufficient_data_with_no_history():
+    result = word_performance.detect_stagnation([])
+    assert result["status"] == "insufficient_data"
+
+
+def test_detect_stagnation_insufficient_data_when_only_recent_window_filled():
+    rows = [
+        {"run_id": "R1", "generated": "600", "kp_passed": "6"},
+    ]
+    result = word_performance.detect_stagnation(rows, min_generated=500)
+    assert result["status"] == "insufficient_data"
+
+
+def test_detect_stagnation_improving_when_recent_rate_up_over_threshold():
+    rows = [
+        {"run_id": "R1", "generated": "1000", "kp_passed": "5"},   # prior: 0.5%
+        {"run_id": "R2", "generated": "1000", "kp_passed": "10"},  # recent: 1.0% (+100%)
+    ]
+    result = word_performance.detect_stagnation(rows, min_generated=500)
+    assert result["status"] == "improving"
+    assert result["recent_pass_rate_pct"] == 1.0
+    assert result["prior_pass_rate_pct"] == 0.5
+
+
+def test_detect_stagnation_declining_when_recent_rate_drops_over_threshold():
+    rows = [
+        {"run_id": "R1", "generated": "1000", "kp_passed": "10"},  # prior: 1.0%
+        {"run_id": "R2", "generated": "1000", "kp_passed": "5"},   # recent: 0.5% (-50%)
+    ]
+    result = word_performance.detect_stagnation(rows, min_generated=500)
+    assert result["status"] == "declining"
+
+
+def test_detect_stagnation_stagnant_when_change_within_threshold():
+    rows = [
+        {"run_id": "R1", "generated": "1000", "kp_passed": "10"},  # prior: 1.0%
+        {"run_id": "R2", "generated": "1000", "kp_passed": "10"},  # recent: 1.0% (0%)
+    ]
+    result = word_performance.detect_stagnation(rows, min_generated=500)
+    assert result["status"] == "stagnant"
+
+
+def test_detect_stagnation_stagnant_when_both_windows_zero_pass():
+    rows = [
+        {"run_id": "R1", "generated": "1000", "kp_passed": "0"},
+        {"run_id": "R2", "generated": "1000", "kp_passed": "0"},
+    ]
+    result = word_performance.detect_stagnation(rows, min_generated=500)
+    assert result["status"] == "stagnant"
+
+
+def test_detect_stagnation_skips_zero_generated_backlog_only_rounds():
+    # generated=0인 backlog 전용 라운드는 구간 계산에서 건너뛴다
+    rows = [
+        {"run_id": "R1", "generated": "1000", "kp_passed": "5"},   # prior: 0.5%
+        {"run_id": "R2", "generated": "0", "kp_passed": "3"},      # 스킵 대상
+        {"run_id": "R3", "generated": "1000", "kp_passed": "10"},  # recent: 1.0%
+    ]
+    result = word_performance.detect_stagnation(rows, min_generated=500)
+    assert result["status"] == "improving"
+    assert result["recent_generated"] == 1000
+    assert result["recent_kp_passed"] == 10
+
+
+def test_detect_stagnation_combines_multiple_small_rounds_into_one_window():
+    rows = [
+        {"run_id": f"R{i}", "generated": "200", "kp_passed": "2"} for i in range(3)  # prior: 3 rounds -> 600 gen
+    ] + [
+        {"run_id": "R-recent", "generated": "600", "kp_passed": "12"},  # recent: 1 round -> 600 gen, 2.0%
+    ]
+    result = word_performance.detect_stagnation(rows, min_generated=500)
+    assert result["status"] == "improving"
+    assert result["prior_rounds"] == 3
+    assert result["prior_generated"] == 600
+    assert result["recent_rounds"] == 1
+
+
+def test_format_stagnation_message_insufficient_data():
+    msg = word_performance.format_stagnation_message({"status": "insufficient_data", "min_generated": 500})
+    assert "[학습 정체 점검]" in msg
+    assert "500" in msg
+
+
+def test_format_stagnation_message_reports_direction_and_numbers():
+    result = word_performance.detect_stagnation(
+        [
+            {"run_id": "R1", "generated": "1000", "kp_passed": "5"},
+            {"run_id": "R2", "generated": "1000", "kp_passed": "10"},
+        ],
+        min_generated=500,
+    )
+    msg = word_performance.format_stagnation_message(result)
+    assert "향상 중" in msg
+    assert "1.00%" in msg
+    assert "0.50%" in msg
+
+
 def test_performance_summary_for_expansion_includes_top_and_retired(tmp_path):
     write_cache(
         tmp_path,

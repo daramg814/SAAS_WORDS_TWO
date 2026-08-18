@@ -737,6 +737,16 @@ def _stage_update_memory_and_git_checkpoint(project_root: Path, options: RunOpti
     # "RUNNING"으로 되돌려놓으므로 신뢰할 수 없다) 항상 DONE으로 기록한다.
     stats = state.context.get("round_stats", {})
     approved = state.context.get("approved", [])
+
+    # 학습 정체 점검(2026-08-19, 사용자 지시): 이 스테이지가 라운드 완료를
+    # 확정하는 유일한 지점이므로 여기서 정확히 한 번 이력에 기록한다.
+    word_performance.append_round_history(
+        project_root, state.run_id, state.mode, ids.now_kst().isoformat(), stats
+    )
+    stagnation = word_performance.detect_stagnation(word_performance.load_round_history(project_root))
+    stagnation_line = word_performance.format_stagnation_message(stagnation)
+    print(stagnation_line)
+
     atomic_write_text(
         project_root / "memory" / "HANDOFF.md",
         "# HANDOFF\n\n"
@@ -747,6 +757,7 @@ def _stage_update_memory_and_git_checkpoint(project_root: Path, options: RunOpti
         f"AI승인 {stats.get('ai_approved', 0)}개, "
         f"backlog반영 {stats.get('backlog_carried', 0)}개, "
         f"Keyword Planner통과 {stats.get('kp_passed', len(approved))}개\n"
+        f"- {stagnation_line}\n"
         f"- 다음 원자 작업: 필요하면 다시 실행(같은 run_id --resume 또는 새 run)\n",
     )
     _run_or_raise(project_root, "git_checkpoint.py", "--message", f"chore: word pipeline checkpoint for {state.run_id}")
