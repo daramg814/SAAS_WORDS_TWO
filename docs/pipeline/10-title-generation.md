@@ -19,11 +19,18 @@
    `output/deliverables/history/generated_candidates.csv`(ledger, 승인/거절
    verdict와 무관하게 전량 기록)를 exclude 집합으로 써서 차단한다 — 한 번
    생성+판정된 조합은 절대 다시 생성되지 않는다.
-5. 이번 라운드에 신규 후보가 0건이고 backlog(아래 7번)도 0건이면 `CAPABILITY_STAGNATION`,
-   Keyword Planner 예산/자격증명 문제로 중단되면 `RETRYING`으로 정직하게 끝난다 —
-   두 경우 모두 4개 문서 중 이미 확정된 부분은 그대로 유지된다.
-6. 조합 전략(불변): `word_bank.py`의 도메인어(업계 특화 명사)와 기능어(동작·역할
-   명사)를 하나씩 짝지어 "도메인어 + 기능어" 순서로 조합한다.
+5. **(2026-08-18 자가확장)** 신규 후보가 0건이면 즉시 포기하지 않는다 — 조합공간
+   소진은 영어 단어가 부족해서가 아니라 `word_bank.py`가 손으로 고른 작은
+   목록이라서다. `expand_word_bank` 판정을 한 번 열어 현재 세션이 직접 새
+   도메인어/기능어를 제안하고, `config/word_bank_expansions.csv`(누적, git
+   추적, `word_bank.py` 원본은 안 건드림)에 append한 뒤 병합된 풀로 재시도한다.
+   그래도(제안된 새 단어로도) 0건이고 backlog(아래 7번)도 0건이면 그제서야
+   진짜 `CAPABILITY_STAGNATION`, Keyword Planner 예산/자격증명 문제로 중단되면
+   `RETRYING`으로 정직하게 끝난다 — 두 경우 모두 4개 문서 중 이미 확정된 부분은
+   그대로 유지된다.
+6. 조합 전략: `word_bank.py`(정적 원본) + `word_bank_expansions.csv`(세션이
+   누적 제안한 확장분)를 병합한 풀에서, 도메인어(업계 특화 명사)와 기능어
+   (동작·역할 명사)를 하나씩 짝지어 "도메인어 + 기능어" 순서로 조합한다.
 7. **Keyword Planner 필터 게이트 + backlog**: AI 판정을 통과한 후보만
    `config/keyword_metrics.yaml` 기준값으로 조회한다(`avg_monthly_searches>=`
    `avg_monthly_searches_min` AND `competition_index==competition_index_exact`,

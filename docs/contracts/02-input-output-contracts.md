@@ -40,6 +40,7 @@ output/
 2. 목표 수량·완료 개념이 없다 - 매 실행이 4개 문서를 누적 갱신하고 끝난다.
 3. ledger/캐시는 임시 파일 작성 후 원자적 교체하고 정규화 키로 병합한다(재조회/재판정 방지).
 4. AI 판정을 통과한 후보는 추가로 Google Ads Keyword Planner 필터(`config/keyword_metrics.yaml`의 `avg_monthly_searches_min`/`competition_index_exact`)를 통과해야 한다 — `memory/ACTIVE_ISSUES.md`의 `GKP-001` 참고. 이 필터 통과율이 낮아도(실측 1~3%) 그 자체가 목표 미달로 취급되지 않는다(목표가 없으므로) - 예산 소진 등으로만 `RETRYING`/`CAPABILITY_STAGNATION`이 된다.
+5. **(2026-08-18 자가확장, `PROJECT-003`)** 신규 후보가 0건이면 `expand_word_bank` 판정을 한 번 열어 현재 세션이 새 도메인어/기능어를 제안하고 `config/word_bank_expansions.csv`(4개 산출물 문서와 별개 - 판정 결과가 아니라 `word_bank.py`를 보완하는 어휘 소스, 누적·git 추적)에 append한다. 매 실행은 `word_bank.py` + 이 파일을 병합한 풀에서 후보를 생성한다.
 
 ## 원본 설계 세부 규칙
 

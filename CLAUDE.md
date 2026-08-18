@@ -49,6 +49,23 @@
 `git log`(커밋 `d1ca668` 이후)로 복원 가능하고, 실측 교훈(`DEMAND-001`)은
 `memory/ACTIVE_ISSUES.md`에 역사적 기록으로 남아있다.
 
+**2026-08-18 자가확장 단어뱅크 도입(사용자 지시, 같은 날 2차 개정).** 2차 전환
+직후 단어뱅크(42업계, 도달가능 25,589 조합)가 실제로 완전 소진됐다. 사용자가
+"지구상 영어 단어가 얼마나 많은데 소진이 말이 되냐"고 지적 — 맞는 지적이었다.
+소진은 알고리즘 한계가 아니라 `word_bank.py`가 손으로 고른 작은 목록이었기
+때문이다. 해결책으로 두 방식(AI가 매 실행마다 그 자리에서 새 단어를 직접
+제안 vs. 정적 목록을 수백~수천 배로 미리 확장) 중 **"매 실행마다 AI가 직접
+생성"**을 사용자가 선택했다. 구현: `word_generation.generate_combinations`가
+병합된 단어 풀(`domain_words`/`function_words` 오버라이드)을 받도록 확장,
+조합공간이 소진되면 `word_pipeline`이 즉시 포기하지 않고 `expand_word_bank`
+판정 라운드를 한 번 열어 현재 세션이 직접 새 도메인어/기능어를 제안 →
+`config/word_bank_expansions.csv`(누적, git 추적, `word_bank.py` 원본은 안 건드림)에
+append → 병합 풀로 재시도. 그래도 0개면 그제서야 진짜 `CAPABILITY_STAGNATION`.
+실제 자격증명으로 라이브 검증 완료(run `QA-20260818-210404-KST`): 소진 상태에서
+자가확장 트리거 → 새 업계 3개(hvac_services/locksmith_security_services/
+interpreter_translation_services) + 새 기능어 12개 제안 → 신규 조합 30개 생성 →
+AI 판정 20승인 → Keyword Planner 통과 1개(`Furnace Tracker`, 3,600/월·경쟁지수0).
+
 원본 설계서(`docs/design/source/claude_code_saas_high_demand_low_supply_two_word_design_v2.4.md`)는
 여전히 역사적 기준이지만, 위 전환들이 실행 규칙의 우선순위를 가진다. 새 규칙과
 원본이 충돌하면 전환 결정을 따르고, 충돌 사실을 `memory/ACTIVE_ISSUES.md`에
@@ -125,6 +142,13 @@
 run 재개든 새 run이든) 시작 시 `_stage_load_state`가 자동으로 쓸어담아 재판정 없이
 게이트에 먼저 태운다 — 예산 소진/네트워크 크래시로 중단돼도 유실되지 않는다.
 
+**자가확장 단어뱅크(2026-08-18)**: `config/word_bank_expansions.csv`는 위 4개
+산출물 문서와 다른 카테고리다 — 판정 결과가 아니라 `word_bank.py`(정적 원본)를
+보완하는 원재료 어휘 소스다. 조합공간이 소진되면 `word_pipeline`이
+`expand_word_bank` 판정을 한 번 열어 현재 세션이 새 도메인어/기능어를 제안하고,
+그 결과가 이 파일에 append된다(`word_bank.py` 자체는 손대지 않음). 매 실행은
+`word_bank.py` + 이 파일을 병합한 풀로 후보를 생성한다.
+
 상세 계약은 `docs/contracts/02-input-output-contracts.md`를 따른다(전환 반영됨).
 
 ## 5. 판단과 코드 역할 분리 — 반드시 유지
@@ -134,6 +158,7 @@ run 재개든 새 run이든) 시작 시 `_stage_load_state`가 자동으로 쓸�
 | 2단어 조합 생성 | 전담(도메인어+기능어 조합, exclude 기반 중복 방지) | — |
 | 정확·역순 중복 제거 | 전담 | — |
 | 제목 검토 | 형식 검사 | 명확성·의미 중복·유명 상표 유사 검토 |
+| 단어뱅크 소진 시 새 도메인어/기능어 제안 | 병합·저장(`config/word_bank_expansions.csv`) | 신규 단어 제안(`expand_word_bank` 판정) |
 | Keyword Planner 게이트 | 전담(순수 수치 비교) | — |
 | ledger/캐시 병합·문서 export | 전담(원자적 쓰기) | — |
 | QA | 동일 파이프라인 실행 | `final-qa-runner`가 실행 결과 판정 |
@@ -144,11 +169,15 @@ run 재개든 새 run이든) 시작 시 `_stage_load_state`가 자동으로 쓸�
 
 **현재(2026-08-18 두 번째 전환 이후) 유효한 워크플로우, "한 번의 CLI 실행 = 한 라운드":**
 세션 시작 → Git/HANDOFF/PLAYBOOK 로드 → `_stage_load_state`(ledger에서 AI승인·
-KP미확인 backlog 스윕) → 단어뱅크에서 round-size만큼 신규 후보 생성(ledger·
-blocklist 제외) → 코드 기반 형식·중복 검증 → 제목 명확성·의미 중복·상표 유사
-검토(현재 세션) → ledger 기록(문서①) → (backlog + 이번 승인분)에 Keyword Planner
-게이트 적용(문서②③④ 갱신) → 메모리·Git 체크포인트. 더 하고 싶으면 다시 실행
-(새 run 또는 `--resume`) — 목표 수량을 쫓는 반복 루프는 없다.
+KP미확인 backlog 스윕) → `word_bank.py`+`word_bank_expansions.csv` 병합 풀에서
+round-size만큼 신규 후보 생성(ledger·blocklist 제외) → **0개면** 조합공간이
+소진된 것 — 즉시 포기하지 않고 `expand_word_bank` 판정(현재 세션이 새
+도메인어/기능어 제안) → 확장분 반영 후 재시도, 그래도 0개면 진짜
+`CAPABILITY_STAGNATION` → (신규 후보가 있으면) 코드 기반 형식·중복 검증 →
+제목 명확성·의미 중복·상표 유사 검토(현재 세션) → ledger 기록(문서①) →
+(backlog + 이번 승인분)에 Keyword Planner 게이트 적용(문서②③④ 갱신) →
+메모리·Git 체크포인트. 더 하고 싶으면 다시 실행(새 run 또는 `--resume`) —
+목표 수량을 쫓는 반복 루프는 없다.
 
 제목 생성 세부 규칙은 `docs/pipeline/10-title-generation.md`(전환 반영됨)를 따른다.
 
@@ -160,6 +189,7 @@ blocklist 제외) → 코드 기반 형식·중복 검증 → 제목 명확성·
 5. `memory/ACTIVE_ISSUES.md`
 6. 현재 `output/_pipeline/runs/<run_id>/run_state.json`
 7. `output/deliverables/history/generated_candidates.csv`/`keyword_metrics_passed.csv` 최근 상태
+8. `config/word_bank_expansions.csv`(자가확장으로 누적된 어휘, 있다면)
 
 전체 활동 로그를 매번 읽지 말고 필요한 범위만 검색한다. 세션/상태/메모리 규칙은 `docs/operations/11-workflow-state-memory.md`를 따른다.
 

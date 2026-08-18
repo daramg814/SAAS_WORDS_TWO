@@ -32,6 +32,44 @@
 - 관련 커밋: word_pipeline.py 재작성, run_state/cli/ids/config 정리, 테스트 재작성,
   수요/공급 삭제, 문서/에이전트/스킬/규칙 정리(커밋 해시는 `git log` 참고).
 
+## PROJECT-003 — 자가확장 단어뱅크(2026-08-18, PROJECT-002 직후 실측으로 촉발)
+- 상태: RESOLVED(사용자 확정, 실제 파이프라인으로 라이브 검증 완료)
+- 배경: PROJECT-002 전환 직후 실제 production 실행(`--round-size 10000` 2회 +
+  잔여 1,025개 소진)으로 42업계·도달가능 25,589 조합이 전부 소진돼
+  `CAPABILITY_STAGNATION`으로 끝났다. 사용자가 "지구상에 영어 단어가 얼마나
+  많은데 소진이 말이 되냐, 단어뱅크 생성 알고리즘을 다시 검토해서 끊임없이
+  찾고 재생성하는 시스템을 구축하라"고 지적 — 정확한 지적이었다. 소진은
+  알고리즘 결함이 아니라 `word_bank.py`가 사람이 손으로 고른 작은 목록(업계당
+  12개 도메인어, 기능어 74개)이었기 때문이다.
+- 사용자 확정 결정(AskUserQuestion, 두 선택지 중): "매 실행마다 AI가 그 자리에서
+  새 후보 단어를 직접 생성" — "정적 목록을 미리 수백~수천 배 확장"보다 우선
+  선택됨. 후자는 언젠가 또 소진되고 반복 확장이 필요하지만, 전자는 실행할 때마다
+  현재 세션의 언어 지식으로 새 단어를 계속 만들어낼 수 있어 진짜 "끊임없는"
+  재생성에 가깝다.
+- 구현: `word_generation.generate_combinations`가 `domain_words`/`function_words`
+  오버라이드를 받도록 확장(기본값 `None`이면 기존과 100% 동일 동작, 회귀 없음).
+  `word_pipeline`에 조합공간 소진 시 여는 `expand_word_bank` 판정 라운드 추가 —
+  현재 세션이 직접 새 도메인어/기능어를 제안하고, `config/word_bank_expansions.csv`
+  (누적, git 추적, `word_bank.py` 원본은 안 건드림)에 append된다. 매 실행은
+  `word_bank.py` + 이 파일을 병합한 풀로 후보를 생성(`_merged_word_bank`). 그래도
+  0개면 그제서야 진짜 `CAPABILITY_STAGNATION`(무한루프 방지, 정직한 종료).
+- **실제 자격증명으로 라이브 검증**(run `QA-20260818-210404-KST`, 소진 상태에서
+  실행): `expand_word_bank` 판정이 실제로 열림 → 세션이 새 업계 3개
+  (hvac_services/locksmith_security_services/interpreter_translation_services,
+  각 10개 도메인어)와 새 기능어 12개(Workbench/Toolkit/Playbook/Journal/
+  Snapshot/Guidebook/Registry/Blueprint/Almanac/Compendium/Codex/Roadmap) 제안 →
+  즉시 신규 조합 30개 생성 확인(기존 업계×새 기능어, 새 업계×새 기능어 둘 다
+  섞여서 나옴) → AI 판정 20승인/10거절(Almanac/Codex/Compendium/Glossary류
+  조합 중 일부는 "TITLE_UNCLEAR"로 정직하게 리젝트 - 새로 제안한 기능어라고
+  전부 관대하게 승인하지 않음) → Keyword Planner 게이트 통과 1개
+  (`Furnace Tracker`, hvac_services, 3,600/월·경쟁지수0) → 4개 문서 전부 실제
+  갱신 확인(ledger/캐시/통과표/단어리스트).
+- pytest 114개(신규 5개 포함) PASS, `verify_design_coverage.py` PASS.
+- 다음 세션 참고: 이제 소진돼도 자동으로 확장을 시도하므로 "단어뱅크가
+  소진됐다"는 이유로 멈추는 일은 거의 없어야 한다 — 만약 `expand_word_bank`
+  판정 후에도 여전히 0개(세션이 유효한 새 단어를 하나도 못 냈다)라면, 그건
+  진짜 이상 신호이니 조용히 넘기지 말고 원인을 확인할 것.
+
 ## GKP-001 — CLAUDE.md §2.3(Google Keyword Planner 의존 금지)과 검색량·경쟁지수 필터 통합 요청 충돌
 - 상태: RESOLVED(사용자 확정 예외, §2.3 개정 완료)
 - 날짜: 2026-08-17
