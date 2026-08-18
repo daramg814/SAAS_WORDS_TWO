@@ -13,24 +13,30 @@ from . import word_bank
 from .contracts import normalize_title, reverse_normalized_title
 
 
-def _round_robin_domain_words() -> list[tuple[str, str]]:
+def _round_robin_domain_words(domain_words: dict[str, tuple[str, ...]]) -> list[tuple[str, str]]:
     """(industry, word) pairs in the same industry-interleaved order
     `generate_combinations` has always used (industry0-word0, industry1-word0,
     ..., industry0-word1, ...), but built generically (does not assume every
     industry has the same number of domain words - an industry with fewer
     words just drops out of later layers instead of wrapping/repeating)."""
-    industries = word_bank.all_industries()
-    max_len = max((len(word_bank.DOMAIN_WORDS[industry]) for industry in industries), default=0)
+    industries = list(domain_words.keys())
+    max_len = max((len(domain_words[industry]) for industry in industries), default=0)
     ordered: list[tuple[str, str]] = []
     for layer in range(max_len):
         for industry in industries:
-            words = word_bank.DOMAIN_WORDS[industry]
+            words = domain_words[industry]
             if layer < len(words):
                 ordered.append((industry, words[layer]))
     return ordered
 
 
-def generate_combinations(count: int, *, exclude: set[str] = frozenset()) -> list[dict]:
+def generate_combinations(
+    count: int,
+    *,
+    exclude: set[str] = frozenset(),
+    domain_words: dict[str, tuple[str, ...]] | None = None,
+    function_words: tuple[str, ...] | None = None,
+) -> list[dict]:
     """Deterministic round-robin over industries and, within each industry,
     over its domain words - paired with a function word chosen so that every
     (domain word, function word) pair is reachable, not just a subset.
@@ -82,14 +88,25 @@ def generate_combinations(count: int, *, exclude: set[str] = frozenset()) -> lis
 
     Returns fewer than `count` items only if the entire word bank is
     exhausted - callers should treat that as real exhaustion, not a bug.
+
+    2026-08-18 (self-expanding word bank): `domain_words`/`function_words`
+    let a caller pass a merged pool (static `word_bank.py` + session-curated
+    `config/word_bank_expansions.csv`, see `word_pipeline._merged_word_bank`)
+    instead of the hardcoded module-level bank. Left at their default
+    (`None`) this resolves to `word_bank.DOMAIN_WORDS`/`word_bank.FUNCTION_WORDS`
+    exactly as before - existing callers and tests (including ones that
+    monkeypatch `word_bank.DOMAIN_WORDS`/`FUNCTION_WORDS` directly) are
+    unaffected.
     """
     if count <= 0:
         return []
 
-    dw_pairs = _round_robin_domain_words()
+    domain_words = word_bank.DOMAIN_WORDS if domain_words is None else domain_words
+    function_words = word_bank.FUNCTION_WORDS if function_words is None else function_words
+
+    dw_pairs = _round_robin_domain_words(domain_words)
     if not dw_pairs:
         return []
-    function_words = word_bank.FUNCTION_WORDS
     n_func = len(function_words)
     seen = set(exclude) | {reverse_normalized_title(t) for t in exclude}
     results: list[dict] = []

@@ -1,3 +1,4 @@
+import csv
 import json
 from datetime import datetime
 from pathlib import Path
@@ -70,6 +71,10 @@ def approve_one_response(run_dir, round_no=1):
     judgment.write_response(run_dir, "review_titles", decisions, round_no=round_no, judged_at="t1")
 
 
+def empty_expand_word_bank_response(run_dir, round_no=1):
+    judgment.write_response(run_dir, "expand_word_bank", [], round_no=round_no, judged_at="t1")
+
+
 # ---------------------------------------------------------------------------
 # RunOptions
 # ---------------------------------------------------------------------------
@@ -130,10 +135,17 @@ def test_stage_load_state_excludes_kp_resolved_from_backlog(tmp_path):
 
 
 def test_generate_and_review_titles_no_candidates_no_backlog_is_capability_stagnation(tmp_path, monkeypatch):
-    monkeypatch.setattr(word_pipeline.word_generation, "generate_combinations", lambda count, exclude: [])
+    monkeypatch.setattr(word_pipeline.word_generation, "generate_combinations", lambda *a, **k: [])
     options = make_options(tmp_path, run_id="QA-20260818-000000-KST")
     state = word_pipeline._load_or_create_state(options)
     word_pipeline._stage_load_state(tmp_path, options, state)
+    run_dir = word_pipeline._run_dir(tmp_path, state)
+
+    # empty candidates first trigger one self-expansion judgment round (2026-08-18)
+    with pytest.raises(judgment.JudgmentRequired):
+        word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)
+    run_state.save(tmp_path, state)
+    empty_expand_word_bank_response(run_dir)
 
     with pytest.raises(word_pipeline.RetryRequired) as excinfo:
         word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)
@@ -142,7 +154,7 @@ def test_generate_and_review_titles_no_candidates_no_backlog_is_capability_stagn
 
 
 def test_generate_and_review_titles_no_candidates_but_backlog_skips_judgment(tmp_path, monkeypatch):
-    monkeypatch.setattr(word_pipeline.word_generation, "generate_combinations", lambda count, exclude: [])
+    monkeypatch.setattr(word_pipeline.word_generation, "generate_combinations", lambda *a, **k: [])
     word_pipeline._append_generated_ledger_rows(
         tmp_path,
         [{"title": "Vendor Guard", "industry": "finance", "ai_approved": "True", "ai_reason": "", "judged_at": "t0"}],
@@ -150,12 +162,115 @@ def test_generate_and_review_titles_no_candidates_but_backlog_skips_judgment(tmp
     options = make_options(tmp_path, run_id="QA-20260818-000000-KST")
     state = word_pipeline._load_or_create_state(options)
     word_pipeline._stage_load_state(tmp_path, options, state)
+    run_dir = word_pipeline._run_dir(tmp_path, state)
 
-    word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)  # no JudgmentRequired raised
+    # empty candidates first trigger one self-expansion judgment round (2026-08-18)
+    with pytest.raises(judgment.JudgmentRequired):
+        word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)
+    run_state.save(tmp_path, state)
+    empty_expand_word_bank_response(run_dir)
+
+    word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)  # no further JudgmentRequired
     assert state.status == "DONE"
     assert [c["title"] for c in state.context["approved"]] == ["Vendor Guard"]
     assert state.context["round_stats"]["backlog_carried"] == 1
     assert state.context["round_stats"]["generated"] == 0
+
+
+# ---------------------------------------------------------------------------
+# 자가확장 단어뱅크 (2026-08-18)
+# ---------------------------------------------------------------------------
+
+
+def test_merged_word_bank_combines_static_and_dynamic_pools(tmp_path, monkeypatch):
+    monkeypatch.setattr(word_pipeline.word_bank, "DOMAIN_WORDS", {"finance": ("Ledger",)})
+    monkeypatch.setattr(word_pipeline.word_bank, "FUNCTION_WORDS", ("Guard",))
+    word_pipeline._append_word_bank_expansion_rows(
+        tmp_path,
+        [
+            {"type": "domain", "word": "Invoice", "industry": "finance", "added_at": "t0", "added_by_run_id": "r0"},
+            {"type": "domain", "word": "Claim", "industry": "insurance", "added_at": "t0", "added_by_run_id": "r0"},
+            {"type": "function", "word": "Tracker", "industry": "", "added_at": "t0", "added_by_run_id": "r0"},
+        ],
+    )
+    domain_words, function_words = word_pipeline._merged_word_bank(tmp_path)
+    assert domain_words["finance"] == ("Ledger", "Invoice")
+    assert domain_words["insurance"] == ("Claim",)
+    assert function_words == ("Guard", "Tracker")
+
+
+def test_append_word_bank_expansion_rows_dedupes_exact_and_across_calls(tmp_path):
+    row = {"type": "function", "word": "Tracker", "industry": "", "added_at": "t0", "added_by_run_id": "r0"}
+    word_pipeline._append_word_bank_expansion_rows(tmp_path, [row, dict(row)])
+    word_pipeline._append_word_bank_expansion_rows(tmp_path, [dict(row, added_by_run_id="r1")])
+    with word_pipeline._word_bank_expansions_path(tmp_path).open(encoding="utf-8", newline="") as f:
+        rows = list(csv.DictReader(f))
+    assert len(rows) == 1
+    assert rows[0]["added_by_run_id"] == "r0"  # first-seen wins, not overwritten
+
+
+def test_consume_word_bank_expansion_drops_invalid_and_keeps_valid():
+    response = {
+        "decisions": [
+            {"type": "domain", "word": "Invoice", "industry": "finance"},
+            {"type": "function", "word": "Tracker"},
+            {"type": "domain", "word": "no industry given"},  # missing industry -> dropped
+            {"type": "function", "word": "not a word!"},  # not a single alpha token -> dropped
+            {"type": "bogus", "word": "Whatever"},  # invalid type -> dropped
+        ]
+    }
+    rows = word_pipeline._consume_word_bank_expansion(response, "RUN-1", "t0")
+    assert [r["word"] for r in rows] == ["Invoice", "Tracker"]
+    assert rows[0]["industry"] == "finance"
+    assert rows[1]["industry"] == ""
+
+
+def test_generate_and_review_titles_self_expands_when_static_bank_exhausted(tmp_path, monkeypatch):
+    monkeypatch.setattr(word_pipeline.word_bank, "DOMAIN_WORDS", {"finance": ("Ledger",)})
+    monkeypatch.setattr(word_pipeline.word_bank, "FUNCTION_WORDS", ("Guard",))
+    # pre-seed the ledger so the tiny static bank's one combo is already spent
+    word_pipeline._append_generated_ledger_rows(
+        tmp_path,
+        [{"title": "Ledger Guard", "industry": "finance", "ai_approved": "True", "ai_reason": "", "judged_at": "t0"}],
+    )
+    options = make_options(tmp_path, run_id="QA-20260818-000002-KST")
+    state = word_pipeline._load_or_create_state(options)
+    word_pipeline._stage_load_state(tmp_path, options, state)
+    run_dir = word_pipeline._run_dir(tmp_path, state)
+
+    with pytest.raises(judgment.JudgmentRequired) as excinfo:
+        word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)
+    assert excinfo.value.stage == "expand_word_bank"
+    run_state.save(tmp_path, state)
+
+    judgment.write_response(
+        run_dir,
+        "expand_word_bank",
+        [
+            {"type": "domain", "word": "Invoice", "industry": "finance"},
+            {"type": "function", "word": "Tracker"},
+        ],
+        round_no=1,
+        judged_at="t1",
+    )
+
+    with pytest.raises(judgment.JudgmentRequired) as excinfo2:
+        word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)
+    assert excinfo2.value.stage == "review_titles"
+    run_state.save(tmp_path, state)
+
+    request = json.loads((run_dir / "judgment" / "review_titles_round1_request.json").read_text(encoding="utf-8"))
+    generated_titles = {item["title"] for item in request["items"]}
+    assert "Ledger Guard" not in generated_titles  # already-ledgered combo not regenerated
+    assert generated_titles  # the newly proposed words produced fresh combos
+
+    approve_all_response(run_dir)
+    word_pipeline._stage_generate_and_review_titles(tmp_path, options, state)
+    assert state.status == "DONE"
+
+    domain_words, function_words = word_pipeline._merged_word_bank(tmp_path)
+    assert "Invoice" in domain_words["finance"]
+    assert "Tracker" in function_words
 
 
 def test_generate_and_review_titles_pauses_for_judgment_then_completes_on_approve(tmp_path):

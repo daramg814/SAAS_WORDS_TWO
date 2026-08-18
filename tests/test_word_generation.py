@@ -89,6 +89,21 @@ def test_generate_combinations_can_reach_every_pair_regardless_of_word_bank_size
     assert len(combos) == 12 * 6
 
 
+def test_generate_combinations_accepts_domain_words_and_function_words_override():
+    # 2026-08-18 (self-expanding word bank): passing explicit pools bypasses
+    # word_bank.DOMAIN_WORDS/FUNCTION_WORDS entirely, so a merged
+    # static+dynamic pool (word_pipeline._merged_word_bank) can be used
+    # without touching module-level state.
+    combos = word_generation.generate_combinations(
+        100,
+        domain_words={"custom_industry": ("Widget", "Gadget")},
+        function_words=("Hub", "Desk"),
+    )
+    assert len(combos) == 4
+    assert {c["title"] for c in combos} == {"Widget Hub", "Widget Desk", "Gadget Hub", "Gadget Desk"}
+    assert {c["industry"] for c in combos} == {"custom_industry"}
+
+
 def test_generate_combinations_respects_reverse_of_exclude_set():
     first = word_generation.generate_combinations(1)
     title = first[0]["title"]

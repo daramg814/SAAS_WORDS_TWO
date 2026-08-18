@@ -19,7 +19,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from . import config, ids, judgment, run_state, word_generation
+from . import config, ids, judgment, run_state, word_bank, word_generation
 from .contracts import atomic_write_text, normalize_title
 from .judgment import JudgmentRequired
 from .keyword_metrics_client import (
@@ -425,10 +425,154 @@ def _apply_keyword_metrics_filter(
 
 
 # ---------------------------------------------------------------------------
+# 자가확장 단어뱅크 (2026-08-18, 사용자 지시): 조합공간이 완전히 소진되면(단어
+# 자체가 없어진 게 아니라 손으로 고른 목록이 작았을 뿐 - 사용자 지적), 실행을
+# CAPABILITY_STAGNATION으로 정직하게 끝내는 대신 현재 세션이 그 자리에서 직접
+# 새 도메인어/기능어를 제안하는 별도 판정 라운드(`expand_word_bank`)를 한 번
+# 연다. 제안은 word_bank.py 원본을 고치지 않고 `config/word_bank_expansions.csv`
+# (누적, git 추적)에만 append되고, `_merged_word_bank`가 매 실행마다 원본과
+# 병합해 후보 생성에 넘긴다 - word_bank.py 자체의 큐레이션 이력은 그대로 보존.
+# ---------------------------------------------------------------------------
+
+_EXPANSION_COLUMNS = ("type", "word", "industry", "added_at", "added_by_run_id")
+
+
+def _word_bank_expansions_path(project_root: Path) -> Path:
+    return project_root / "config" / "word_bank_expansions.csv"
+
+
+def _load_dynamic_word_bank(project_root: Path) -> tuple[dict[str, list[str]], list[str]]:
+    path = _word_bank_expansions_path(project_root)
+    domain_words: dict[str, list[str]] = {}
+    function_words: list[str] = []
+    if not path.exists():
+        return domain_words, function_words
+    with path.open("r", encoding="utf-8", newline="") as f:
+        for row in csv.DictReader(f):
+            if row["type"] == "domain":
+                domain_words.setdefault(row["industry"], []).append(row["word"])
+            elif row["type"] == "function":
+                function_words.append(row["word"])
+    return domain_words, function_words
+
+
+def _merged_word_bank(project_root: Path) -> tuple[dict[str, tuple[str, ...]], tuple[str, ...]]:
+    """`word_bank.py`(정적 원본) + `config/word_bank_expansions.csv`(세션이
+    누적 제안한 것) 병합, 중복 제거. 반환 형태는 `word_bank.DOMAIN_WORDS`/
+    `FUNCTION_WORDS`와 동일해서 `word_generation.generate_combinations`에
+    그대로 넘길 수 있다."""
+    dyn_domain, dyn_function = _load_dynamic_word_bank(project_root)
+    merged_domain: dict[str, list[str]] = {
+        industry: list(words) for industry, words in word_bank.DOMAIN_WORDS.items()
+    }
+    for industry, words in dyn_domain.items():
+        existing = merged_domain.setdefault(industry, [])
+        for w in words:
+            if w not in existing:
+                existing.append(w)
+    merged_function = list(word_bank.FUNCTION_WORDS)
+    for w in dyn_function:
+        if w not in merged_function:
+            merged_function.append(w)
+    return {industry: tuple(words) for industry, words in merged_domain.items()}, tuple(merged_function)
+
+
+def _append_word_bank_expansion_rows(project_root: Path, new_rows: list[dict]) -> None:
+    if not new_rows:
+        return
+    path = _word_bank_expansions_path(project_root)
+    rows: list[dict] = []
+    seen: set[tuple[str, str, str]] = set()
+
+    def _key(row: dict) -> tuple[str, str, str]:
+        return (row["type"], row["word"].strip().lower(), row.get("industry", "").strip().lower())
+
+    if path.exists():
+        with path.open("r", encoding="utf-8", newline="") as f:
+            for row in csv.DictReader(f):
+                key = _key(row)
+                if key not in seen:
+                    seen.add(key)
+                    rows.append(row)
+    for row in new_rows:
+        key = _key(row)
+        if key in seen:
+            continue
+        seen.add(key)
+        rows.append(row)
+
+    buffer = io.StringIO()
+    writer = csv.DictWriter(buffer, fieldnames=_EXPANSION_COLUMNS, lineterminator="\n")
+    writer.writeheader()
+    writer.writerows(rows)
+    atomic_write_text(path, buffer.getvalue())
+
+
+def _consume_word_bank_expansion(response: dict, run_id: str, when: str) -> list[dict]:
+    """판정 응답의 decisions(각 {type, word, industry?})를 검증해 유효한
+    것만 반환한다 - 단일 Title Case 영단어, type은 domain/function, domain이면
+    industry 필수. 형식이 안 맞는 제안은 조용히 버린다(예산 낭비 방지 목적의
+    관대한 검증 - 나머지 review_titles 판정이 최종 필터 역할을 한다)."""
+    rows = []
+    for decision in response.get("decisions", []):
+        word = str(decision.get("word", "")).strip()
+        word_type = decision.get("type")
+        industry = str(decision.get("industry", "")).strip()
+        if word_type not in ("domain", "function"):
+            continue
+        if not word.isalpha() or word != word.capitalize():
+            continue
+        if word_type == "domain" and not industry:
+            continue
+        rows.append(
+            {
+                "type": word_type,
+                "word": word,
+                "industry": industry if word_type == "domain" else "",
+                "added_at": when,
+                "added_by_run_id": run_id,
+            }
+        )
+    return rows
+
+
+_EXPAND_WORD_BANK_INSTRUCTIONS = (
+    "현재 단어뱅크(word_bank.py + 이미 제안된 확장분) 조합공간이 완전히 소진됐다 - "
+    "영어 단어 자체가 부족한 게 아니라 손으로 고른 목록이 작아서다. 새 도메인어(업무 "
+    "대상·문서·프로세스를 연상시키는 명사, 특정 업계 최소 20개 이상)와 새 기능어(업계에 "
+    "무관하게 '이 도구가 무엇을 하는지' 연상시키는 동작·역할 명사, 최소 10개 이상)를 "
+    "제안하라. 완전히 새로운 업계를 제안해도 좋다. Terminal/Ring처럼 특정 업계에서만 "
+    "말이 되는 단어는 기능어로 제안하지 말 것(과거 실측으로 문제였음). 기존 word_bank.py와 "
+    "이미 제안된 확장분(입력으로 함께 제공됨)과 겹치지 않게. 각 항목을 "
+    '{"type": "domain"|"function", "word": "Title Case 단일 영단어", "industry": '
+    '"domain일 때만 필수, function이면 생략"} 형태로 응답하라.'
+)
+
+
+def _write_expand_word_bank_request(project_root: Path, run_dir: Path, state: run_state.RunState) -> Path:
+    existing_domain, existing_function = _merged_word_bank(project_root)
+    items = [
+        {"industry": industry, "existing_domain_words": list(words)}
+        for industry, words in existing_domain.items()
+    ] + [{"existing_function_words": list(existing_function)}]
+    return judgment.write_request(
+        run_dir,
+        "expand_word_bank",
+        state.run_id,
+        _EXPAND_WORD_BANK_INSTRUCTIONS,
+        items,
+        round_no=1,
+        generated_at=ids.now_kst().isoformat(),
+    )
+
+
+# ---------------------------------------------------------------------------
 # Stage: generate_and_review_titles - "한 번의 CLI 실행 = 한 라운드"(2026-08-18
 # 전환). backlog(load_state에서 적재) + 이번에 새로 생성/판정한 승인분을 합쳐
 # Keyword Planner 게이트에 태우고 끝난다. 더 이상 target_count를 추격하는
 # 다중 라운드 루프가 없다 - 더 하고 싶으면 다시 실행(새 run 또는 --resume).
+# 조합공간이 소진되면 즉시 포기하지 않고, 자가확장(위 섹션) 판정을 한 번 거친
+# 뒤에도 여전히 신규 후보가 없을 때만 진짜 CAPABILITY_STAGNATION으로 처리한다.
 # ---------------------------------------------------------------------------
 
 
@@ -481,14 +625,35 @@ def _stage_generate_and_review_titles(project_root: Path, options: RunOptions, s
 
     excluded = _excluded_normalized(project_root, state)
     round_size = options.round_size or DEFAULT_ROUND_SIZE[options.mode]
-    candidates = word_generation.generate_combinations(round_size, exclude=excluded)
+    domain_words, function_words = _merged_word_bank(project_root)
+    candidates = word_generation.generate_combinations(
+        round_size, exclude=excluded, domain_words=domain_words, function_words=function_words
+    )
+
+    if not candidates:
+        expand_stage = "expand_word_bank"
+        if judgment.has_response(run_dir, expand_stage, round_no):
+            expand_response = judgment.read_response(run_dir, expand_stage, round_no)
+            new_rows = _consume_word_bank_expansion(
+                expand_response, state.run_id, ids.now_kst().isoformat()
+            )
+            _append_word_bank_expansion_rows(project_root, new_rows)
+            domain_words, function_words = _merged_word_bank(project_root)
+            candidates = word_generation.generate_combinations(
+                round_size, exclude=excluded, domain_words=domain_words, function_words=function_words
+            )
+        elif not state.context.get("word_bank_expansion_attempted"):
+            state.context["word_bank_expansion_attempted"] = True
+            expand_request_path = _write_expand_word_bank_request(project_root, run_dir, state)
+            _pause_for_judgment(project_root, state, expand_stage, expand_request_path)
 
     if not candidates:
         if not backlog:
             state.status = "CAPABILITY_STAGNATION"
             run_state.save(project_root, state)
             raise RetryRequired(
-                "word bank exhausted - no new combinations and no pending backlog",
+                "word bank exhausted even after a self-expansion attempt - "
+                "no new combinations and no pending backlog",
                 status="CAPABILITY_STAGNATION",
             )
         try:

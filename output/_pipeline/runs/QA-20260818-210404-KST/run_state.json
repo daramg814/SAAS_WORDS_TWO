@@ -1,0 +1,57 @@
+{
+  "awaiting_judgment": null,
+  "context": {
+    "approved": [
+      {
+        "industry": "hvac_services",
+        "title": "Furnace Tracker"
+      }
+    ],
+    "backlog": [],
+    "candidate_industry": {
+      "Attendance Snapshot": "fitness_wellness",
+      "Attendance Toolkit": "childcare",
+      "Casket Blueprint": "funeral_services",
+      "Class Workbench": "fitness_wellness",
+      "Crew Guidebook": "cleaning_services",
+      "Crew Snapshot": "landscaping",
+      "Curriculum Guidebook": "childcare",
+      "Deadbolt Dock": "locksmith_security_services",
+      "Dialect Rail": "interpreter_translation_services",
+      "Furnace Tracker": "hvac_services",
+      "Glossary Meter": "interpreter_translation_services",
+      "Grooming Playbook": "veterinary",
+      "Hygiene Journal": "dental",
+      "Incident Registry": "senior_care",
+      "Inspection Blueprint": "pest_control",
+      "Inventory Workbench": "automotive",
+      "Keyway Dial": "locksmith_security_services",
+      "Localization Flow": "interpreter_translation_services",
+      "Maintenance Roadmap": "aviation",
+      "Manifest Codex": "maritime_shipping",
+      "Medication Playbook": "senior_care",
+      "Refill Compendium": "pharmacy",
+      "Refrigerant Route": "hvac_services",
+      "Rekey Sync": "locksmith_security_services",
+      "Reservation Toolkit": "food_service",
+      "Season Almanac": "landscaping",
+      "Stylist Almanac": "salon_spa",
+      "Technician Journal": "pest_control",
+      "Thermostat Panel": "hvac_services",
+      "Ticket Registry": "laundry_dry_cleaning"
+    },
+    "round_stats": {
+      "ai_approved": 20,
+      "backlog_carried": 0,
+      "generated": 30,
+      "kp_passed": 1
+    },
+    "word_bank_expansion_attempted": true
+  },
+  "created_at": "2026-08-18T21:04:04.392807+09:00",
+  "mode": "qa",
+  "run_id": "QA-20260818-210404-KST",
+  "stage": "generate_and_review_titles",
+  "status": "RUNNING",
+  "updated_at": "2026-08-18T21:06:04.077590+09:00"
+}
