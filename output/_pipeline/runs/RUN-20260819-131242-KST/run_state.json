@@ -6513,7 +6513,7 @@
   "created_at": "2026-08-19T13:12:42.894079+09:00",
   "mode": "production",
   "run_id": "RUN-20260819-131242-KST",
-  "stage": "generate_and_review_titles",
-  "status": "RUNNING",
-  "updated_at": "2026-08-19T13:42:37.691987+09:00"
+  "stage": "update_memory_and_git_checkpoint",
+  "status": "DONE",
+  "updated_at": "2026-08-19T13:42:44.667784+09:00"
 }
