@@ -1,62 +1,62 @@
 # 단어 성과 리포트 (자동 생성)
 
-- 생성 시각: 2026-08-19T21:33:06.625410+09:00
-- 누적 통과율: 569/58611 = 0.97%
+- 생성 시각: 2026-08-19T22:07:59.259018+09:00
+- 누적 통과율: 697/66862 = 1.04%
 - 은퇴 기능어: 34개 (`config/retired_function_words.csv`)
 
 ## 기능어 통과율 상위 (시도 100회 이상)
 
 | 기능어 | 통과 | 시도 | 통과율 |
 |---|---|---|---|
-| Status | 31 | 517 | 6.00% |
-| Map | 28 | 500 | 5.60% |
-| Rate | 27 | 498 | 5.42% |
-| Portal | 26 | 516 | 5.04% |
-| Log | 19 | 509 | 3.73% |
-| Note | 19 | 509 | 3.73% |
-| Update | 19 | 515 | 3.69% |
-| Check | 17 | 511 | 3.33% |
-| File | 16 | 516 | 3.10% |
-| Card | 14 | 501 | 2.79% |
-| Tracker | 13 | 518 | 2.51% |
-| History | 12 | 517 | 2.32% |
-| Score | 11 | 507 | 2.17% |
-| Hub | 11 | 518 | 2.12% |
-| Point | 10 | 496 | 2.02% |
-| Form | 10 | 511 | 1.96% |
-| Draft | 9 | 495 | 1.82% |
-| Register | 9 | 512 | 1.76% |
-| Report | 9 | 518 | 1.74% |
-| Alert | 2 | 116 | 1.72% |
+| Code | 42 | 540 | 7.78% |
+| Status | 31 | 549 | 5.65% |
+| Chart | 7 | 127 | 5.51% |
+| Rate | 29 | 530 | 5.47% |
+| Map | 29 | 532 | 5.45% |
+| Portal | 27 | 547 | 4.94% |
+| List | 24 | 545 | 4.40% |
+| Log | 20 | 541 | 3.70% |
+| Note | 19 | 541 | 3.51% |
+| Check | 19 | 543 | 3.50% |
+| Update | 19 | 547 | 3.47% |
+| File | 17 | 548 | 3.10% |
+| Card | 14 | 533 | 2.63% |
+| Line | 3 | 122 | 2.46% |
+| Tracker | 13 | 550 | 2.36% |
+| Sample | 11 | 487 | 2.26% |
+| History | 12 | 549 | 2.19% |
+| Score | 11 | 539 | 2.04% |
+| Hub | 11 | 550 | 2.00% |
+| Point | 10 | 527 | 1.90% |
 
 ## 은퇴 대상(통과 0 / 시도 300회 이상)
 
-Almanac, Anchor, Blueprint, Catalog, Checklist, Cockpit, Codex, Compendium, Dashboard, Depot, Dial, Digest, Dock, Guard, Guidebook, Hotline, Insight, Lens, Lock, Meter, Metrics, Navigator, Node, Organizer, Pilot, Pulse, Queue, Roadmap, Sentry, Snapshot, Suite, Sync, Toolkit, Workbench
+Almanac, Anchor, Blueprint, Book, Catalog, Checklist, Cockpit, Codex, Compendium, Dashboard, Depot, Dial, Digest, Dock, Guard, Guidebook, Hotline, Insight, Lens, Lock, Meter, Metrics, Navigator, Node, Organizer, Pilot, Pulse, Queue, Roadmap, Sentry, Snapshot, Suite, Sync, Toolkit, Workbench
 
 ## 도메인어 통과율 상위 (시도 30회 이상)
 
 | 도메인어 | 통과 | 시도 | 통과율 |
 |---|---|---|---|
-| License | 9 | 94 | 9.57% |
-| Family | 9 | 123 | 7.32% |
-| Strike | 6 | 98 | 6.12% |
-| Complaint | 4 | 66 | 6.06% |
-| Billing | 7 | 122 | 5.74% |
-| Chat | 7 | 123 | 5.69% |
-| Fuel | 7 | 124 | 5.65% |
-| Vacancy | 4 | 71 | 5.63% |
-| Grid | 6 | 110 | 5.45% |
-| Package | 5 | 93 | 5.38% |
-| Chart | 6 | 114 | 5.26% |
-| Ratio | 6 | 115 | 5.22% |
-| Menu | 6 | 121 | 4.96% |
-| Reference | 6 | 122 | 4.92% |
-| Snow | 6 | 122 | 4.92% |
-| Grading | 6 | 123 | 4.88% |
-| Membership | 6 | 123 | 4.88% |
-| Opening | 5 | 106 | 4.72% |
-| Closing | 5 | 108 | 4.63% |
-| Notice | 3 | 65 | 4.62% |
+| License | 10 | 104 | 9.62% |
+| Strike | 8 | 108 | 7.41% |
+| Chat | 9 | 132 | 6.82% |
+| Family | 9 | 133 | 6.77% |
+| Grading | 8 | 133 | 6.02% |
+| Closing | 7 | 118 | 5.93% |
+| Grid | 7 | 118 | 5.93% |
+| Package | 6 | 103 | 5.83% |
+| Ratio | 7 | 121 | 5.79% |
+| Chart | 7 | 123 | 5.69% |
+| Billing | 7 | 131 | 5.34% |
+| Complaint | 4 | 75 | 5.33% |
+| Reference | 7 | 132 | 5.30% |
+| Membership | 7 | 133 | 5.26% |
+| Fuel | 7 | 134 | 5.22% |
+| Opening | 6 | 116 | 5.17% |
+| Vacancy | 4 | 80 | 5.00% |
+| Port | 6 | 129 | 4.65% |
+| Menu | 6 | 131 | 4.58% |
+| Class | 6 | 132 | 4.55% |
 
 > 해석 가이드: 새 기능어를 제안할 때는 상위 표의 패턴(실제 검색되는 구체적
 > 명사)을 닮게, 은퇴 목록의 패턴(전문용어풍 합성어)은 피한다. Keyword
