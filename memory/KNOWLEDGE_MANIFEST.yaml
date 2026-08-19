@@ -7,6 +7,7 @@ read_order:
   - current_run_state
   - output/deliverables/history/generated_candidates.csv
   - output/deliverables/history/keyword_metrics_passed.csv
+  - memory/WORD_GENERATION_LEARNINGS.md
 canonical_documents:
   charter: docs/project/01-project-charter.md
   io_contract: docs/contracts/02-input-output-contracts.md

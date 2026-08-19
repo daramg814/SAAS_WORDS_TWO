@@ -66,6 +66,20 @@ append → 병합 풀로 재시도. 그래도 0개면 그제서야 진짜 `CAPAB
 interpreter_translation_services) + 새 기능어 12개 제안 → 신규 조합 30개 생성 →
 AI 판정 20승인 → Keyword Planner 통과 1개(`Furnace Tracker`, 3,600/월·경쟁지수0).
 
+**2026-08-19 단어 생성 노하우 누적 문서 도입(사용자 지시).** 라운드가 반복될
+때마다 `expand_word_bank` 판정(새 도메인어/기능어 제안)의 품질이 세션마다
+"감"에 좌우되는 문제(실측: 근거 없이 발명한 기능어 10개 중 4개가 즉시 은퇴
+확정되며 통과율이 2.59%→0.51%로 급락한 사례)를 구조적으로 줄이기 위해
+`memory/WORD_GENERATION_LEARNINGS.md`를 도입했다. "핵심 원칙" 섹션(지금 유효한
+원칙 요약)과 "라운드별 로그" 섹션(append-only 시행착오 기록)으로 나뉘며,
+**"핵심 원칙" 섹션은 `word_pipeline._write_expand_word_bank_request`가 매번
+코드로 강제 추출해 판정 요청의 `accumulated_learnings` 필드에 주입한다** —
+`function_word_performance`와 동일하게 세션이 "읽으려는 의지"에 기대지 않는
+구조적 전달이다(§5 역할분리 표 참고). `expand_word_bank`로 새 단어를 제안한
+라운드가 끝나면(그 라운드의 Keyword Planner 결과가 나온 뒤) 현재 세션이 이
+문서에 로그를 append하고 일반화 가능한 교훈이면 핵심 원칙도 갱신해야 한다 —
+이건 의미 해석이라 코드가 대신하지 않는다.
+
 원본 설계서(`docs/design/source/claude_code_saas_high_demand_low_supply_two_word_design_v2.4.md`)는
 여전히 역사적 기준이지만, 위 전환들이 실행 규칙의 우선순위를 가진다. 새 규칙과
 원본이 충돌하면 전환 결정을 따르고, 충돌 사실을 `memory/ACTIVE_ISSUES.md`에
@@ -189,6 +203,7 @@ backlog만 처리한 라운드(신규 생성 0건)는 구간 계산에서 제외
 | 제목 검토 | 형식 검사 | 명확성·의미 중복·유명 상표 유사 검토 |
 | 단어뱅크 소진 시 새 도메인어/기능어 제안 | 병합·저장(`config/word_bank_expansions.csv`) | 신규 단어 제안(`expand_word_bank` 판정, 실측 성과 요약 준수) |
 | 단어 성과 분석·은퇴 목록 | 전담(순수 통계, `word_performance.py`) | 리포트 해석·확장 제안에 반영 |
+| 단어 생성 노하우 누적(`memory/WORD_GENERATION_LEARNINGS.md`) | "핵심 원칙" 섹션 추출·`expand_word_bank` 판정 요청에 강제 주입 | 라운드 결과 해석 후 로그 append·핵심 원칙 갱신 |
 | 라운드별 정체 점검(개선/정체/저하 판정) | 전담(순수 수치 비교, `detect_stagnation`) | 정체·저하 신호의 원인 해석·대응 |
 | Keyword Planner 게이트 | 전담(순수 수치 비교) | — |
 | ledger/캐시 병합·문서 export | 전담(원자적 쓰기) | — |
@@ -202,13 +217,17 @@ backlog만 처리한 라운드(신규 생성 0건)는 구간 계산에서 제외
 세션 시작 → Git/HANDOFF/PLAYBOOK 로드 → `_stage_load_state`(ledger에서 AI승인·
 KP미확인 backlog 스윕) → `word_bank.py`+`word_bank_expansions.csv` 병합 풀에서
 round-size만큼 신규 후보 생성(ledger·blocklist 제외) → **0개면** 조합공간이
-소진된 것 — 즉시 포기하지 않고 `expand_word_bank` 판정(현재 세션이 새
-도메인어/기능어 제안) → 확장분 반영 후 재시도, 그래도 0개면 진짜
-`CAPABILITY_STAGNATION` → (신규 후보가 있으면) 코드 기반 형식·중복 검증 →
-제목 명확성·의미 중복·상표 유사 검토(현재 세션) → ledger 기록(문서①) →
-(backlog + 이번 승인분)에 Keyword Planner 게이트 적용(문서②③④ 갱신) →
-메모리·Git 체크포인트. 더 하고 싶으면 다시 실행(새 run 또는 `--resume`) —
-목표 수량을 쫓는 반복 루프는 없다.
+소진된 것 — 즉시 포기하지 않고 `expand_word_bank` 판정(`memory/
+WORD_GENERATION_LEARNINGS.md`의 "핵심 원칙"이 판정 요청에 코드로 강제
+주입된 상태에서, 현재 세션이 그 원칙에 맞춰 새 도메인어/기능어 제안) →
+확장분 반영 후 재시도, 그래도 0개면 진짜 `CAPABILITY_STAGNATION` → (신규
+후보가 있으면) 코드 기반 형식·중복 검증 → 제목 명확성·의미 중복·상표 유사
+검토(현재 세션) → ledger 기록(문서①) → (backlog + 이번 승인분)에 Keyword
+Planner 게이트 적용(문서②③④ 갱신) → 메모리·Git 체크포인트 → **이번 라운드에
+`expand_word_bank`가 있었다면** 그 결과(통과율 변화, 신규 은퇴 단어 유무)를
+`memory/WORD_GENERATION_LEARNINGS.md`의 라운드별 로그에 append하고 일반화
+가능한 교훈이면 핵심 원칙도 갱신. 더 하고 싶으면 다시 실행(새 run 또는
+`--resume`) — 목표 수량을 쫓는 반복 루프는 없다.
 
 제목 생성 세부 규칙은 `docs/pipeline/10-title-generation.md`(전환 반영됨)를 따른다.
 
@@ -221,6 +240,9 @@ round-size만큼 신규 후보 생성(ledger·blocklist 제외) → **0개면** 
 6. 현재 `output/_pipeline/runs/<run_id>/run_state.json`
 7. `output/deliverables/history/generated_candidates.csv`/`keyword_metrics_passed.csv` 최근 상태
 8. `config/word_bank_expansions.csv`(자가확장으로 누적된 어휘, 있다면)
+9. `memory/WORD_GENERATION_LEARNINGS.md`(단어 생성 노하우 누적 — "핵심 원칙"은
+   `expand_word_bank` 판정 요청에도 코드로 자동 주입되지만, "라운드별 로그"의
+   맥락은 세션 시작 시 직접 읽어야만 파악된다)
 
 전체 활동 로그를 매번 읽지 말고 필요한 범위만 검색한다. 세션/상태/메모리 규칙은 `docs/operations/11-workflow-state-memory.md`를 따른다.
 

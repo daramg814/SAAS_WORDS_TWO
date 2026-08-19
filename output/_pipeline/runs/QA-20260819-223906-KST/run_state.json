@@ -1,0 +1,52 @@
+{
+  "awaiting_judgment": null,
+  "context": {
+    "approved": [],
+    "backlog": [],
+    "candidate_industry": {
+      "Application Chain": "insurance",
+      "Attic Keeper": "property_management_services",
+      "Basement Nexus": "property_management_services",
+      "Certificate Rail": "insurance",
+      "Coinsurance Frame": "insurance",
+      "Coinsurance Map": "insurance",
+      "Courtyard Trail": "property_management_services",
+      "Declarations Deck": "insurance",
+      "Declarations Studio": "insurance",
+      "Driveway Panel": "property_management_services",
+      "Entrance Route": "property_management_services",
+      "Garage Center": "property_management_services",
+      "Garden Ring": "property_management_services",
+      "Grace Base": "insurance",
+      "Grace Core": "insurance",
+      "Investigation Atlas": "insurance",
+      "Key Assistant": "property_management_services",
+      "Landlord Lab": "property_management_services",
+      "Landlord Studio": "property_management_services",
+      "Laundry Portal": "property_management_services",
+      "Nonrenewal Console": "insurance",
+      "Policyholder Grid": "insurance",
+      "Policyholder Wave": "insurance",
+      "Reinstatement Zone": "insurance",
+      "Smoke Engine": "property_management_services",
+      "Surcharge Center": "insurance",
+      "Surcharge Terminal": "insurance",
+      "Umbrella Board": "insurance",
+      "Umbrella Ledger": "insurance",
+      "Verification Gate": "insurance"
+    },
+    "round_stats": {
+      "ai_approved": 27,
+      "backlog_carried": 0,
+      "generated": 30,
+      "kp_passed": 0
+    },
+    "word_bank_expansion_attempted": true
+  },
+  "created_at": "2026-08-19T22:39:06.956679+09:00",
+  "mode": "qa",
+  "run_id": "QA-20260819-223906-KST",
+  "stage": "generate_and_review_titles",
+  "status": "RUNNING",
+  "updated_at": "2026-08-19T22:41:54.097329+09:00"
+}

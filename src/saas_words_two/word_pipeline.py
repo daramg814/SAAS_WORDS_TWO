@@ -14,6 +14,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import re
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -553,6 +554,15 @@ def _consume_word_bank_expansion(
 
 
 _EXPAND_WORD_BANK_INSTRUCTIONS = (
+    "[누적 노하우 - 반드시 먼저 읽을 것] 입력에 포함된 accumulated_learnings는 "
+    "과거 라운드들의 시행착오를 현재 세션(들)이 memory/WORD_GENERATION_LEARNINGS.md에 "
+    "직접 기록해 쌓아온 핵심 원칙이다. 이 라운드의 제안은 그 원칙과 모순되지 않아야 "
+    "한다 - 특히 과거에 실패로 확인된 패턴(예: 특정 업종 전문용어, 특정 발명 단어 "
+    "유형)을 반복하지 마라. 이번 라운드 결과가 나온 뒤(같은 실행 종료 시점) 현재 "
+    "세션은 이번에 제안한 단어들과 그 결과(통과율 변화, 새로 은퇴된 단어 유무)를 "
+    "memory/WORD_GENERATION_LEARNINGS.md의 라운드별 로그에 append하고, 일반화 가능한 "
+    "교훈이면 '핵심 원칙' 절도 갱신해야 한다 - 이 기록이 다음 expand_word_bank 라운드에 "
+    "다시 자동으로 주입된다. "
     "현재 단어뱅크(word_bank.py + 이미 제안된 확장분) 조합공간이 완전히 소진됐다 - "
     "영어 단어 자체가 부족한 게 아니라 손으로 고른 목록이 작아서다. 새 도메인어(업무 "
     "대상·문서·프로세스를 연상시키는 명사, 특정 업계 최소 20개 이상)와 새 기능어(업계에 "
@@ -585,6 +595,36 @@ _EXPAND_WORD_BANK_INSTRUCTIONS = (
 )
 
 
+def _word_generation_learnings_path(project_root: Path) -> Path:
+    return project_root / "memory" / "WORD_GENERATION_LEARNINGS.md"
+
+
+def _load_word_generation_learnings_principles(project_root: Path) -> str:
+    """`memory/WORD_GENERATION_LEARNINGS.md`의 "## 핵심 원칙" 섹션만 추출해 반환한다.
+
+    2026-08-19 사용자 지시: 세션이 매번 이 문서를 "읽으려는 의지"에 기대지 않고,
+    `expand_word_bank` 판정 요청을 만드는 이 코드가 매번 강제로 끼워 넣는다 -
+    `function_word_performance`와 동일한 패턴(구조적 전달, 세션의 선택 사항이 아님).
+    전체 문서(라운드별 로그 포함)를 매번 넣으면 로그가 쌓일수록 요청이 무한정
+    커지므로, "지금 유효한 원칙" 요약만 담는 이 섹션만 추출한다. 파일이 없거나
+    섹션이 없으면(아직 아무것도 기록되지 않았으면) 빈 문자열."""
+    path = _word_generation_learnings_path(project_root)
+    if not path.exists():
+        return ""
+    text = path.read_text(encoding="utf-8")
+    # 줄 시작(^)에 오는 실제 헤딩만 매칭 - 본문 설명 중 백틱 안에 같은 문자열이
+    # 그대로 등장해도(예: "`## 핵심 원칙` 섹션은...") 오매칭되지 않도록 함
+    # (2026-08-19 실측으로 발견된 버그: 단순 문자열 탐색은 첫 등장 위치인 설명
+    # 문단을 헤딩으로 착각했다).
+    match = re.search(r"^## 핵심 원칙\s*\n", text, flags=re.MULTILINE)
+    if match is None:
+        return ""
+    start = match.end()
+    next_match = re.search(r"^## ", text[start:], flags=re.MULTILINE)
+    section = text[start : start + next_match.start()] if next_match else text[start:]
+    return section.strip()
+
+
 def _write_expand_word_bank_request(project_root: Path, run_dir: Path, state: run_state.RunState) -> Path:
     existing_domain, existing_function = _merged_word_bank(project_root)
     items = [
@@ -593,6 +633,7 @@ def _write_expand_word_bank_request(project_root: Path, run_dir: Path, state: ru
     ] + [
         {"existing_function_words": list(existing_function)},
         {"function_word_performance": word_performance.performance_summary_for_expansion(project_root)},
+        {"accumulated_learnings": _load_word_generation_learnings_principles(project_root)},
     ]
     return judgment.write_request(
         run_dir,

@@ -253,6 +253,81 @@ def test_consume_word_bank_expansion_drops_invalid_and_keeps_valid():
     assert rows[1]["industry"] == ""
 
 
+# ---------------------------------------------------------------------------
+# WORD_GENERATION_LEARNINGS.md - 누적 노하우가 expand_word_bank 판정 요청에
+# 강제 주입되는지 (2026-08-19 사용자 지시: 세션이 "읽으려는 의지"에 기대지
+# 않고 코드가 매번 구조적으로 전달해야 함)
+# ---------------------------------------------------------------------------
+
+
+def test_load_word_generation_learnings_principles_returns_empty_when_file_missing(tmp_path):
+    assert word_pipeline._load_word_generation_learnings_principles(tmp_path) == ""
+
+
+def test_load_word_generation_learnings_principles_extracts_only_that_section(tmp_path):
+    # 본문 설명 중에 헤딩과 똑같은 문자열이 먼저 등장해도(백틱 안 등) 그걸
+    # 헤딩으로 오인하지 않아야 한다 - 2026-08-19 실측으로 실제 발견된 버그.
+    doc = (
+        "# WORD_GENERATION_LEARNINGS\n\n"
+        "이 섹션은 `## 핵심 원칙`이라는 제목의 절을 말한다 - 본문 설명일 뿐 헤딩이 아님.\n\n"
+        "## 핵심 원칙\n\n"
+        "1. 짧고 흔한 명사를 쓸 것.\n"
+        "2. 니치 전문용어 업계는 피할 것.\n\n"
+        "## 라운드별 로그\n\n"
+        "### RUN-1\n- 이 로그 섹션 내용은 추출되면 안 된다.\n"
+    )
+    (tmp_path / "memory").mkdir()
+    (tmp_path / "memory" / "WORD_GENERATION_LEARNINGS.md").write_text(doc, encoding="utf-8")
+
+    section = word_pipeline._load_word_generation_learnings_principles(tmp_path)
+    assert "짧고 흔한 명사" in section
+    assert "니치 전문용어" in section
+    assert "핵심 원칙" not in section  # 헤딩 줄 자체는 섹션 본문에 없어야 함
+    assert "라운드별 로그" not in section  # 다음 섹션이 섞여 들어오면 안 됨
+    assert "RUN-1" not in section
+
+
+def test_write_expand_word_bank_request_includes_accumulated_learnings(tmp_path):
+    (tmp_path / "memory").mkdir()
+    (tmp_path / "memory" / "WORD_GENERATION_LEARNINGS.md").write_text(
+        "## 핵심 원칙\n\n짧고 흔한 명사만 제안할 것.\n\n## 라운드별 로그\n\n(비어있음)\n",
+        encoding="utf-8",
+    )
+    state = run_state.RunState(
+        run_id="RUN-TEST",
+        mode="qa",
+        stage="generate_and_review_titles",
+        status="RUNNING",
+        created_at="t0",
+        updated_at="t0",
+    )
+    run_dir = word_pipeline._run_dir(tmp_path, state)
+    word_pipeline._write_expand_word_bank_request(tmp_path, run_dir, state)
+
+    request = json.loads((run_dir / "judgment" / "expand_word_bank_round1_request.json").read_text(encoding="utf-8"))
+    learnings_items = [item for item in request["items"] if "accumulated_learnings" in item]
+    assert len(learnings_items) == 1
+    assert "짧고 흔한 명사만 제안할 것" in learnings_items[0]["accumulated_learnings"]
+    assert "라운드별 로그" not in learnings_items[0]["accumulated_learnings"]
+
+
+def test_write_expand_word_bank_request_empty_learnings_when_file_absent(tmp_path):
+    state = run_state.RunState(
+        run_id="RUN-TEST",
+        mode="qa",
+        stage="generate_and_review_titles",
+        status="RUNNING",
+        created_at="t0",
+        updated_at="t0",
+    )
+    run_dir = word_pipeline._run_dir(tmp_path, state)
+    word_pipeline._write_expand_word_bank_request(tmp_path, run_dir, state)
+
+    request = json.loads((run_dir / "judgment" / "expand_word_bank_round1_request.json").read_text(encoding="utf-8"))
+    learnings_items = [item for item in request["items"] if "accumulated_learnings" in item]
+    assert learnings_items == [{"accumulated_learnings": ""}]
+
+
 def test_generate_and_review_titles_self_expands_when_static_bank_exhausted(tmp_path, monkeypatch):
     monkeypatch.setattr(word_pipeline.word_bank, "DOMAIN_WORDS", {"finance": ("Ledger",)})
     monkeypatch.setattr(word_pipeline.word_bank, "FUNCTION_WORDS", ("Guard",))
