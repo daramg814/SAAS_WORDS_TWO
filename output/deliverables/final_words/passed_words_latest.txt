@@ -72,9 +72,11 @@ Distribution Map
 Distribution Watch
 Driver Station
 Driver Studio
+Editing Zone
 Editorial Board
 Efficiency Engine
 Elevator Gate
+Enrollment Roll
 Estimate Point
 Extraction Point
 Family Companion
@@ -97,6 +99,7 @@ Fuel Register
 Fuel Watch
 Furnace Deck
 Furnace Tracker
+Grading Chart
 Grid Atlas
 Grid Compass
 Grid Finder
@@ -116,11 +119,17 @@ Inventory Hub
 Knowledge Board
 Knowledge Gate
 Leave Office
+License Board
+License Portal
+License Tracker
 Licensing Board
 Licensing Portal
+Lighting Map
+Lighting Scheduler
 Listing Map
 Livestock Assistant
 Localization Signal
+Location Relay
 Manifest Hub
 Manifest Tracker
 Material Hub
@@ -152,6 +161,8 @@ Offer Wave
 Order Panel
 Outage Finder
 Outage Tracker
+Package Manager
+Package Zone
 Patient Gate
 Patient Station
 Perimeter Directory
@@ -164,10 +175,12 @@ Port Map
 Premium Hub
 Premium Nexus
 Premium Portal
+Print Portal
 Program Flow
 Provider Flow
 Provider Hub
 Queue Monitor
+Ratio Chart
 Ratio Finder
 Ratio Grid
 Ratio Scale
@@ -191,6 +204,8 @@ Registration Journal
 Rent Panel
 Rent Register
 Rent Registry
+Rental Panel
+Rental Register
 Reservation Map
 Reserve Map
 Resident Playbook
@@ -215,6 +230,7 @@ Screening Scale
 Season Office
 Service Directory
 Service Loop
+Session Window
 Snow Map
 Snow Point
 Snow Radar
@@ -234,6 +250,7 @@ Ticket Board
 Title Counter
 Title Manager
 Transcript Ledger
+Vaccination Passport
 Vendor Center
 Venue Ops
 Waiver Tracker

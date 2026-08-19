@@ -1,0 +1,176 @@
+[
+  {
+    "word": "Almanac",
+    "avg_monthly_searches": 90500.0,
+    "competition_index": 4.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Anchor",
+    "avg_monthly_searches": 550000.0,
+    "competition_index": 13.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Blueprint",
+    "avg_monthly_searches": 450000.0,
+    "competition_index": 10.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Cockpit",
+    "avg_monthly_searches": 301000.0,
+    "competition_index": 40.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Codex",
+    "avg_monthly_searches": 1830000.0,
+    "competition_index": 14.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Compendium",
+    "avg_monthly_searches": 135000.0,
+    "competition_index": 6.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Dashboard",
+    "avg_monthly_searches": 1220000.0,
+    "competition_index": 7.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Depot",
+    "avg_monthly_searches": 550000.0,
+    "competition_index": 35.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Dial",
+    "avg_monthly_searches": 165000.0,
+    "competition_index": 4.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Dock",
+    "avg_monthly_searches": 368000.0,
+    "competition_index": 7.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Guard",
+    "avg_monthly_searches": 246000.0,
+    "competition_index": 1.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Guidebook",
+    "avg_monthly_searches": 22200.0,
+    "competition_index": 2.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Insight",
+    "avg_monthly_searches": 1000000.0,
+    "competition_index": 9.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Lens",
+    "avg_monthly_searches": 2240000.0,
+    "competition_index": 13.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Lock",
+    "avg_monthly_searches": 673000.0,
+    "competition_index": 44.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Meter",
+    "avg_monthly_searches": 246000.0,
+    "competition_index": 11.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Metrics",
+    "avg_monthly_searches": 165000.0,
+    "competition_index": 2.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Navigator",
+    "avg_monthly_searches": 165000.0,
+    "competition_index": 24.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Node",
+    "avg_monthly_searches": 301000.0,
+    "competition_index": 1.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Organizer",
+    "avg_monthly_searches": 165000.0,
+    "competition_index": 98.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Pilot",
+    "avg_monthly_searches": 1000000.0,
+    "competition_index": 5.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Pulse",
+    "avg_monthly_searches": 673000.0,
+    "competition_index": 4.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Roadmap",
+    "avg_monthly_searches": 201000.0,
+    "competition_index": 5.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Sentry",
+    "avg_monthly_searches": 450000.0,
+    "competition_index": 10.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Snapshot",
+    "avg_monthly_searches": 135000.0,
+    "competition_index": 1.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Suite",
+    "avg_monthly_searches": 368000.0,
+    "competition_index": 6.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Sync",
+    "avg_monthly_searches": 246000.0,
+    "competition_index": 4.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Toolkit",
+    "avg_monthly_searches": 74000.0,
+    "competition_index": 48.0,
+    "api_status": "success"
+  },
+  {
+    "word": "Workbench",
+    "avg_monthly_searches": 135000.0,
+    "competition_index": 95.0,
+    "api_status": "success"
+  }
+]
