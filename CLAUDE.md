@@ -78,7 +78,12 @@ AI 판정 20승인 → Keyword Planner 통과 1개(`Furnace Tracker`, 3,600/월�
 구조적 전달이다(§5 역할분리 표 참고). `expand_word_bank`로 새 단어를 제안한
 라운드가 끝나면(그 라운드의 Keyword Planner 결과가 나온 뒤) 현재 세션이 이
 문서에 로그를 append하고 일반화 가능한 교훈이면 핵심 원칙도 갱신해야 한다 —
-이건 의미 해석이라 코드가 대신하지 않는다.
+이건 의미 해석이라 코드가 대신하지 않는다. **(2026-08-19 개정)** 핵심 원칙
+각 항목은 `PROJECT_PLAYBOOK.md`와 동일한 `candidate`/`validated` 승격 규칙을
+따른다(§8) — 서로 다른 라운드에서 같은 방향 관측 2회 이상 + 반례 없음이면
+`validated`. 한 라운드에서 여러 변수를 동시에 바꾸면 그 라운드는 각 변수를
+독립적으로 확인해준 게 아니므로(교란) 단독으로 승격 근거가 되지 않는다 —
+`expand_word_bank` 판정 시 이 점이 프롬프트에 명시적으로 포함된다.
 
 원본 설계서(`docs/design/source/claude_code_saas_high_demand_low_supply_two_word_design_v2.4.md`)는
 여전히 역사적 기준이지만, 위 전환들이 실행 규칙의 우선순위를 가진다. 새 규칙과
