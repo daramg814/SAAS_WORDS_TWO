@@ -4,6 +4,7 @@ Access Portal
 Activation Code
 Activation Rail
 Actuary Table
+Adjustment Entry
 Admission Calendar
 Admission Card
 Admission Note
@@ -38,6 +39,7 @@ Assignment Index
 Assignment Score
 Assignment Status
 Attendance Code
+Attendance Confirmation
 Attendance View
 Attic Radar
 Audit Desk
@@ -84,6 +86,7 @@ Bond Timeline
 Briefing Note
 Briefing Report
 Broadcast Station
+Budget Circular
 Budget Estimate
 Budget Rail
 Budget Score
@@ -99,6 +102,7 @@ Camera Report
 Camera Score
 Campaign Trail
 Cancellation Check
+Cancellation Confirmation
 Candidate Register
 Candidate Status
 Care Compass
@@ -120,6 +124,7 @@ Change Code
 Change Directory
 Change Keeper
 Change Tab
+Chart Circular
 Chart Finder
 Chart List
 Chart Panel
@@ -169,6 +174,7 @@ Client Code
 Client List
 Closing Chart
 Closing Code
+Closing Entry
 Closing Form
 Closing Map
 Closing Order
@@ -187,6 +193,7 @@ Complaint Status
 Compressor Map
 Configuration Update
 Consecutive Sample
+Content Advisory
 Content Feed
 Content Table
 Contract Base
@@ -233,6 +240,7 @@ Diagnosis Ticket
 Dialect Journal
 Dialect Map
 Discharge Form
+Discharge Petition
 Discharge Summary
 Disclosure Hub
 Discovery Calendar
@@ -250,6 +258,7 @@ Distribution Map
 Distribution Sample
 Distribution Table
 Distribution Watch
+Dividend Recap
 Docket Sheet
 Donor Card
 Driver Index
@@ -257,6 +266,7 @@ Driver Rate
 Driver Station
 Driver Status
 Driver Studio
+Editing Brief
 Editing Draft
 Editing Profile
 Editing Zone
@@ -473,6 +483,7 @@ Network Code
 Network Manager
 Network Tracker
 Notice Alert
+Notice Entry
 Notice Form
 Notice Rate
 Nutrition Status
@@ -575,6 +586,7 @@ Ratio Grid
 Ratio Rate
 Ratio Scale
 Ratio Table
+Recall Petition
 Reception Status
 Recipe Beacon
 Recipe Compass
@@ -612,6 +624,7 @@ Reservation Bill
 Reservation Map
 Reserve Map
 Reserve Rate
+Resident Advisory
 Resident Playbook
 Resident Portal
 Resident Zone
@@ -635,6 +648,7 @@ Return Status
 Review Companion
 Review History
 Review Journal
+Review Petition
 Review Zone
 Rider Panel
 Rider Portal
@@ -661,7 +675,9 @@ Screening Scale
 Season List
 Season Office
 Season Order
+Segment Circular
 Segment Code
+Service Bulletin
 Service Code
 Service Directory
 Service Loop
@@ -682,6 +698,7 @@ Smoke Map
 Smoke Radar
 Smoke Station
 Smoke Tracker
+Snow Advisory
 Snow Level
 Snow Map
 Snow Point
@@ -693,6 +710,7 @@ Soil Profile
 Sourcing File
 Sourcing Journal
 Sourcing List
+Sponsor Confirmation
 Sponsor List
 Staffing Directory
 Staffing Log
@@ -732,6 +750,7 @@ Tile Map
 Timeline History
 Timesheet Reminder
 Title Counter
+Title Entry
 Title List
 Title Manager
 Toast Alert
@@ -746,6 +765,7 @@ Turbidity Flow
 Umbrella Status
 Utility Portal
 Vacancy Chart
+Vacancy Circular
 Vacancy Form
 Vacancy Rate
 Vacancy Update

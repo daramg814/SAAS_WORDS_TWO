@@ -5,6 +5,7 @@ import hashlib
 import os
 import re
 import tempfile
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
@@ -82,10 +83,24 @@ def atomic_write_text(path: Path, content: str) -> None:
             f.write(content)
             f.flush()
             os.fsync(f.fileno())
-        os.replace(tmp_path, path)
+        _replace_with_retry(tmp_path, path)
     except Exception:
         tmp_path.unlink(missing_ok=True)
         raise
+
+
+def _replace_with_retry(tmp_path: Path, path: Path, attempts: int = 5, base_delay: float = 0.2) -> None:
+    """os.replace on Windows can transiently fail with PermissionError (WinError 5)
+    when another process (antivirus/indexer) briefly holds the destination open -
+    retry with backoff instead of failing a whole pipeline stage over it."""
+    for attempt in range(attempts):
+        try:
+            os.replace(tmp_path, path)
+            return
+        except PermissionError:
+            if attempt == attempts - 1:
+                raise
+            time.sleep(base_delay * (2**attempt))
 
 
 def sha256_file(path: Path) -> str:

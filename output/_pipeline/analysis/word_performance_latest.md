@@ -1,7 +1,7 @@
 # 단어 성과 리포트 (자동 생성)
 
-- 생성 시각: 2026-08-21T00:51:45.560776+09:00
-- 누적 통과율: 771/78280 = 0.98%
+- 생성 시각: 2026-08-21T01:09:41.430908+09:00
+- 누적 통과율: 791/84082 = 0.94%
 - 은퇴 기능어: 38개 (`config/retired_function_words.csv`)
 
 ## 기능어 통과율 상위 (시도 100회 이상)
@@ -31,32 +31,32 @@
 
 ## 은퇴 대상(통과 0 / 시도 300회 이상)
 
-Almanac, Anchor, Blueprint, Book, Catalog, Checklist, Cockpit, Codex, Compendium, Dashboard, Depot, Dial, Digest, Dock, Flag, Grade, Guard, Guidebook, Hotline, Insight, Lens, Lock, Meter, Metrics, Navigator, Node, Organizer, Pilot, Pulse, Queue, Roadmap, Sentry, Snapshot, Suite, Sync, Tally, Toolkit, Workbench
+Almanac, Anchor, Blueprint, Book, Catalog, Checklist, Cockpit, Codex, Compendium, Dashboard, Depot, Dial, Digest, Dock, Dossier, Excerpt, Flag, Grade, Guard, Guidebook, Hotline, Insight, Lens, Lock, Meter, Metrics, Navigator, Node, Organizer, Pilot, Pulse, Queue, Roadmap, Sentry, Snapshot, Suite, Sync, Tally, Toolkit, Workbench
 
 ## 도메인어 통과율 상위 (시도 30회 이상)
 
 | 도메인어 | 통과 | 시도 | 통과율 |
 |---|---|---|---|
-| License | 10 | 112 | 8.93% |
-| Strike | 8 | 116 | 6.90% |
-| Closing | 8 | 121 | 6.61% |
-| Chat | 9 | 143 | 6.29% |
-| Family | 9 | 144 | 6.25% |
-| Opening | 7 | 123 | 5.69% |
-| Smoke | 7 | 123 | 5.69% |
-| Grading | 8 | 143 | 5.59% |
-| Fuel | 8 | 145 | 5.52% |
-| Grid | 7 | 127 | 5.51% |
-| Ratio | 7 | 132 | 5.30% |
-| Chart | 7 | 133 | 5.26% |
-| Package | 6 | 114 | 5.26% |
-| Port | 7 | 140 | 5.00% |
-| Reference | 7 | 141 | 4.96% |
-| Billing | 7 | 142 | 4.93% |
-| Return | 7 | 143 | 4.90% |
-| Membership | 7 | 144 | 4.86% |
-| Biometric | 6 | 126 | 4.76% |
-| Complaint | 4 | 86 | 4.65% |
+| License | 10 | 122 | 8.20% |
+| Closing | 9 | 131 | 6.87% |
+| Strike | 8 | 123 | 6.50% |
+| Chat | 9 | 153 | 5.88% |
+| Family | 9 | 154 | 5.84% |
+| Chart | 8 | 143 | 5.59% |
+| Smoke | 7 | 131 | 5.34% |
+| Opening | 7 | 133 | 5.26% |
+| Grading | 8 | 153 | 5.23% |
+| Fuel | 8 | 155 | 5.16% |
+| Grid | 7 | 137 | 5.11% |
+| Vacancy | 5 | 101 | 4.95% |
+| Ratio | 7 | 142 | 4.93% |
+| Package | 6 | 124 | 4.84% |
+| Billing | 7 | 148 | 4.73% |
+| Port | 7 | 150 | 4.67% |
+| Reference | 7 | 151 | 4.64% |
+| Return | 7 | 153 | 4.58% |
+| Snow | 7 | 153 | 4.58% |
+| Membership | 7 | 154 | 4.55% |
 
 > 해석 가이드: 새 기능어를 제안할 때는 상위 표의 패턴(실제 검색되는 구체적
 > 명사)을 닮게, 은퇴 목록의 패턴(전문용어풍 합성어)은 피한다. Keyword
