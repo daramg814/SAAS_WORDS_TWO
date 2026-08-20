@@ -84,6 +84,7 @@ Billing Desk,27100.0,0.0,success,True,2026-08-17T20:33:21.754611+09:00
 Billing History,8100.0,0.0,success,True,2026-08-19T20:43:39.981777+09:00
 Billing Portal,33100.0,0.0,success,True,2026-08-17T21:32:50.995270+09:00
 Billing Status,40500.0,0.0,success,True,2026-08-19T20:43:26.923996+09:00
+Billing Tax,8100.0,0.0,success,True,2026-08-21T02:10:26.523271+09:00
 Billing Update,1000.0,0.0,success,True,2026-08-19T20:44:05.928260+09:00
 Billing View,450000.0,0.0,success,True,2026-08-19T20:43:33.378176+09:00
 Binder Forge,2900.0,0.0,success,True,2026-08-17T21:35:41.309233+09:00
@@ -98,6 +99,7 @@ Boiler Order,1900.0,0.0,success,True,2026-08-19T21:46:47.844671+09:00
 Bond Check,5400.0,0.0,success,True,2026-08-21T00:48:15.897610+09:00
 Bond Order,22200.0,0.0,success,True,2026-08-21T00:49:41.369493+09:00
 Bond Timeline,1600.0,0.0,success,True,2026-08-21T00:49:20.798290+09:00
+Bonus Tax,5400.0,0.0,success,True,2026-08-21T02:11:23.948204+09:00
 Briefing Note,3600.0,0.0,success,True,2026-08-19T21:29:07.329786+09:00
 Briefing Plan,1600.0,0.0,success,True,2026-08-21T01:56:30.460489+09:00
 Briefing Report,1600.0,0.0,success,True,2026-08-19T21:19:01.988330+09:00
@@ -187,6 +189,7 @@ Claim Point,1000.0,0.0,success,True,2026-08-17T20:33:16.020559+09:00
 Claim Status,33100.0,0.0,success,True,2026-08-19T20:43:57.147560+09:00
 Claim Vault,1900.0,0.0,success,True,2026-08-17T20:42:11.427186+09:00
 Claimant Portal,1600.0,0.0,success,True,2026-08-21T00:45:22.913101+09:00
+Class Fare,1000.0,0.0,success,True,2026-08-21T02:10:45.957047+09:00
 Class File,1600.0,0.0,success,True,2026-08-19T20:40:17.061535+09:00
 Class List,14800.0,0.0,success,True,2026-08-19T21:53:13.442826+09:00
 Class Log,6600.0,0.0,success,True,2026-08-19T13:24:10.018965+09:00
@@ -214,7 +217,9 @@ Combination Chart,5400.0,0.0,success,True,2026-08-19T21:32:06.209951+09:00
 Commission Fee,2900.0,0.0,success,True,2026-08-21T01:59:37.170622+09:00
 Commission Rate,2400.0,0.0,success,True,2026-08-19T20:41:43.197527+09:00
 Commission Sheet,6600.0,0.0,success,True,2026-08-19T13:22:59.111226+09:00
+Commission Tax,1300.0,0.0,success,True,2026-08-21T02:06:11.713342+09:00
 Comparable Chart,2900.0,0.0,success,True,2026-08-21T01:41:42.095051+09:00
+Comparable Cost,9900.0,0.0,success,True,2026-08-21T02:10:49.609792+09:00
 Comparable List,90500.0,0.0,success,True,2026-08-21T01:44:14.161023+09:00
 Comparable Table,2400.0,0.0,success,True,2026-08-21T01:44:20.732547+09:00
 Compensation Point,1300.0,0.0,success,True,2026-08-21T00:50:29.679005+09:00
@@ -223,20 +228,25 @@ Complaint Register,2900.0,0.0,success,True,2026-08-19T20:46:16.448832+09:00
 Complaint Registry,2900.0,0.0,success,True,2026-08-19T20:46:39.045000+09:00
 Complaint Status,1300.0,0.0,success,True,2026-08-19T20:38:12.818207+09:00
 Compressor Map,1000.0,0.0,success,True,2026-08-18T22:11:43.174107+09:00
+Configuration Item,1300.0,0.0,success,True,2026-08-21T02:05:44.847740+09:00
 Configuration Update,1000.0,0.0,success,True,2026-08-19T20:39:32.642664+09:00
 Consecutive Sample,2900.0,0.0,success,True,2026-08-19T21:52:04.287712+09:00
+Consumption Tax,4400.0,0.0,success,True,2026-08-21T02:14:19.948102+09:00
 Contact Calendar,1000.0,0.0,success,True,2026-08-21T01:26:01.379135+09:00
 Contact Compass,1600.0,0.0,success,True,2026-08-21T01:21:42.147576+09:00
 Content Advisory,1000.0,0.0,success,True,2026-08-21T01:02:18.693445+09:00
 Content Feed,1600.0,0.0,success,True,2026-08-19T20:40:28.949050+09:00
 Content Table,201000.0,0.0,success,True,2026-08-19T22:01:31.900197+09:00
+Contingency Cost,1300.0,0.0,success,True,2026-08-21T02:07:53.857202+09:00
 Contingency Plan,60500.0,0.0,success,True,2026-08-21T01:50:28.240015+09:00
 Contingency Planner,60500.0,0.0,success,True,2026-08-21T01:37:30.941685+09:00
 Contingency Table,18100.0,0.0,success,True,2026-08-21T01:41:56.935291+09:00
 Contract Base,1600.0,0.0,success,True,2026-08-17T20:32:36.001496+09:00
+Contract Cost,1600.0,0.0,success,True,2026-08-21T02:09:08.901398+09:00
 Contract Note,1300.0,0.0,success,True,2026-08-19T13:24:22.197081+09:00
 Conversion Base,8100.0,0.0,success,True,2026-08-17T21:37:08.932405+09:00
 Conversion Calendar,33100.0,0.0,success,True,2026-08-18T23:58:15.272323+09:00
+Conversion Cost,5400.0,0.0,success,True,2026-08-21T02:07:20.173569+09:00
 Conversion Fee,1000.0,0.0,success,True,2026-08-21T01:50:16.047866+09:00
 Conversion Log,1000.0,0.0,success,True,2026-08-19T13:36:47.380431+09:00
 Conversion Order,1000.0,0.0,success,True,2026-08-19T21:57:08.159846+09:00
@@ -252,6 +262,7 @@ Credential Deck,2400.0,0.0,success,True,2026-08-17T20:38:53.767345+09:00
 Crew Center,1300.0,0.0,success,True,2026-08-17T20:38:11.520193+09:00
 Crew Portal,49500.0,0.0,success,True,2026-08-17T20:36:17.521162+09:00
 Crew Score,1000.0,0.0,success,True,2026-08-19T13:24:10.018965+09:00
+Crop Loan,1900.0,0.0,success,True,2026-08-21T02:11:30.479876+09:00
 Curb Line,1300.0,0.0,success,True,2026-08-19T21:59:12.539055+09:00
 Curriculum Hub,1600.0,0.0,success,True,2026-08-17T20:33:42.611240+09:00
 Customs Portal,74000.0,0.0,success,True,2026-08-17T20:43:30.530213+09:00
@@ -299,6 +310,7 @@ Dispatch Ledger,5400.0,0.0,success,True,2026-08-17T20:36:39.507807+09:00
 Dispatch Log,1300.0,0.0,success,True,2026-08-19T13:23:22.980764+09:00
 Dispatch Update,3600.0,0.0,success,True,2026-08-19T20:40:17.061535+09:00
 Distribution Code,1300.0,0.0,success,True,2026-08-19T21:57:31.477256+09:00
+Distribution Cost,1000.0,0.0,success,True,2026-08-21T02:07:16.373051+09:00
 Distribution Ledger,1600.0,0.0,success,True,2026-08-17T21:36:10.133574+09:00
 Distribution Map,1900.0,0.0,success,True,2026-08-18T07:52:30.485728+09:00
 Distribution Sample,12100.0,0.0,success,True,2026-08-19T21:58:22.475915+09:00
@@ -312,6 +324,7 @@ Driver Rate,1900.0,0.0,success,True,2026-08-19T20:43:57.147560+09:00
 Driver Station,9900.0,0.0,success,True,2026-08-17T21:41:04.521769+09:00
 Driver Status,5400.0,0.0,success,True,2026-08-19T20:43:22.271749+09:00
 Driver Studio,1600.0,0.0,success,True,2026-08-18T07:52:06.675931+09:00
+Driveway Tax,1300.0,0.0,success,True,2026-08-21T02:08:44.609671+09:00
 Editing Brief,1900.0,0.0,success,True,2026-08-21T01:05:55.165491+09:00
 Editing Draft,6600.0,0.0,success,True,2026-08-19T20:44:48.132741+09:00
 Editing Profile,8100.0,0.0,success,True,2026-08-19T13:23:25.617100+09:00
@@ -319,6 +332,7 @@ Editing Zone,1000.0,0.0,success,True,2026-08-19T12:27:36.694411+09:00
 Editorial Board,4400.0,0.0,success,True,2026-08-17T20:43:26.313536+09:00
 Editorial Form,1300.0,0.0,success,True,2026-08-19T13:36:19.763333+09:00
 Editorial Sample,6600.0,0.0,success,True,2026-08-19T22:04:26.155627+09:00
+Efficiency Cost,9900.0,0.0,success,True,2026-08-21T02:07:34.217644+09:00
 Efficiency Engine,1000.0,0.0,success,True,2026-08-17T23:24:32.888927+09:00
 Elevator Gate,1600.0,0.0,success,True,2026-08-19T00:36:57.137576+09:00
 Endorsement Check,9900.0,0.0,success,True,2026-08-19T22:00:12.371601+09:00
@@ -329,6 +343,7 @@ Enrollment Status,2400.0,0.0,success,True,2026-08-19T20:45:53.854460+09:00
 Entrance Fee,4400.0,0.0,success,True,2026-08-21T01:50:23.005803+09:00
 Equipment List,2400.0,0.0,success,True,2026-08-19T22:03:17.563220+09:00
 Equity Card,1600.0,0.0,success,True,2026-08-21T01:44:25.853714+09:00
+Equity Cost,8100.0,0.0,success,True,2026-08-21T02:12:23.232619+09:00
 Equity Statement,18100.0,0.0,success,True,2026-08-21T01:37:34.913486+09:00
 Estimate Point,6600.0,0.0,success,True,2026-08-17T23:31:17.212800+09:00
 Exclusion List,1000.0,0.0,success,True,2026-08-19T21:58:17.004802+09:00
@@ -358,6 +373,7 @@ Financing Status,2400.0,0.0,success,True,2026-08-19T20:42:29.664942+09:00
 Fitness File,2400.0,0.0,success,True,2026-08-19T22:01:05.588899+09:00
 Flight Bridge,1300.0,0.0,success,True,2026-08-17T23:11:08.683373+09:00
 Flight Reminder,4400.0,0.0,success,True,2026-08-19T21:16:16.247165+09:00
+Flight Tax,1300.0,0.0,success,True,2026-08-21T02:12:59.494269+09:00
 Flue Map,9900.0,0.0,success,True,2026-08-19T21:09:52.138956+09:00
 Flue Rate,1000.0,0.0,success,True,2026-08-19T21:32:15.548375+09:00
 Flue Tracker,2400.0,0.0,success,True,2026-08-19T21:06:15.149170+09:00
@@ -424,8 +440,10 @@ Heater Engine,9900.0,0.0,success,True,2026-08-19T21:12:15.731161+09:00
 Hinge Code,1300.0,0.0,success,True,2026-08-19T21:59:07.775168+09:00
 Hinge Point,1000.0,0.0,success,True,2026-08-19T21:16:48.614230+09:00
 Hold Bridge,2900.0,0.0,success,True,2026-08-21T01:25:00.165555+09:00
+Hold Cost,1900.0,0.0,success,True,2026-08-21T02:14:24.666160+09:00
 Hold Entry,4400.0,0.0,success,True,2026-08-21T01:23:30.836605+09:00
 Hold Statement,1300.0,0.0,success,True,2026-08-21T01:22:33.143231+09:00
+Hold Tax,27100.0,0.0,success,True,2026-08-21T02:14:32.398981+09:00
 Homework Code,8100.0,0.0,success,True,2026-08-19T22:05:48.495667+09:00
 Housekeeping Note,22200.0,0.0,success,True,2026-08-19T13:39:51.910868+09:00
 Immunization Card,5400.0,0.0,success,True,2026-08-19T13:24:22.197081+09:00
@@ -437,6 +455,7 @@ Impact Point,1900.0,0.0,success,True,2026-08-17T20:32:17.131006+09:00
 Impact Statement,2900.0,0.0,success,True,2026-08-21T00:27:22.208885+09:00
 Incident Map,1000.0,0.0,success,True,2026-08-17T21:32:40.946824+09:00
 Incident Rate,8100.0,0.0,success,True,2026-08-19T20:41:30.953351+09:00
+Incident Tax,8100.0,0.0,success,True,2026-08-21T02:10:09.458176+09:00
 Intake Center,1000.0,0.0,success,True,2026-08-17T21:36:38.708092+09:00
 Interaction Log,4400.0,0.0,success,True,2026-08-19T13:21:11.802983+09:00
 Intercom Note,1000.0,0.0,success,True,2026-08-19T21:13:25.403661+09:00
@@ -471,6 +490,7 @@ Lever Card,4400.0,0.0,success,True,2026-08-19T21:30:33.343002+09:00
 License Board,1900.0,0.0,success,True,2026-08-19T12:26:06.734544+09:00
 License Card,2900.0,0.0,success,True,2026-08-19T13:34:25.531210+09:00
 License Check,90500.0,0.0,success,True,2026-08-19T13:35:17.832639+09:00
+License Cost,1600.0,0.0,success,True,2026-08-21T02:08:11.666475+09:00
 License File,1600.0,0.0,success,True,2026-08-19T20:38:46.605593+09:00
 License Form,33100.0,0.0,success,True,2026-08-19T13:34:15.397109+09:00
 License Portal,6600.0,0.0,success,True,2026-08-19T12:26:30.202611+09:00
@@ -480,6 +500,7 @@ License Summary,1300.0,0.0,success,True,2026-08-19T21:07:49.558493+09:00
 License Tracker,90500.0,0.0,success,True,2026-08-19T12:24:37.833597+09:00
 Licensing Board,1900.0,0.0,success,True,2026-08-17T21:35:33.419897+09:00
 Licensing Check,90500.0,0.0,success,True,2026-08-19T13:27:56.460670+09:00
+Licensing Cost,1600.0,0.0,success,True,2026-08-21T02:10:45.957047+09:00
 Licensing Form,33100.0,0.0,success,True,2026-08-19T13:27:18.608287+09:00
 Licensing Portal,6600.0,0.0,success,True,2026-08-17T20:45:32.525368+09:00
 Licensing Status,18100.0,0.0,success,True,2026-08-19T20:44:29.865338+09:00
@@ -504,6 +525,7 @@ Loss Line,1000.0,0.0,success,True,2026-08-19T21:55:44.120814+09:00
 Loss Log,4400.0,0.0,success,True,2026-08-19T21:56:27.780319+09:00
 Loss Report,40500.0,0.0,success,True,2026-08-19T21:56:14.793890+09:00
 Mailbox Map,1300.0,0.0,success,True,2026-08-21T00:50:45.127530+09:00
+Maintenance Cost,3600.0,0.0,success,True,2026-08-21T02:06:17.677670+09:00
 Maintenance Fee,4400.0,0.0,success,True,2026-08-21T01:51:26.021065+09:00
 Maintenance Feed,4400.0,0.0,success,True,2026-08-19T20:39:26.869721+09:00
 Major Update,1000.0,0.0,success,True,2026-08-21T01:43:23.087757+09:00
@@ -515,6 +537,7 @@ Manifest Tracker,4400.0,0.0,success,True,2026-08-17T21:37:24.355362+09:00
 Manuscript Draft,4400.0,0.0,success,True,2026-08-19T20:49:32.682801+09:00
 Markdown File,49500.0,0.0,success,True,2026-08-19T20:46:39.045000+09:00
 Material Code,1300.0,0.0,success,True,2026-08-19T22:07:52.466558+09:00
+Material Cost,4400.0,0.0,success,True,2026-08-21T02:11:15.261095+09:00
 Material File,4400.0,0.0,success,True,2026-08-19T20:46:04.507912+09:00
 Material Hub,2900.0,0.0,success,True,2026-08-17T20:44:07.827451+09:00
 Material List,9900.0,0.0,success,True,2026-08-19T21:45:58.620929+09:00
@@ -525,6 +548,7 @@ Medication Route,3600.0,0.0,success,True,2026-08-17T23:30:05.459796+09:00
 Medication Station,1900.0,0.0,success,True,2026-08-17T23:28:41.981102+09:00
 Membership Center,8100.0,0.0,success,True,2026-08-17T20:44:09.032273+09:00
 Membership Core,1900.0,0.0,success,True,2026-08-17T21:33:59.802696+09:00
+Membership Cost,2900.0,0.0,success,True,2026-08-21T02:07:29.886940+09:00
 Membership Counter,1300.0,0.0,success,True,2026-08-18T23:59:24.120788+09:00
 Membership Fee,4400.0,0.0,success,True,2026-08-21T01:50:28.240015+09:00
 Membership List,1600.0,0.0,success,True,2026-08-19T21:54:34.064665+09:00
@@ -579,6 +603,7 @@ Opening Score,4400.0,0.0,success,True,2026-08-19T21:04:36.711918+09:00
 Opening Statement,5400.0,0.0,success,True,2026-08-21T00:35:31.431507+09:00
 Opening Terminal,3600.0,0.0,success,True,2026-08-19T21:14:44.485943+09:00
 Order Code,1300.0,0.0,success,True,2026-08-19T22:00:37.818778+09:00
+Order Cost,1000.0,0.0,success,True,2026-08-21T02:13:09.073610+09:00
 Order Draft,27100.0,0.0,success,True,2026-08-19T20:46:16.448832+09:00
 Order Panel,1000.0,0.0,success,True,2026-08-17T23:24:15.710246+09:00
 Outage Finder,6600.0,0.0,success,True,2026-08-18T23:57:31.846586+09:00
@@ -621,6 +646,7 @@ Permit Check,3600.0,0.0,success,True,2026-08-19T13:28:12.912105+09:00
 Permit Fee,1000.0,0.0,success,True,2026-08-21T01:56:34.859851+09:00
 Permit Portal,4400.0,0.0,success,True,2026-08-17T20:34:34.179062+09:00
 Permit Status,2400.0,0.0,success,True,2026-08-19T20:46:30.162701+09:00
+Pet Tax,1600.0,0.0,success,True,2026-08-21T02:13:09.073610+09:00
 Pickup Hub,2900.0,0.0,success,True,2026-08-17T23:04:40.930662+09:00
 Placement Check,12100.0,0.0,success,True,2026-08-19T13:28:33.821561+09:00
 Placement Fee,1600.0,0.0,success,True,2026-08-21T01:53:10.453555+09:00
@@ -664,6 +690,8 @@ Property Log,60500.0,0.0,success,True,2026-08-19T13:32:47.690424+09:00
 Provider Flow,9900.0,0.0,success,True,2026-08-17T20:45:24.269018+09:00
 Provider Hub,2900.0,0.0,success,True,2026-08-17T20:44:22.162347+09:00
 Pump Radar,14800.0,0.0,success,True,2026-08-19T21:19:50.890463+09:00
+Quality Cost,4400.0,0.0,success,True,2026-08-21T02:08:27.719210+09:00
+Quality Price,1300.0,0.0,success,True,2026-08-21T02:08:33.058112+09:00
 Quarter Wave,1300.0,0.0,success,True,2026-08-21T01:39:38.707543+09:00
 Quarter Zone,1300.0,0.0,success,True,2026-08-21T01:40:37.729948+09:00
 Queue Monitor,1000.0,0.0,success,True,2026-08-17T23:26:55.594772+09:00
@@ -683,12 +711,14 @@ Ratio Grid,1000.0,0.0,success,True,2026-08-17T23:07:35.240679+09:00
 Ratio Rate,3600.0,0.0,success,True,2026-08-19T20:47:06.290958+09:00
 Ratio Scale,8100.0,0.0,success,True,2026-08-17T23:24:01.156266+09:00
 Ratio Table,6600.0,0.0,success,True,2026-08-19T22:05:25.560581+09:00
+Ratio Unit,1000.0,0.0,success,True,2026-08-21T02:05:54.756908+09:00
 Recall Petition,1300.0,0.0,success,True,2026-08-21T01:05:43.113119+09:00
 Reception Status,2900.0,0.0,success,True,2026-08-19T20:37:14.893241+09:00
 Recipe Beacon,6600.0,0.0,success,True,2026-08-17T20:41:48.704350+09:00
 Recipe Compass,4400.0,0.0,success,True,2026-08-17T20:42:32.290659+09:00
 Records Base,1600.0,0.0,success,True,2026-08-18T07:52:46.019796+09:00
 Records History,1300.0,0.0,success,True,2026-08-19T20:37:28.019595+09:00
+Recurring Cost,1300.0,0.0,success,True,2026-08-21T02:12:43.354957+09:00
 Recycling Calendar,2900.0,0.0,success,True,2026-08-21T00:45:33.278488+09:00
 Recycling Receipt,2900.0,0.0,success,True,2026-08-21T00:48:48.333943+09:00
 Redline Monitor,3600.0,0.0,success,True,2026-08-17T23:23:29.892589+09:00
@@ -716,13 +746,16 @@ Registration Journal,12100.0,0.0,success,True,2026-08-18T22:10:25.741480+09:00
 Registration Slip,1900.0,0.0,success,True,2026-08-19T22:03:08.515859+09:00
 Reimbursement Fee,6600.0,0.0,success,True,2026-08-21T01:50:49.145007+09:00
 Renewal Fee,1900.0,0.0,success,True,2026-08-21T01:51:22.429358+09:00
+Renewal Tax,2900.0,0.0,success,True,2026-08-21T02:08:23.223151+09:00
 Rent Panel,1600.0,0.0,success,True,2026-08-18T07:52:55.085793+09:00
 Rent Register,5400.0,0.0,success,True,2026-08-17T23:15:12.775041+09:00
 Rent Registry,5400.0,0.0,success,True,2026-08-18T22:11:30.674698+09:00
 Rental Panel,1600.0,0.0,success,True,2026-08-19T12:27:49.196174+09:00
 Rental Register,5400.0,0.0,success,True,2026-08-19T12:23:56.615526+09:00
+Repair Cost,4400.0,0.0,success,True,2026-08-21T02:12:54.787375+09:00
 Request Tracker,2240000.0,0.0,success,True,2026-08-21T01:20:11.987698+09:00
 Reservation Bill,27100.0,0.0,success,True,2026-08-19T21:56:56.242658+09:00
+Reservation Fee,1000.0,0.0,success,True,2026-08-21T02:05:54.756908+09:00
 Reservation Map,14800.0,0.0,success,True,2026-08-17T20:41:46.079279+09:00
 Reserve Fee,1000.0,0.0,success,True,2026-08-21T01:51:43.156382+09:00
 Reserve Map,14800.0,0.0,success,True,2026-08-17T23:24:58.944526+09:00
@@ -737,6 +770,7 @@ Resolution List,1600.0,0.0,success,True,2026-08-19T21:56:50.628145+09:00
 Resolution Note,1900.0,0.0,success,True,2026-08-19T13:36:50.709528+09:00
 Resolution Portal,1600.0,0.0,success,True,2026-08-17T21:31:49.761986+09:00
 Resolution Scope,1900.0,0.0,success,True,2026-08-17T20:42:49.578916+09:00
+Response Cost,1600.0,0.0,success,True,2026-08-21T02:07:37.270032+09:00
 Response Rate,2400.0,0.0,success,True,2026-08-19T20:47:51.523685+09:00
 Response Sheet,4400.0,0.0,success,True,2026-08-19T13:35:27.432298+09:00
 Retail Chain,2400.0,0.0,success,True,2026-08-17T23:32:52.026751+09:00
@@ -807,6 +841,7 @@ Session Plan,1600.0,0.0,success,True,2026-08-21T01:55:06.085634+09:00
 Session Window,1000.0,0.0,success,True,2026-08-19T12:24:58.043642+09:00
 Severance Check,1000.0,0.0,success,True,2026-08-21T01:22:29.239348+09:00
 Severance Office,3600.0,0.0,success,True,2026-08-21T01:19:57.563871+09:00
+Severance Tax,1000.0,0.0,success,True,2026-08-21T02:07:58.916446+09:00
 Severity Alert,1000.0,0.0,success,True,2026-08-21T01:19:25.139986+09:00
 Shift Code,74000.0,0.0,success,True,2026-08-19T21:51:45.660208+09:00
 Shift Tab,5400.0,0.0,success,True,2026-08-21T00:24:39.947545+09:00
@@ -825,6 +860,7 @@ Smoke Index,3600.0,0.0,success,True,2026-08-21T00:08:35.535549+09:00
 Smoke Map,60500.0,0.0,success,True,2026-08-21T00:10:34.597077+09:00
 Smoke Radar,3600.0,0.0,success,True,2026-08-21T00:09:38.850867+09:00
 Smoke Station,8100.0,0.0,success,True,2026-08-21T00:11:04.008018+09:00
+Smoke Tax,9900.0,0.0,success,True,2026-08-21T02:07:41.553019+09:00
 Smoke Tracker,1600.0,0.0,success,True,2026-08-21T00:09:23.484193+09:00
 Snow Advisory,450000.0,0.0,success,True,2026-08-21T00:58:34.367334+09:00
 Snow Level,2900.0,0.0,success,True,2026-08-19T20:38:03.591827+09:00
@@ -858,6 +894,7 @@ Subscriber Counter,18100.0,0.0,success,True,2026-08-18T23:57:22.753165+09:00
 Superintendent Office,1600.0,0.0,success,True,2026-08-21T00:46:15.039620+09:00
 Supply Core,1000.0,0.0,success,True,2026-08-17T23:05:47.972316+09:00
 Surcharge Rate,1600.0,0.0,success,True,2026-08-21T00:09:09.007645+09:00
+Surcharge Tax,1000.0,0.0,success,True,2026-08-21T02:09:05.168889+09:00
 Survey Note,1000.0,0.0,success,True,2026-08-21T01:24:22.725454+09:00
 Survey Receipt,2900.0,0.0,success,True,2026-08-21T01:26:01.379135+09:00
 Survey Status,4400.0,0.0,success,True,2026-08-21T01:24:35.885777+09:00
@@ -880,6 +917,7 @@ Threat Level,14800.0,0.0,success,True,2026-08-19T20:48:48.411735+09:00
 Threat Note,18100.0,0.0,success,True,2026-08-19T13:37:07.437416+09:00
 Threat Signal,1300.0,0.0,success,True,2026-08-17T21:34:24.214520+09:00
 Ticket Board,40500.0,0.0,success,True,2026-08-17T20:31:41.996994+09:00
+Ticket Cost,3600.0,0.0,success,True,2026-08-21T02:10:13.973101+09:00
 Ticket Note,1900.0,0.0,success,True,2026-08-19T13:24:10.018965+09:00
 Tile Map,8100.0,0.0,success,True,2026-08-19T21:17:25.572760+09:00
 Timeline History,14800.0,0.0,success,True,2026-08-19T20:45:10.019254+09:00
@@ -903,11 +941,13 @@ Transfer List,2400.0,0.0,success,True,2026-08-21T01:21:10.960024+09:00
 Transfer Order,1900.0,0.0,success,True,2026-08-21T01:20:45.332631+09:00
 Transfer Portal,201000.0,0.0,success,True,2026-08-21T01:25:45.514354+09:00
 Transfer Status,1300.0,0.0,success,True,2026-08-21T01:19:29.603335+09:00
+Transfer Tax,4400.0,0.0,success,True,2026-08-21T02:10:26.523271+09:00
 Transfer Ticker,1900.0,0.0,success,True,2026-08-21T01:18:16.729979+09:00
 Transfer Update,6600.0,0.0,success,True,2026-08-21T01:19:57.563871+09:00
 Transfer Wave,110000.0,0.0,success,True,2026-08-21T01:25:06.636344+09:00
 Triage Level,1900.0,0.0,success,True,2026-08-19T20:43:48.362624+09:00
 Truck Status,2900.0,0.0,success,True,2026-08-19T20:45:10.019254+09:00
+Tuition Cost,4400.0,0.0,success,True,2026-08-21T02:11:23.948204+09:00
 Tuition Fee,40500.0,0.0,success,True,2026-08-21T01:55:44.868962+09:00
 Tuition Feed,40500.0,0.0,success,True,2026-08-19T20:37:52.054454+09:00
 Tuition Note,14800.0,0.0,success,True,2026-08-19T13:39:37.773489+09:00
@@ -928,6 +968,7 @@ Vacancy Chart,33100.0,0.0,success,True,2026-08-19T20:38:18.738836+09:00
 Vacancy Circular,1900.0,0.0,success,True,2026-08-21T01:03:04.478545+09:00
 Vacancy Form,22200.0,0.0,success,True,2026-08-19T20:39:47.752844+09:00
 Vacancy Rate,2400.0,0.0,success,True,2026-08-19T20:41:40.323358+09:00
+Vacancy Tax,1300.0,0.0,success,True,2026-08-21T02:12:19.408855+09:00
 Vacancy Update,1600.0,0.0,success,True,2026-08-19T20:41:45.467674+09:00
 Vaccination Card,18100.0,0.0,success,True,2026-08-19T13:24:58.997710+09:00
 Vaccination Passport,1000.0,0.0,success,True,2026-08-19T12:23:14.200437+09:00
@@ -939,6 +980,7 @@ Vendor Center,40500.0,0.0,success,True,2026-08-17T20:45:28.437462+09:00
 Vendor Code,2900.0,0.0,success,True,2026-08-19T21:47:38.670449+09:00
 Venue Ops,1600.0,0.0,success,True,2026-08-17T23:29:01.871676+09:00
 Verification Badge,18100.0,0.0,success,True,2026-08-21T00:26:21.311990+09:00
+Verification Tax,4400.0,0.0,success,True,2026-08-21T02:08:11.666475+09:00
 Verification Ticket,49500.0,0.0,success,True,2026-08-21T00:08:56.538180+09:00
 Violation Tracker,1300.0,0.0,success,True,2026-08-19T20:44:56.793146+09:00
 Volunteer Sample,1300.0,0.0,success,True,2026-08-19T21:46:50.004607+09:00
