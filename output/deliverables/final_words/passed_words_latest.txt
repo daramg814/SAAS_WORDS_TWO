@@ -121,6 +121,7 @@ Cancellation Confirmation
 Cancellation Fee
 Candidate Register
 Candidate Status
+Capacity Unit
 Care Compass
 Care Report
 Cargo Update

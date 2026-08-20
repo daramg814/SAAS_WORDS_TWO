@@ -15,6 +15,10 @@
         "title": "Membership Fee"
       },
       {
+        "industry": "marketing",
+        "title": "Conversion Unit"
+      },
+      {
         "industry": "real_estate",
         "title": "Contingency Plan"
       },
@@ -29,6 +33,10 @@
       {
         "industry": "moving_relocation_services",
         "title": "Reimbursement Fee"
+      },
+      {
+        "industry": "childcare",
+        "title": "Ratio Unit"
       },
       {
         "industry": "insurance",
@@ -171,6 +179,14 @@
         "title": "Backup Plan"
       },
       {
+        "industry": "telecom",
+        "title": "Bandwidth Unit"
+      },
+      {
+        "industry": "healthcare",
+        "title": "Discharge Unit"
+      },
+      {
         "industry": "property_management_services",
         "title": "Gate Fee"
       },
@@ -189,6 +205,22 @@
       {
         "industry": "salon_spa",
         "title": "Commission Fee"
+      },
+      {
+        "industry": "cybersecurity",
+        "title": "Perimeter Unit"
+      },
+      {
+        "industry": "laundry_dry_cleaning",
+        "title": "Pricing Unit"
+      },
+      {
+        "industry": "pest_control",
+        "title": "Chemical Unit"
+      },
+      {
+        "industry": "it_devops",
+        "title": "Capacity Unit"
       }
     ],
     "backlog": [],
@@ -3565,10 +3597,10 @@
       "Zoning Unit": "hvac_services"
     },
     "round_stats": {
-      "ai_approved": 2926,
+      "ai_approved": 3355,
       "backlog_carried": 0,
       "generated": 3370,
-      "kp_passed": 47
+      "kp_passed": 55
     },
     "word_bank_expansion_attempted": true
   },
@@ -3577,5 +3609,5 @@
   "run_id": "RUN-20260821-014701-KST",
   "stage": "generate_and_review_titles",
   "status": "RUNNING",
-  "updated_at": "2026-08-21T02:00:05.208095+09:00"
+  "updated_at": "2026-08-21T02:00:07.310696+09:00"
 }
