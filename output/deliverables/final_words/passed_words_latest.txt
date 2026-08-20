@@ -53,6 +53,7 @@ Attendance Confirmation
 Attendance View
 Attic Radar
 Audit Desk
+Audit Duty
 Audit Voucher
 Backlog Order
 Backup Plan
@@ -174,10 +175,12 @@ Chat Sheet
 Chat Status
 Chat Update
 Checkin Code
+Chemical Charge
 Chemical Code
 Chemical File
 Chemical Level
 Chemical Unit
+Chlorine Charge
 Circulation Portal
 Citation Log
 Citation Portal
@@ -219,6 +222,7 @@ Combination Sum
 Commission Fee
 Commission Rate
 Commission Sheet
+Commission Tariff
 Commission Tax
 Comparable Chart
 Comparable Cost
@@ -249,6 +253,7 @@ Contract Cost
 Contract Note
 Conversion Base
 Conversion Calendar
+Conversion Charge
 Conversion Cost
 Conversion Fee
 Conversion Log
@@ -271,7 +276,9 @@ Curb Line
 Curriculum Hub
 Customs Portal
 Customs Rate
+Customs Tariff
 Cylinder Rate
+Damage Charge
 Damage Frame
 Damage Item
 Damage Monitor
@@ -296,6 +303,7 @@ Dependent Rate
 Deposit Fee
 Deposit File
 Deposit Note
+Detention Charge
 Diagnosis Ticket
 Dialect Journal
 Dialect Map
@@ -352,6 +360,7 @@ Equity Debt
 Equity Statement
 Estimate Point
 Estimate Sum
+Excess Duty
 Exclusion List
 Extraction Point
 Family Check
@@ -392,6 +401,7 @@ Fraud Slip
 Freight Rail
 Freight Trail
 Fuel Check
+Fuel Duty
 Fuel Map
 Fuel Pass
 Fuel Radar
@@ -460,6 +470,7 @@ Impact Frame
 Impact Lab
 Impact Point
 Impact Statement
+Incident Charge
 Incident Map
 Incident Rate
 Incident Tax
@@ -531,12 +542,15 @@ Location Relay
 Loss Line
 Loss Log
 Loss Report
+Loyalty Duty
 Mailbox Map
+Maintenance Charge
 Maintenance Cost
 Maintenance Fee
 Maintenance Feed
 Major Update
 Mandate Cash
+Mandate Charge
 Mandate Form
 Mandate Order
 Manifest File
@@ -551,6 +565,7 @@ Material Hub
 Material List
 Material Status
 Material Tab
+Meal Allowance
 Medication History
 Medication Route
 Medication Station
@@ -584,6 +599,7 @@ Monitoring Check
 Monitoring Scale
 Mortise View
 Move Reminder
+Negligence Duty
 Neighborhood Code
 Neighborhood Draft
 Neighborhood Map
@@ -635,6 +651,7 @@ Patient Log
 Patient Pass
 Patient Station
 Payment Code
+Payment Duty
 Payment Fee
 Payment Feed
 Payment History
@@ -650,6 +667,7 @@ Pension Status
 Perimeter Directory
 Perimeter Unit
 Permit Card
+Permit Charge
 Permit Check
 Permit Fee
 Permit Portal
@@ -677,6 +695,7 @@ Port Status
 Premium Hub
 Premium Nexus
 Premium Portal
+Prescription Charge
 Prescription Fee
 Pricing Estimate
 Pricing Unit
@@ -749,11 +768,13 @@ Refund Scheduler
 Refund Status
 Refund Tracker
 Registrar Assistant
+Registration Charge
 Registration Code
 Registration Grid
 Registration Journal
 Registration Slip
 Reimbursement Fee
+Relocation Allowance
 Renewal Fee
 Renewal Tax
 Rent Panel
@@ -761,6 +782,7 @@ Rent Register
 Rent Registry
 Rental Panel
 Rental Register
+Repair Charge
 Repair Cost
 Request Tracker
 Reservation Bill
@@ -807,18 +829,21 @@ Rider Portal
 Rider Score
 Rim Tracker
 Roaming List
+Roster Duty
 Roster Form
 Rotation Point
 Rotation Rate
 Route Code
 Route Slip
 Route Slot
+Royalty Charge
 Royalty Fee
 Rubric Sample
 Rubric Score
 Safe Route
 Safety Route
 Salary Alert
+Salary Allowance
 Salary Base
 Salary Directory
 Salary History
@@ -835,6 +860,7 @@ Schedule Update
 Scheduling Fee
 Scholarship Log
 Scholarship Status
+Screening Charge
 Screening Scale
 Season List
 Season Office
@@ -845,6 +871,7 @@ Semester Fee
 Semester Point
 Seniority List
 Service Bulletin
+Service Charge
 Service Code
 Service Directory
 Service Fee
@@ -857,6 +884,7 @@ Severance Check
 Severance Office
 Severance Tax
 Severity Alert
+Shift Allowance
 Shift Code
 Shift Tab
 Shipment Bill
@@ -944,9 +972,11 @@ Title Manager
 Toast Alert
 Trade Badge
 Trade Quota
+Trade Tariff
 Training Radar
 Transcript Ledger
 Transfer Center
+Transfer Charge
 Transfer Code
 Transfer Fee
 Transfer Feed
@@ -978,6 +1008,7 @@ Union Sample
 Union Score
 Union Table
 Union Tag
+Utility Allowance
 Utility Portal
 Vacancy Chart
 Vacancy Circular
@@ -989,6 +1020,7 @@ Vaccination Card
 Vaccination Passport
 Vaccination Table
 Vacuum Journal
+Valuation Allowance
 Valuation Map
 Variant Order
 Vendor Center
@@ -1006,6 +1038,7 @@ Waiver Tracker
 Walkthrough Portal
 Waste Path
 Watermark Sample
+Withdrawal Charge
 Withdrawal Check
 Withdrawal Form
 Withdrawal History
