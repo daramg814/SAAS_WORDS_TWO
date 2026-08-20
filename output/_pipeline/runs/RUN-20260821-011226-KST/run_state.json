@@ -5089,7 +5089,7 @@
   "created_at": "2026-08-21T01:12:26.241301+09:00",
   "mode": "production",
   "run_id": "RUN-20260821-011226-KST",
-  "stage": "generate_and_review_titles",
-  "status": "RUNNING",
-  "updated_at": "2026-08-21T01:26:45.512393+09:00"
+  "stage": "update_memory_and_git_checkpoint",
+  "status": "DONE",
+  "updated_at": "2026-08-21T01:26:55.167413+09:00"
 }

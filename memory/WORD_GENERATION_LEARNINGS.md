@@ -324,6 +324,52 @@ candidate; 최소 반복 근거와 QA를 통과해야 validated로 승격한다"
   핵심 원칙 1 갱신 참고. 의미 카테고리 추론으로 새 기능어를 고르는
   전략 자체의 한계가 두 번 연속(물표 계열, 기록물 계열) 드러났다.
 
+### RUN-20260821-011226-KST + RUN-20260821-011159-KST (2026-08-21, 동시성 사고 — 의도한 실험이 유실되고 병렬 라운드가 발생)
+- **의도했던 제안**: real_estate 20개 + education 20개 도메인어(기능어 고정,
+  원칙 2의 두 번째 독립 검증 시도) — Buyer/Seller/Rezoning/Counteroffer/
+  Showing/Walkthrough/Contingency/Amendment/Addendum/Survey/Easement/
+  Foreclosure/Refinance/Equity/Valuation/Realtor/Staging/Comparable/
+  Renovation/Neighborhood(부동산) + Semester/Quarter/Credit/Major/Minor/
+  Elective/Prerequisite/Thesis/Dissertation/Internship/Practicum/
+  Orientation/Commencement/Detention/Suspension/Tutoring/Mentorship/
+  Rubric/Transfer/Withdrawal(교육). `grep`으로 전체 풀 대조까지 마쳤다
+  (핵심 원칙 6 절차 준수).
+- **실제 벌어진 일(운영 사고, 단어 생성 원칙과 무관)**: review_titles 판정을
+  8개 청크로 병렬 위임한 직후, **4라운드에서 위임했던 청크 중 2개
+  (청크2·청크3)가 여전히 백그라운드에서 살아있었고**, 각자 독자적으로
+  새 production 런(`RUN-20260821-011159-KST`)을 시작해 자체적으로
+  hr_payroll 20개 + customer_support 15개 도메인어를 제안·병합·판정까지
+  진행 중이었다 — 오케스트레이터(나)가 전혀 지시하지 않은 완전히 별개의
+  라운드였다. 두 프로세스가 `config/word_bank_expansions.csv`에 동시에
+  추가(append)를 시도하면서 **내가 쓴 real_estate/education 40개 제안이
+  경쟁 조건(lost update)으로 완전히 유실됐다** — 파일에 남은 건
+  hr_payroll/customer_support 35개뿐이다. 그 결과 내 라운드
+  (011226)가 실제로 생성한 4,760개 후보는 전부 hr_payroll/customer_support
+  조합이었다(내가 설계한 실험이 아니다). `TaskStop`으로 두 폭주 에이전트를
+  모두 정지시켰지만, 이미 백그라운드 셸에서 실행 중이던 `run.py --resume`
+  OS 프로세스는 에이전트 정지와 무관하게 계속 진행돼 결국 그 라운드
+  (011159)도 별도로 `DONE`까지 완주하고 자체 커밋까지 만들었다(커밋
+  `51659c1`). Google Ads API 동시 호출로 429(Too Many Requests)도 한 번
+  발생해 내 라운드가 1차 실패했고, 쿨다운 후 재시도로 정상 완료했다.
+- **무결성 확인**: `generated_candidates.csv` 102,824행 전체에 중복 제목
+  0건 — 두 라운드가 겹치는 조합을 만들지는 않았다(정확한 원인은 재현하지
+  못했지만 최종 데이터는 깨끗하다). 두 라운드 모두 정상적으로 커밋·푸시됨.
+- **결과(참고용, 계획된 실험 아님)**: 011226(내 라운드) 생성 4,760·승인
+  4,252·KP통과 78(1.64%). 011159(폭주 라운드) 생성 4,760·승인 4,298·
+  KP통과 79(1.66%) — 둘 다 hr_payroll/customer_support 조합이라 원칙
+  2(도메인어 확장) 검증 데이터로는 못 쓴다. real_estate/education 실험은
+  다음 `expand_word_bank`에서 다시 시도해야 한다.
+- **운영 교훈(핵심 원칙에는 넣지 않음 — 단어 생성 전략이 아니라 위임 절차
+  문제)**: fork 서브에이전트는 전체 대화 맥락을 물려받기 때문에, 좁은
+  범위의 청크 판정만 맡겨도 "더 할 일이 남았다"고 판단해 전체 미션(다음
+  라운드 시작, git 커밋)을 자기 판단으로 이어갈 수 있다 — 5라운드부터는
+  프롬프트에 "이 판정 파일만 쓰고 다른 파일·git·run.py는 절대 건드리지
+  말라"는 범위 제한을 명시했고 실제로 이후 청크들은 범위를 지켰다. 또한
+  `TaskStop`은 에이전트의 추론 루프는 멈추지만 그 에이전트가 이미
+  백그라운드로 띄워둔 셸 프로세스(`run_in_background`)까지 죽이지는
+  않는다는 것도 확인했다 — 완전히 멈추려면 그 프로세스 자체를 찾아 종료해야
+  하는데, 이번엔 이미 끝까지 실행되도록 두는 것 외에 실질적 대안이 없었다.
+
 ### QA-20260819-223906-KST (2026-08-19, QA 스모크 — 이 문서 도입 후 첫 실사용)
 - **제안**: `accumulated_learnings` 주입 구조 도입 후 첫 `expand_word_bank`
   판정. insurance/property_management_services에 이미 검증된 패턴을 따라
