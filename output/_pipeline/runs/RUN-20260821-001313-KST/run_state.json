@@ -6395,7 +6395,7 @@
   "created_at": "2026-08-21T00:13:13.162801+09:00",
   "mode": "production",
   "run_id": "RUN-20260821-001313-KST",
-  "stage": "generate_and_review_titles",
-  "status": "RUNNING",
-  "updated_at": "2026-08-21T00:36:56.126067+09:00"
+  "stage": "update_memory_and_git_checkpoint",
+  "status": "DONE",
+  "updated_at": "2026-08-21T00:37:02.319980+09:00"
 }
