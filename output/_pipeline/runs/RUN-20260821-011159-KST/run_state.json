@@ -1,6 +1,324 @@
 {
-  "awaiting_judgment": "review_titles",
+  "awaiting_judgment": null,
   "context": {
+    "approved": [
+      {
+        "industry": "customer_support",
+        "title": "Channel Code"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Channel List"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Case Status"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Pension Board"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Grievance Passport"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Dependent Rate"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Union Log"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Wage Level"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Case Update"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Union Score"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Pension Portal"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Termination Line"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Union Tag"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Salary History"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Union Level"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Grievance Status"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Case List"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Wage List"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Rating Deck"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Seniority List"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Transfer Ticker"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Union List"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Union Table"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Union Sample"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Survey Studio"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Transfer Form"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Grievance List"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Severity Alert"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Transfer Status"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Backlog Order"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Training Radar"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Union Bulletin"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Severance Office"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Transfer Update"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Transfer Feed"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Request Tracker"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Channel Portal"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Promotion List"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Channel Route"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Transfer Order"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Agent Station"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Transfer Code"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Transfer List"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Agent Portal"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Agent Panel"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Contact Compass"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Pension Status"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Agent Atlas"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Salary Base"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Rating Chart"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Severance Check"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Hold Statement"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Union Center"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Salary Portal"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Priority Order"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Hold Entry"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Grievance Portal"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Pension List"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Pension Slip"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Agent Booth"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Union Nexus"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Rating Update"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Transfer Wave"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Survey Note"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Hold Bridge"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Survey Status"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Withholding Rate"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Grievance Register"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Salary Directory"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Rating List"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Transfer Center"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Transfer Portal"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Agent Log"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Contact Calendar"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Survey Receipt"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Withholding Table"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Dependent Card"
+      },
+      {
+        "industry": "customer_support",
+        "title": "Case Log"
+      },
+      {
+        "industry": "hr_payroll",
+        "title": "Salary Alert"
+      }
+    ],
     "backlog": [],
     "candidate_industry": {
       "Agent Advisory": "customer_support",
@@ -4764,6 +5082,12 @@
       "Withholding Yard": "hr_payroll",
       "Withholding Zone": "hr_payroll"
     },
+    "round_stats": {
+      "ai_approved": 4298,
+      "backlog_carried": 0,
+      "generated": 4760,
+      "kp_passed": 79
+    },
     "word_bank_expansion_attempted": true
   },
   "created_at": "2026-08-21T01:11:59.855637+09:00",
@@ -4771,5 +5095,5 @@
   "run_id": "RUN-20260821-011159-KST",
   "stage": "generate_and_review_titles",
   "status": "RUNNING",
-  "updated_at": "2026-08-21T01:13:12.489025+09:00"
+  "updated_at": "2026-08-21T01:26:48.502370+09:00"
 }
