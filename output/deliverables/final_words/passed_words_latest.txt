@@ -25,6 +25,7 @@ Album Rate
 Alumni Card
 Alumni Portal
 Amendment Bill
+Amenity Fee
 Application History
 Application Statement
 Application Status
@@ -38,6 +39,7 @@ Assembly Level
 Assembly Loop
 Assembly Register
 Assembly Sample
+Assessment Fee
 Assessment Pass
 Assessment Report
 Assessment Sample
@@ -53,12 +55,15 @@ Attic Radar
 Audit Desk
 Audit Voucher
 Backlog Order
+Backup Plan
 Backup Planner
 Backup Signal
 Badge Cascade
 Badge Center
 Balcony View
+Bandwidth Unit
 Barcode Board
+Barcode Item
 Barcode Slot
 Barcode Ticket
 Batch Check
@@ -93,6 +98,7 @@ Bond Check
 Bond Order
 Bond Timeline
 Briefing Note
+Briefing Plan
 Briefing Report
 Broadcast Station
 Budget Circular
@@ -112,6 +118,7 @@ Camera Score
 Campaign Trail
 Cancellation Check
 Cancellation Confirmation
+Cancellation Fee
 Candidate Register
 Candidate Status
 Care Compass
@@ -151,6 +158,7 @@ Chart Status
 Chart Update
 Charter Log
 Charter Map
+Chat Item
 Chat List
 Chat Log
 Chat Map
@@ -164,6 +172,7 @@ Checkin Code
 Chemical Code
 Chemical File
 Chemical Level
+Chemical Unit
 Circulation Portal
 Citation Log
 Citation Portal
@@ -200,6 +209,7 @@ Closing Statement
 Closing Window
 Clubhouse Register
 Combination Chart
+Commission Fee
 Commission Rate
 Commission Sheet
 Comparable Chart
@@ -218,15 +228,18 @@ Contact Compass
 Content Advisory
 Content Feed
 Content Table
+Contingency Plan
 Contingency Planner
 Contingency Table
 Contract Base
 Contract Note
 Conversion Base
 Conversion Calendar
+Conversion Fee
 Conversion Log
 Conversion Order
 Conversion Status
+Conversion Unit
 Courier Form
 Cover Flow
 Cover Ops
@@ -243,7 +256,9 @@ Customs Portal
 Customs Rate
 Cylinder Rate
 Damage Frame
+Damage Item
 Damage Monitor
+Damage Plan
 Damage Report
 Damages Report
 Dealer Code
@@ -251,6 +266,7 @@ Dealer Log
 Dealer Path
 Declarations Form
 Defect Card
+Defect Item
 Defect List
 Defect Monitor
 Defect Point
@@ -260,6 +276,7 @@ Delivery Update
 Demand Draft
 Dependent Card
 Dependent Rate
+Deposit Fee
 Deposit File
 Deposit Note
 Diagnosis Ticket
@@ -268,6 +285,7 @@ Dialect Map
 Discharge Form
 Discharge Petition
 Discharge Summary
+Discharge Unit
 Disclosure Hub
 Discovery Calendar
 Discovery Hub
@@ -303,8 +321,10 @@ Efficiency Engine
 Elevator Gate
 Endorsement Check
 Engagement Status
+Enrollment Fee
 Enrollment Roll
 Enrollment Status
+Entrance Fee
 Equipment List
 Equity Card
 Equity Statement
@@ -325,6 +345,7 @@ Feedback Assistant
 Feedback Hub
 Feedback Station
 Filing Directory
+Filing Fee
 Filing List
 Filing Radar
 Filing Report
@@ -361,6 +382,7 @@ Furnace Tracker
 Gallery Note
 Gallery Tag
 Garage Journal
+Gate Fee
 Gate Score
 Gauge Map
 Glossary List
@@ -406,6 +428,7 @@ Homework Code
 Housekeeping Note
 Immunization Card
 Immunization Register
+Impact Fee
 Impact Frame
 Impact Lab
 Impact Point
@@ -467,6 +490,7 @@ Liner Slot
 Linguist List
 Listing File
 Listing Index
+Listing Item
 Listing Map
 Listing Order
 Livestock Assistant
@@ -478,6 +502,7 @@ Loss Line
 Loss Log
 Loss Report
 Mailbox Map
+Maintenance Fee
 Maintenance Feed
 Major Update
 Mandate Form
@@ -499,6 +524,7 @@ Medication Station
 Membership Center
 Membership Core
 Membership Counter
+Membership Fee
 Membership List
 Membership Log
 Membership Portal
@@ -507,6 +533,7 @@ Memorial Map
 Mentorship Portal
 Menu Assistant
 Menu Console
+Menu Item
 Menu Loop
 Menu Roster
 Menu Update
@@ -564,6 +591,7 @@ Package View
 Package Zone
 Packing Code
 Panic Log
+Parking Fee
 Parking Portal
 Patch Note
 Patient Gate
@@ -572,6 +600,7 @@ Patient Log
 Patient Pass
 Patient Station
 Payment Code
+Payment Fee
 Payment Feed
 Payment History
 Payment Order
@@ -584,12 +613,15 @@ Pension Portal
 Pension Slip
 Pension Status
 Perimeter Directory
+Perimeter Unit
 Permit Card
 Permit Check
+Permit Fee
 Permit Portal
 Permit Status
 Pickup Hub
 Placement Check
+Placement Fee
 Placement Log
 Placement Portal
 Playground Map
@@ -609,7 +641,9 @@ Port Status
 Premium Hub
 Premium Nexus
 Premium Portal
+Prescription Fee
 Pricing Estimate
+Pricing Unit
 Pricing Update
 Print History
 Print Portal
@@ -666,7 +700,9 @@ Reference Frame
 Reference Journal
 Reference Map
 Reference Rate
+Referral Fee
 Referral Feed
+Refund Fee
 Refund Locator
 Refund Scheduler
 Refund Status
@@ -676,6 +712,8 @@ Registration Code
 Registration Grid
 Registration Journal
 Registration Slip
+Reimbursement Fee
+Renewal Fee
 Rent Panel
 Rent Register
 Rent Registry
@@ -684,6 +722,7 @@ Rental Register
 Request Tracker
 Reservation Bill
 Reservation Map
+Reserve Fee
 Reserve Map
 Reserve Rate
 Resident Advisory
@@ -699,9 +738,11 @@ Resolution Scope
 Response Rate
 Response Sheet
 Retail Chain
+Retention Fee
 Retention List
 Return Check
 Return Code
+Return Fee
 Return Hub
 Return Log
 Return Scale
@@ -723,6 +764,7 @@ Rotation Rate
 Route Code
 Route Slip
 Route Slot
+Royalty Fee
 Rubric Sample
 Rubric Score
 Safe Route
@@ -737,8 +779,10 @@ Satisfaction Level
 Satisfaction Tab
 Schedule Bridge
 Schedule Draft
+Schedule Fee
 Schedule Path
 Schedule Update
+Scheduling Fee
 Scholarship Log
 Scholarship Status
 Screening Scale
@@ -747,14 +791,17 @@ Season Office
 Season Order
 Segment Circular
 Segment Code
+Semester Fee
 Semester Point
 Seniority List
 Service Bulletin
 Service Code
 Service Directory
+Service Fee
 Service Loop
 Service Update
 Session File
+Session Plan
 Session Window
 Severance Check
 Severance Office
@@ -837,6 +884,7 @@ Timeline History
 Timesheet Reminder
 Title Counter
 Title Entry
+Title Fee
 Title List
 Title Manager
 Toast Alert
@@ -846,6 +894,7 @@ Training Radar
 Transcript Ledger
 Transfer Center
 Transfer Code
+Transfer Fee
 Transfer Feed
 Transfer Form
 Transfer List
@@ -857,6 +906,7 @@ Transfer Update
 Transfer Wave
 Triage Level
 Truck Status
+Tuition Fee
 Tuition Feed
 Tuition Note
 Turbidity Flow
@@ -892,6 +942,7 @@ Violation Tracker
 Volunteer Sample
 Wage Level
 Wage List
+Waiver Fee
 Waiver Tracker
 Walkthrough Portal
 Waste Path

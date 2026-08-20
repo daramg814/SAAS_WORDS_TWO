@@ -1,7 +1,7 @@
 # 단어 성과 리포트 (자동 생성)
 
-- 생성 시각: 2026-08-21T01:44:41.092541+09:00
-- 누적 통과율: 909/92693 = 0.98%
+- 생성 시각: 2026-08-21T02:00:04.884757+09:00
+- 누적 통과율: 960/95937 = 1.00%
 - 은퇴 기능어: 40개 (`config/retired_function_words.csv`)
 
 ## 기능어 통과율 상위 (시도 100회 이상)
@@ -13,6 +13,7 @@
 | Status | 39 | 672 | 5.80% |
 | List | 37 | 668 | 5.54% |
 | Map | 34 | 655 | 5.19% |
+| Fee | 34 | 658 | 5.17% |
 | Rate | 33 | 653 | 5.05% |
 | Chart | 10 | 250 | 4.00% |
 | Log | 23 | 665 | 3.46% |
@@ -27,36 +28,35 @@
 | Sample | 14 | 610 | 2.30% |
 | Order | 14 | 621 | 2.25% |
 | Tracker | 15 | 673 | 2.23% |
-| Report | 15 | 674 | 2.23% |
 
 ## 은퇴 대상(통과 0 / 시도 300회 이상)
 
-Almanac, Anchor, Blueprint, Book, Catalog, Checklist, Cockpit, Codex, Compendium, Dashboard, Depot, Dial, Digest, Dock, Dossier, Excerpt, Flag, Grade, Guard, Guidebook, Hotline, Insight, Lens, Lock, Meter, Metrics, Navigator, Node, Organizer, Pilot, Pulse, Queue, Roadmap, Sentry, Snapshot, Suite, Sync, Tally, Toolkit, Workbench
+Almanac, Anchor, Blueprint, Book, Catalog, Checklist, Cockpit, Codex, Compendium, Dashboard, Deal, Depot, Dial, Digest, Dock, Dossier, Excerpt, Flag, Grade, Guard, Guidebook, Hotline, Insight, Lens, Lock, Meter, Metrics, Navigator, Node, Organizer, Pilot, Pulse, Queue, Roadmap, Sentry, Snapshot, Suite, Sync, Tally, Toolkit, Workbench
 
 ## 도메인어 통과율 상위 (시도 30회 이상)
 
 | 도메인어 | 통과 | 시도 | 통과율 |
 |---|---|---|---|
-| Transfer | 11 | 131 | 8.40% |
-| License | 10 | 122 | 8.20% |
-| Union | 10 | 127 | 7.87% |
-| Closing | 9 | 131 | 6.87% |
-| Strike | 8 | 123 | 6.50% |
-| Chat | 9 | 153 | 5.88% |
-| Family | 9 | 154 | 5.84% |
-| Chart | 8 | 143 | 5.59% |
-| Agent | 7 | 131 | 5.34% |
-| Smoke | 7 | 131 | 5.34% |
-| Opening | 7 | 133 | 5.26% |
-| Grading | 8 | 153 | 5.23% |
-| Fuel | 8 | 155 | 5.16% |
-| Grid | 7 | 137 | 5.11% |
-| Vacancy | 5 | 101 | 4.95% |
-| Ratio | 7 | 142 | 4.93% |
-| Package | 6 | 124 | 4.84% |
-| Billing | 7 | 148 | 4.73% |
-| Port | 7 | 150 | 4.67% |
-| Salary | 6 | 129 | 4.65% |
+| Transfer | 12 | 136 | 8.82% |
+| License | 10 | 126 | 7.94% |
+| Union | 10 | 132 | 7.58% |
+| Closing | 9 | 136 | 6.62% |
+| Chat | 10 | 157 | 6.37% |
+| Strike | 8 | 127 | 6.30% |
+| Family | 9 | 159 | 5.66% |
+| Chart | 8 | 148 | 5.41% |
+| Agent | 7 | 136 | 5.15% |
+| Smoke | 7 | 136 | 5.15% |
+| Opening | 7 | 138 | 5.07% |
+| Grading | 8 | 158 | 5.06% |
+| Return | 8 | 158 | 5.06% |
+| Membership | 8 | 159 | 5.03% |
+| Fuel | 8 | 160 | 5.00% |
+| Grid | 7 | 142 | 4.93% |
+| Ratio | 7 | 146 | 4.79% |
+| Vacancy | 5 | 106 | 4.72% |
+| Package | 6 | 129 | 4.65% |
+| Conversion | 7 | 152 | 4.61% |
 
 > 해석 가이드: 새 기능어를 제안할 때는 상위 표의 패턴(실제 검색되는 구체적
 > 명사)을 닮게, 은퇴 목록의 패턴(전문용어풍 합성어)은 피한다. Keyword
