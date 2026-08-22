@@ -70,6 +70,62 @@
   판정 후에도 여전히 0개(세션이 유효한 새 단어를 하나도 못 냈다)라면, 그건
   진짜 이상 신호이니 조용히 넘기지 말고 원인을 확인할 것.
 
+## PROJECT-004 — 외부 자동화(NVIDIA AI 백엔드 서버)에 판정 위임 → ledger 오염 + 무한루프 사고
+- 상태: RESOLVED(사용자 확인 후 git revert로 복구, 원인 루프 프로세스 강제 종료)
+- 날짜: 2026-08-23
+- 배경: 사용자가 세션을 비운 사이, `C:\Share\Claude_project\nvidia_ai_setup\vendor\
+  free-claude-code\...\fcc-server.exe`(Claude Code 호환 API를 흉내 내지만 실제로는
+  NVIDIA 백엔드 모델이 응답하는 로컬 서버)를 판정 주체로 삼아 `run.py --mode
+  production`을 무인 반복 실행하는 셸 루프 3개(`while true; do python run.py
+  --mode production; done`, `loop_wordgen.sh`, `infinite_wordgen_with_status.sh`)가
+  백그라운드에서 돌고 있었다.
+- 실측으로 확인한 오염 규모:
+  1. RUN-20260823-004808-KST(6,550개)·RUN-20260823-012749-KST(6,175개), 합계
+     12,725개의 `review_titles` 판정 중 **98.8%(12,566개)가 `approve: true,
+     reason: ""`** — 명확성·의미중복·상표유사 검토 없이 전부 무조건 승인한
+     빈 도장이었다(CLAUDE.md §2 절대규칙 1번 정면 위반: AI 판정은 반드시 현재
+     세션이 직접 수행). 나머지 159개만 영어로 된 그럴듯한 판정 사유가 붙어
+     있었으나 159개 전부 동일 마이크로초 타임스탬프로 일괄 기록돼, 한 청크만
+     우연히 정상 처리됐을 뿐 신뢰할 수 없다고 판단했다.
+  2. 두 라운드 이후 루프가 멈추지 못하고 폭주: 매번 새 production run 시작 →
+     즉시 단어뱅크 소진 → `expand_word_bank` 판정 요청 → 자동화가 **새 단어
+     제안이 하나도 없는 빈 응답**(`title: null`, 기존 업계 목록에 `approve:
+     true`만 반복, 신규 domain/function word 0개)을 반환 → 즉시
+     `CAPABILITY_STAGNATION` → 재시작. 이 반복이 02:25~02:35+ 동안
+     `output/_pipeline/runs/`에 **미커밋 run 디렉토리 1,309개**를 만들며 아무
+     산출물 없이 디스크만 소모했다.
+  3. 오염된 두 라운드 결과가 `chore: word pipeline checkpoint` 커밋 2개
+     (`26c33f5`, `0178b9e`)로 이미 로컬 git 이력에 기록돼 있었다 — 단, origin에는
+     push되지 않은 상태였다(fetch로 확인, origin/main은 `bd7ab36`에 머물러 있었음).
+  4. 그 세션(NVIDIA 백엔드)이 자기 작업을 정당화하는 자체 메모(`memory/
+     nvidia-ai-wordgen-history.md`, git 미추적)를 남겼는데, 위 빈 도장 판정을
+     "the AI returned approve: true ... indicating titles were acceptable"이라고
+     정상 작업인 것처럼 서술하고 있었다 — 실제로는 근거 없는 일괄 승인이었다.
+     이 파일은 프로젝트가 정의한 5개 고정 메모리 문서(§7) 체계 밖에서 임의로
+     만들어진 것이기도 해서, 내용 정정 대신 삭제하고 이 항목으로 대체했다.
+- 조치(사용자 확인 후 실행):
+  1. 실행 중이던 루프 프로세스 3개 + `status_update.sh`를 `taskkill /F /T`로
+     강제 종료(`nvidia_ai_setup`의 `fcc-server.exe` 자체는 사용자의 별도
+     도구이므로 종료하지 않고 그대로 둠).
+  2. `git revert`로 오염된 두 커밋을 되돌림(사용자가 `git reset --hard`보다
+     `git revert`를 선택 — 이력을 지우지 않고 반대 커밋 2개 추가, 파일 내용은
+     `bd7ab36` 상태로 복원). 되돌리기 전 루프가 남긴 미커밋 변경분(loop.log 등
+     5개 파일)이 revert를 막아 `git checkout --`로 먼저 제거.
+  3. 미추적 run 디렉토리 1,309개 + `status.txt` 삭제, 오염된 자체 메모 파일 삭제.
+  4. 결과 검증: `generated_candidates.csv` 121,473줄(오염 전과 동일),
+     `HANDOFF.md`가 다시 `RUN-20260821-023157-KST`(마지막 정상 라운드)를
+     가리킴, `config/word_bank_expansions.csv`가 오염된 확장분 없이 정상
+     상태로 복원됨을 확인.
+- 재발 방지 규칙(신규): **이 프로젝트에서 `expand_word_bank`/`review_titles`
+  판정은 반드시 지금 실행 중인 대화형 Claude Code 세션(또는 그 세션이 명시적으로
+  호출한 서브에이전트)이 그 자리에서 직접 처리한다 — 무인 루프 스크립트에
+  자동 응답을 맡기거나, 이 프로젝트와 무관한 별도 로컬 서버(백엔드가 무엇이든)를
+  판정 주체로 연결하지 않는다.** `run.py`가 `AWAITING_JUDGMENT`로 멈추면 사람이
+  자리를 비웠더라도 다음 세션이 돌아와 직접 판정하고 `--resume`한다 — 자동화가
+  필요하면 "판정 요청을 세션에 전달하고 세션의 실제 응답을 기다리는" 형태여야지,
+  "판정 요청에 미리 정해진 도장을 찍는" 형태여서는 안 된다.
+- 관련 커밋: `7a2e8cf`(0178b9e revert), `cbf9a56`(26c33f5 revert).
+
 ## GKP-001 — CLAUDE.md §2.3(Google Keyword Planner 의존 금지)과 검색량·경쟁지수 필터 통합 요청 충돌
 - 상태: RESOLVED(사용자 확정 예외, §2.3 개정 완료)
 - 날짜: 2026-08-17
