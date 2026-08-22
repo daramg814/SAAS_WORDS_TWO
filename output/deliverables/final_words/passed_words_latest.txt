@@ -190,6 +190,7 @@ Claim Code
 Claim Counter
 Claim Map
 Claim Point
+Claim Stake
 Claim Status
 Claim Vault
 Claimant Portal
@@ -260,6 +261,7 @@ Conversion Log
 Conversion Order
 Conversion Status
 Conversion Unit
+Conversion Value
 Courier Form
 Cover Flow
 Cover Ops
@@ -357,9 +359,11 @@ Equipment List
 Equity Card
 Equity Cost
 Equity Debt
+Equity Stake
 Equity Statement
 Estimate Point
 Estimate Sum
+Estimate Value
 Excess Duty
 Exclusion List
 Extraction Point
@@ -477,6 +481,7 @@ Incident Tax
 Intake Center
 Interaction Log
 Intercom Note
+Intercom Value
 Internship File
 Internship Report
 Internship Studio
@@ -495,6 +500,7 @@ Invite Tracker
 Key Base
 Key Report
 Key Sheet
+Key Value
 Knowledge Board
 Knowledge Check
 Knowledge Gate
@@ -502,6 +508,7 @@ Knowledge Level
 Lapse Rate
 Laundry List
 Laundry View
+Leave Margin
 Leave Office
 Leave Score
 Lever Card
@@ -641,6 +648,7 @@ Package Note
 Package View
 Package Zone
 Packing Code
+Padding Margin
 Panic Log
 Parking Fee
 Parking Portal
@@ -706,6 +714,7 @@ Print Status
 Priority Order
 Production Code
 Production Draft
+Production Value
 Program Feed
 Program File
 Program Flow
@@ -760,6 +769,7 @@ Reference Frame
 Reference Journal
 Reference Map
 Reference Rate
+Reference Value
 Referral Fee
 Referral Feed
 Refund Fee
@@ -808,6 +818,7 @@ Response Cost
 Response Rate
 Response Sheet
 Retail Chain
+Retail Value
 Retention Fee
 Retention List
 Return Cash
@@ -819,6 +830,7 @@ Return Log
 Return Scale
 Return Statement
 Return Status
+Return Value
 Review Companion
 Review History
 Review Journal
@@ -827,6 +839,7 @@ Review Zone
 Rider Panel
 Rider Portal
 Rider Score
+Rights Value
 Rim Tracker
 Roaming List
 Roster Duty
@@ -840,7 +853,9 @@ Royalty Charge
 Royalty Fee
 Rubric Sample
 Rubric Score
+Safe Margin
 Safe Route
+Safety Margin
 Safety Route
 Salary Alert
 Salary Allowance
@@ -862,6 +877,7 @@ Scholarship Log
 Scholarship Status
 Screening Charge
 Screening Scale
+Season Fine
 Season List
 Season Office
 Season Order
@@ -951,7 +967,9 @@ Tenant Register
 Terminal Map
 Terminal Rate
 Terminal Report
+Terminal Value
 Termination Line
+Termination Value
 Testimony Sample
 Thermostat Note
 Thesis Statement
@@ -1009,6 +1027,7 @@ Union Score
 Union Table
 Union Tag
 Utility Allowance
+Utility Margin
 Utility Portal
 Vacancy Chart
 Vacancy Circular

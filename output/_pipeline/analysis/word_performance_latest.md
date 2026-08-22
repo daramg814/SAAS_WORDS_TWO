@@ -1,7 +1,7 @@
 # 단어 성과 리포트 (자동 생성)
 
-- 생성 시각: 2026-08-21T02:46:07.513072+09:00
-- 누적 통과율: 1052/105457 = 1.00%
+- 생성 시각: 2026-08-23T02:58:56.360775+09:00
+- 누적 통과율: 1071/108301 = 0.99%
 - 은퇴 기능어: 42개 (`config/retired_function_words.csv`)
 
 ## 기능어 통과율 상위 (시도 100회 이상)
@@ -31,32 +31,32 @@
 
 ## 은퇴 대상(통과 0 / 시도 300회 이상)
 
-Almanac, Anchor, Blueprint, Book, Catalog, Checklist, Cockpit, Codex, Compendium, Dashboard, Deal, Depot, Dial, Digest, Dock, Dossier, Excerpt, Flag, Grade, Guard, Guidebook, Hotline, Insight, Lens, Lock, Meter, Metrics, Navigator, Node, Organizer, Pilot, Pulse, Queue, Roadmap, Sentry, Snapshot, Suite, Sync, Tally, Toll, Toolkit, Workbench
+Almanac, Anchor, Blueprint, Book, Catalog, Checklist, Cockpit, Codex, Compendium, Dashboard, Deal, Depot, Dial, Digest, Dock, Dossier, Excerpt, Flag, Grade, Guard, Guidebook, Hotline, Insight, Lens, Lock, Meter, Metrics, Navigator, Node, Organizer, Pilot, Profit, Pulse, Queue, Roadmap, Sentry, Snapshot, Suite, Sync, Tally, Toll, Toolkit, Workbench
 
 ## 도메인어 통과율 상위 (시도 30회 이상)
 
 | 도메인어 | 통과 | 시도 | 통과율 |
 |---|---|---|---|
-| Transfer | 14 | 150 | 9.33% |
-| License | 11 | 141 | 7.80% |
-| Union | 10 | 146 | 6.85% |
-| Chat | 11 | 172 | 6.40% |
-| Closing | 9 | 150 | 6.00% |
-| Strike | 8 | 142 | 5.63% |
-| Conversion | 9 | 166 | 5.42% |
-| Salary | 8 | 148 | 5.41% |
-| Smoke | 8 | 150 | 5.33% |
-| Return | 9 | 172 | 5.23% |
-| Family | 9 | 173 | 5.20% |
-| Membership | 9 | 173 | 5.20% |
-| Fuel | 9 | 174 | 5.17% |
-| Vacancy | 6 | 120 | 5.00% |
-| Ratio | 8 | 161 | 4.97% |
-| Chart | 8 | 162 | 4.94% |
-| Billing | 8 | 167 | 4.79% |
-| Agent | 7 | 150 | 4.67% |
+| Transfer | 14 | 155 | 9.03% |
+| License | 11 | 145 | 7.59% |
+| Union | 10 | 149 | 6.71% |
+| Chat | 11 | 175 | 6.29% |
+| Conversion | 10 | 169 | 5.92% |
+| Closing | 9 | 155 | 5.81% |
+| Return | 10 | 176 | 5.68% |
+| Strike | 8 | 147 | 5.44% |
+| Salary | 8 | 152 | 5.26% |
+| Smoke | 8 | 155 | 5.16% |
+| Family | 9 | 178 | 5.06% |
+| Membership | 9 | 178 | 5.06% |
+| Fuel | 9 | 179 | 5.03% |
+| Ratio | 8 | 166 | 4.82% |
+| Vacancy | 6 | 125 | 4.80% |
+| Chart | 8 | 167 | 4.79% |
+| Billing | 8 | 172 | 4.65% |
 | Grading | 8 | 172 | 4.65% |
-| Payment | 8 | 172 | 4.65% |
+| Reference | 8 | 175 | 4.57% |
+| Payment | 8 | 176 | 4.55% |
 
 > 해석 가이드: 새 기능어를 제안할 때는 상위 표의 패턴(실제 검색되는 구체적
 > 명사)을 닮게, 은퇴 목록의 패턴(전문용어풍 합성어)은 피한다. Keyword
